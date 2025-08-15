@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonizar</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/tone@14.7.58/build/Tone.js"></script>
+    <script src="assets/scripts.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Harmonizar</h1>
+        <p>Herramienta para explorar armonías y progresiones</p>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('scales-chords-tab', event)">Escalas y Acordes</button>
+            <button class="tab-button" onclick="openTab('piano-tab', event)">Nota pedal</button>
+        </div>
+
+        <div id="scales-chords-tab" class="tab-content active">
+            <div class="selector-box">
+                <div class="selector-group">
+                    <label for="semitonos-dropdown">Tonalidad:</label>
+                    <select id="semitonos-dropdown"></select>
+                </div>
+                <div class="selector-group">
+                    <label for="escalas-dropdown">Escalas:</label>
+                    <select id="escalas-dropdown"></select>
+                </div>
+                <div class="selector-group">
+                    <label for="acordes-dropdown">Acordes:</label>
+                    <select id="acordes-dropdown"></select>
+                </div>
+            </div>
+            
+            <div id="resultado-box" class="result-box">
+                </div>
+
+            <div id="contexto-box" class="context-box">
+                </div>
+
+            <div id="progression-container" class="progression-section">
+                <h2>Progresión de Acordes</h2>
+                <div id="progression-builder" class="progression-builder">
+                    </div>
+                <div class="progression-controls">
+                    <button id="toggle-progression-btn" class="control-button stopped">
+                        <span class="play-icon">▶</span>
+                        <span class="stop-icon">■</span>
+                    </button>
+                    <button id="clear-progression-btn" class="control-button">Limpiar</button>
+                    <button id="generate-random-btn" class="control-button">Generar Aleatorio</button>
+                    <div class="drum-control">
+                        <label for="drum-volume">Batería:</label>
+                        <select id="drum-loop-select">
+                            <option value="drumloop.wav">Loop 1</option>
+                            <option value="drumloop2.wav">Loop 2</option>
+                            <option value="drumloop3.wav">Loop 3</option>
+                        </select>
+                        <input type="range" id="drum-volume" min="0" max="1" step="0.1" value="0.5" class="volume-slider">
+                    </div><div class="metronome-section">
+    <h2>Metrónomo</h2>
+    <div class="metronome-controls">
+        <button id="toggle-metronome-btn" class="control-button stopped">
+            <span class="play-icon">▶</span>
+            <span class="stop-icon">■</span>
+        </button>
+        <div class="bpm-control">
+            <label for="bpm-slider">Tempo (BPM):</label>
+            <input type="range" id="bpm-slider" min="60" max="180" value="120">
+            <span id="bpm-value">120</span>
+        </div>
+        <div class="volume-control">
+            <label for="metronome-volume">Volumen:</label>
+            <input type="range" id="metronome-volume" min="0" max="1" value="0.75" step="0.01">
+        </div>
+    </div>
+</div>
+                    
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div id="piano-tab" class="tab-content" style="display: none;">
+            <div class="piano-box">
+               
+                <div class="piano-controls">
+                    <label for="note-volume">Volumen:</label>
+                    <input type="range" id="note-volume" min="-30" max="0" step="1" value="-10" class="volume-slider">
+                </div>
+                <div class="piano-keyboard">
+                    <div class="note-btn white" data-note="Do">C</div>
+                    <div class="note-btn black" data-note="Do#">C#</div>
+                    <div class="note-btn white" data-note="Re">D</div>
+                    <div class="note-btn black" data-note="Re#">D#</div>
+                    <div class="note-btn white" data-note="Mi">E</div>
+                    <div class="note-btn white" data-note="Fa">F</div>
+                    <div class="note-btn black" data-note="Fa#">F#</div>
+                    <div class="note-btn white" data-note="Sol">G</div>
+                    <div class="note-btn black" data-note="Sol#">G#</div>
+                    <div class="note-btn white" data-note="La">A</div>
+                    <div class="note-btn black" data-note="La#">A#</div>
+                    <div class="note-btn white" data-note="Si">B</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p> </p>
+    </footer>
+
+</body>
+</html>

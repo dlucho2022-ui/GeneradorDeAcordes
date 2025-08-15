@@ -179,160 +179,212 @@ footer {
     box-shadow: 0 0 8px #6a0dad;
 }
 
-.acorde-btn.playing {
-    background-color: #9b59b6;
-    color: #fff;
-    box-shadow: 0 0 10px #9b59b6;
-}
-
-.add-to-progression {
-    background-color: #2ecc71;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    font-size: 1.2em;
-    cursor: pointer;
-    margin-left: 5px;
-    line-height: 1;
-    vertical-align: top;
-    transform: translateY(1px);
+.acorde-btn.playing-chord {
+    background-color: #ff6347; /* Tomate */
+    color: #212121;
+    box-shadow: 0 0 10px #ff6347;
 }
 
 .progression-section {
-    background-color: #2c2c2c;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    margin-top: 30px;
+}
+
+.progression-section h2 {
     text-align: center;
+    border-bottom: 2px solid #6a0dad;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .progression-builder {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
     gap: 10px;
+    border: 2px dashed #444;
+    padding: 15px;
+    border-radius: 8px;
     min-height: 60px;
-    padding: 10px;
-    border: 1px dashed #444;
+}
+
+.progression-chord {
+    background-color: #383838;
     border-radius: 5px;
-    margin-bottom: 15px;
-}
-
-.progression-acorde {
-    position: relative;
-}
-
-.remove-acorde {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #e74c3c;
-    color: #fff;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.9em;
-    line-height: 1.1;
+    padding: 10px 15px;
     cursor: pointer;
+    transition: background-color 0.2s;
     text-align: center;
+    position: relative;
+    border: 1px solid #444;
+}
+
+.progression-chord:hover {
+    background-color: #ff6347;
+}
+
+.progression-chord.playing-chord {
+    background-color: #6a0dad;
+    animation: pulse 1s infinite alternate;
+}
+
+.chord-name-display {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.chord-notes-display {
+    font-size: 0.8em;
+    color: #b0b0b0;
+}
+
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 5px #6a0dad;
+    }
+    to {
+        box-shadow: 0 0 20px #6a0dad;
+    }
 }
 
 .progression-controls {
     display: flex;
     justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Para que los botones se adapten en pantallas pequeñas */
     gap: 15px;
-}
-
-.control-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    color: #fff;
-    transition: background-color 0.3s;
-}
-
-.control-button:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-}
-
-#toggle-progression-btn {
-    background-color: #2ecc71;
-}
-
-#toggle-progression-btn.stopped .play-icon {
-    display: inline;
-}
-
-#toggle-progression-btn.stopped .stop-icon {
-    display: none;
-}
-
-#toggle-progression-btn.playing {
-    background-color: #e74c3c;
-}
-
-#toggle-progression-btn.playing .play-icon {
-    display: none;
-}
-
-#toggle-progression-btn.playing .stop-icon {
-    display: inline;
-}
-
-#clear-progression-btn {
-    background-color: #e67e22;
-}
-
-#generate-random-progression-btn {
-    background-color: #3498db;
-}
-
-/* Nota pedal (Piano tab) */
-.piano-box {
-    background-color: #2c2c2c;
-    padding: 30px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    text-align: center;
-}
-
-.keyboard {
-    display: flex;
-    justify-content: center;
     margin-top: 20px;
 }
 
-.key {
-    width: 50px;
-    height: 150px;
-    background-color: #f0f0f0;
-    border: 1px solid #000;
-    border-radius: 0 0 5px 5px;
+.control-button {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.2s;
+}
+
+.control-button:hover {
+    background-color: #7b2edb;
+}
+
+.control-button.stopped .stop-icon { display: none; }
+.control-button.playing .play-icon { display: none; }
+.control-button.playing { background-color: #ff6347; }
+.control-button.playing:hover { background-color: #e5533c; }
+
+.drum-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.volume-slider {
+    width: 80px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: #444;
+    border-radius: 4px;
+    outline: none;
+    transition: opacity .2s;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #9370db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #9370db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Piano interactivo */
+.piano-box {
+    text-align: center;
+}
+
+.piano-box h2 {
+    color: #6a0dad;
+    margin-bottom: 20px;
+}
+
+.piano-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.piano-keyboard {
     position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.note-btn {
+    position: relative;
+    border: 1px solid #212121;
     box-sizing: border-box;
+    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    padding-bottom: 5px;
-    font-size: 0.9em;
+    font-weight: bold;
     user-select: none;
+    transition: background-color 0.2s;
 }
 
-.black-key {
-    position: absolute;
-    width: 30px;
-    height: 100px;
-    background-color: #000;
+.note-btn.white {
+    background-color: #f0f0f0;
+    color: #212121;
+    width: 50px;
+    height: 180px;
     z-index: 1;
+    margin-right: -10px;
+    padding-bottom: 10px;
+}
+
+.note-btn.white:hover, .note-btn.white.active {
+    background-color: #9370db;
+    color: #212121;
+}
+
+.note-btn.black {
+    background-color: #212121;
+    color: #f0f0f0;
+    width: 30px;
+    height: 120px;
+    margin-right: -10px;
+    z-index: 2;
     margin-left: -15px;
-    margin-right: -15px;
-    border-radius: 0 0 5px 5px;
-    box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.6);
+    padding-bottom: 5px;
+}
+
+.note-btn.black:hover, .note-btn.black.active {
+    background-color: #9370db;
+    color: #212121;
+}
+/* Nuevo estilo para el control de volumen del metrónomo */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+}
+
+#metronome-volume {
+    width: 100px;
 }

@@ -54,68 +54,31 @@
                         <span class="stop-icon">■</span>
                     </button>
                     <button id="clear-progression-btn" class="control-button">Limpiar</button>
-                    <button id="generate-random-btn" class="control-button">Generar Aleatorio</button>
-                    <div class="drum-control">
-                        <label for="drum-volume">Batería:</label>
-                        <select id="drum-loop-select">
-                            <option value="drumloop.wav">Loop 1</option>
-                            <option value="drumloop2.wav">Loop 2</option>
-                            <option value="drumloop3.wav">Loop 3</option>
-                        </select>
-                        <input type="range" id="drum-volume" min="0" max="1" step="0.1" value="0.5" class="volume-slider">
-                    </div><div class="metronome-section">
-    <h2>Metrónomo</h2>
-    <div class="metronome-controls">
-        <button id="toggle-metronome-btn" class="control-button stopped">
-            <span class="play-icon">▶</span>
-            <span class="stop-icon">■</span>
-        </button>
-        <div class="bpm-control">
-            <label for="bpm-slider">Tempo (BPM):</label>
-            <input type="range" id="bpm-slider" min="60" max="180" value="120">
-            <span id="bpm-value">120</span>
-        </div>
-        <div class="volume-control">
-            <label for="metronome-volume">Volumen:</label>
-            <input type="range" id="metronome-volume" min="0" max="1" value="0.75" step="0.01">
-        </div>
-    </div>
-</div>
-                    
+                    <button id="generate-random-progression-btn" class="control-button">Aleatoria</button>
                 </div>
             </div>
         </div>
-
         
-
-        <div id="piano-tab" class="tab-content" style="display: none;">
-            <div class="piano-box">
-               
-                <div class="piano-controls">
-                    <label for="note-volume">Volumen:</label>
-                    <input type="range" id="note-volume" min="-30" max="0" step="1" value="-10" class="volume-slider">
+        <div id="piano-tab" class="tab-content">
+            <div class="selector-box">
+                <div class="selector-group">
+                    <label for="nota-pedal-dropdown">Nota Pedal:</label>
+                    <select id="nota-pedal-dropdown"></select>
                 </div>
-                <div class="piano-keyboard">
-                    <div class="note-btn white" data-note="Do">C</div>
-                    <div class="note-btn black" data-note="Do#">C#</div>
-                    <div class="note-btn white" data-note="Re">D</div>
-                    <div class="note-btn black" data-note="Re#">D#</div>
-                    <div class="note-btn white" data-note="Mi">E</div>
-                    <div class="note-btn white" data-note="Fa">F</div>
-                    <div class="note-btn black" data-note="Fa#">F#</div>
-                    <div class="note-btn white" data-note="Sol">G</div>
-                    <div class="note-btn black" data-note="Sol#">G#</div>
-                    <div class="note-btn white" data-note="La">A</div>
-                    <div class="note-btn black" data-note="La#">A#</div>
-                    <div class="note-btn white" data-note="Si">B</div>
+                <div class="selector-group">
+                    <label for="acordes-pedal-dropdown">Acordes:</label>
+                    <select id="acordes-pedal-dropdown"></select>
                 </div>
             </div>
+
+            <div id="piano-box" class="piano-box">
+                </div>
         </div>
 
     </main>
 
     <footer>
-        <p> </p>
+        <p>Hecho con ❤️ para músicos y estudiantes.</p>
     </footer>
 
 </body>

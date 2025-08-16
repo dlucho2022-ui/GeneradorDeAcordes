@@ -121,8 +121,6 @@
             function preloadSounds() {
                 console.log("--- Iniciando precarga de sonidos ---");
                 
-                // CORRECCIÓN: Se define una lista explícita de los 30 archivos de audio a cargar.
-                // Esto es más robusto y evita errores de cálculo.
                 const soundNoteNames = [
                     'B1', 'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2',
                     'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
@@ -207,13 +205,13 @@
                         }
 
                         if (index === currentNotes.length - 1) {
-                            const lastNoteDuration = noteObject.duration === 4 ? quarterNoteDuration : quarterNoteDuration / 2;
+                            const lastNoteDuration = quarterNoteDuration * (4 / noteObject.duration);
                             const finalTimeout = setTimeout(stopAllSounds, lastNoteDuration);
                             scheduledTimeouts.push(finalTimeout);
                         }
                     }, accumulatedDelay);
                     
-                    const noteDuration = noteObject.duration === 4 ? quarterNoteDuration : quarterNoteDuration / 2;
+                    const noteDuration = quarterNoteDuration * (4 / noteObject.duration);
                     accumulatedDelay += noteDuration;
                     scheduledTimeouts.push(timeoutId);
                 });
@@ -222,7 +220,6 @@
             function generateSheetMusic() {
                 if (!api) return;
                 
-                let notesForScore = [];
                 currentNotes = [];
                 let scoreString = '';
 
@@ -230,18 +227,27 @@
                     let beatsInMeasure = 0;
                     let measureNotes = [];
                     while (beatsInMeasure < 4) {
-                        if (Math.random() > 0.4) {
+                        const rand = Math.random();
+                        // Decidir aleatoriamente entre negra, corcheas o semicorcheas
+                        if (rand < 0.5) { // 50% Negra
                             const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
                             currentNotes.push({ note: randomNote, duration: 4 });
                             measureNotes.push(randomNote + '.4');
                             beatsInMeasure += 1;
-                        } else {
+                        } else if (rand < 0.85) { // 35% Corcheas
                             const randomNote1 = notePool[Math.floor(Math.random() * notePool.length)];
                             const randomNote2 = notePool[Math.floor(Math.random() * notePool.length)];
                             currentNotes.push({ note: randomNote1, duration: 8 });
                             currentNotes.push({ note: randomNote2, duration: 8 });
                             measureNotes.push(randomNote1 + '.8');
                             measureNotes.push(randomNote2 + '.8');
+                            beatsInMeasure += 1;
+                        } else { // 15% Semicorcheas
+                            for(let j=0; j<4; j++){
+                                const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
+                                currentNotes.push({ note: randomNote, duration: 16 });
+                                measureNotes.push(randomNote + '.16');
+                            }
                             beatsInMeasure += 1;
                         }
                     }

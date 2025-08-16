@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Práctica de Lectura a Primera Vista (Audio Real)</title>
+    <title>Práctica de Lectura a Primera Vista con VexFlow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Se utiliza la versión de VexFlow solicitada -->
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -29,8 +31,12 @@
             max-width: 800px;
             text-align: center;
         }
-        .at-viewport {
-             border-radius: 0.5rem;
+        #vexflow-output {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
         button {
             transition: all 0.3s ease;
@@ -43,17 +49,62 @@
             background-color: #9ca3af;
             cursor: not-allowed;
         }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Lector de Partituras con Sonido Real</h1>
-            <p class="text-gray-600 mt-2">Genera 4 compases de notas aleatorias y escúchalas.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Lector de Partituras con VexFlow</h1>
+            <p class="text-gray-600 mt-2">Personaliza y genera tu ejercicio de lectura a primera vista.</p>
         </header>
 
-        <div id="alpha-tab-container"></div>
+        <div id="vexflow-output"></div>
+
+        <!-- Panel de Controles -->
+        <div class="settings-grid">
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-blanca" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-blanca" class="font-medium">Blanca</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-negra" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-negra" class="font-medium">Negra</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-corcheas" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-corcheas" class="font-medium">2 Corcheas</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-semicorcheas" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-semicorcheas" class="font-medium">4 Semicorcheas</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-silencio-corchea" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-silencio-corchea" class="font-medium">Silencio de Corchea, Corchea</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-corchea-silencio" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-corchea-silencio" class="font-medium">Corchea, Silencio de Corchea</label>
+            </div>
+             <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-corchea-semis" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-corchea-semis" class="font-medium">Corchea, 2 Semicorcheas</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-semis-corchea" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-semis-corchea" class="font-medium">2 Semicorcheas, Corchea</label>
+            </div>
+        </div>
 
         <footer class="mt-8 flex flex-wrap justify-center items-center gap-6">
             <button id="generate-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
@@ -64,37 +115,43 @@
             </button>
             <div class="flex items-center gap-2 text-gray-700">
                 <label for="bpm-slider" class="font-medium">BPM:</label>
-                <input id="bpm-slider" type="range" min="40" max="220" value="120" class="w-32 cursor-pointer">
-                <span id="bpm-value" class="font-bold text-lg w-10 text-left">120</span>
+                <input id="bpm-slider" type="range" min="40" max="220" value="60" class="w-32 cursor-pointer">
+                <span id="bpm-value" class="font-bold text-lg w-10 text-left">60</span>
+            </div>
+            <div class="flex items-center justify-center gap-2 text-gray-700">
+                <input type="checkbox" id="metronome-toggle" class="h-5 w-5 rounded text-blue-600">
+                <label for="metronome-toggle" class="font-medium">Metrónomo</label>
             </div>
         </footer>
     </div>
-
-    <!-- Librería para visuales -->
-    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.js"></script>
     
     <script>
+        let isAppInitialized = false;
+
         window.addEventListener('load', () => {
-            if (typeof alphaTab === 'undefined') {
-                const container = document.querySelector('#alpha-tab-container');
-                container.innerText = "Error: La librería alphaTab no se pudo cargar.";
+            if (isAppInitialized) return;
+            isAppInitialized = true;
+
+            if (typeof Vex === 'undefined') {
+                document.querySelector('#vexflow-output').innerText = "Error: La librería VexFlow no se pudo cargar.";
                 return;
             }
 
-            const container = document.querySelector('#alpha-tab-container');
+            const { Renderer, Stave, StaveNote, Beam, Formatter, Voice, Accidental } = Vex.Flow;
+            const outputDiv = document.getElementById('vexflow-output');
             const generateBtn = document.getElementById('generate-btn');
             const playBtn = document.getElementById('play-btn');
             const bpmSlider = document.getElementById('bpm-slider');
             const bpmValue = document.getElementById('bpm-value');
+            const metronomeToggle = document.getElementById('metronome-toggle');
             
             const notePool = [
-                'B0', 'C1', 'C#1', 'Db1', 'D1', 'D#1', 'Eb1', 'E1', 'F1', 'F#1', 'Gb1', 'G1', 'G#1', 'Ab1', 'A1', 'A#1', 'Bb1', 'B1',
-                'C2', 'C#2', 'Db2', 'D2', 'D#2', 'Eb2', 'E2', 'F2', 'F#2', 'Gb2', 'G2', 'G#2', 'Ab2', 'A2', 'A#2', 'Bb2', 'B2',
-                'C3', 'C#3', 'Db3', 'D3', 'D#3', 'Eb3', 'E3'
+                'B1', 'C2', 'C#2', 'Db2', 'D2', 'D#2', 'Eb2', 'E2', 'F2', 'F#2', 'Gb2', 'G2', 'G#2', 'Ab2', 'A2', 'A#2', 'Bb2', 'B2',
+                'C3', 'C#3', 'Db3', 'D3', 'D#3', 'Eb3', 'E3', 'F3', 'F#3', 'Gb3', 'G3'
             ];
-            let api = null;
-            let currentNotes = [];
-            let bpm = 120;
+            let currentPlaybackSequence = [];
+            let bpm = 60;
+            let isMetronomeOn = false;
 
             let isPlaying = false;
             let scheduledTimeouts = [];
@@ -102,63 +159,47 @@
             
             const audioCache = {};
             const enharmonicMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
-
-            try {
-                api = new alphaTab.AlphaTabApi(container, { core: { tex: true } });
-            } catch (e) {
-                console.error("Error al inicializar alphaTab:", e);
-                container.innerText = "Hubo un error al inicializar el renderizador.";
-                return;
-            }
+            
+            const renderer = new Renderer(outputDiv, Renderer.Backends.SVG);
+            const context = renderer.getContext();
 
             function getAudioNoteName(writtenNote) {
                 const noteLetter = writtenNote.slice(0, -1);
                 const octave = writtenNote.slice(-1);
-                const enharmonicEquivalent = enharmonicMap[noteLetter];
-                return enharmonicEquivalent ? enharmonicEquivalent + octave : writtenNote;
+                return (enharmonicMap[noteLetter] || noteLetter) + octave;
             }
 
             function preloadSounds() {
-                console.log("--- Iniciando precarga de sonidos ---");
-                
                 const soundNoteNames = [
                     'B1', 'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2',
-                    'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
-                    'C4', 'C#4', 'D4', 'D#4', 'E4'
+                    'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3'
                 ];
-
+                
+                const metronomeFileName = 'metronomo.wav';
                 let soundsLoaded = 0;
-                const totalSounds = soundNoteNames.length;
-
-                if (totalSounds === 0) {
-                    playBtn.disabled = false;
-                    playBtn.innerText = 'Reproducir';
-                    return;
-                }
+                const totalSounds = soundNoteNames.length + 1;
                 playBtn.innerText = `Cargando 0/${totalSounds}`;
 
-                const onSoundLoad = (fileName) => {
+                const onSoundLoad = () => {
                     soundsLoaded++;
-                    console.log(`[${soundsLoaded}/${totalSounds}] ✅ ${fileName} cargado.`);
                     playBtn.innerText = `Cargando ${soundsLoaded}/${totalSounds}`;
                     if (soundsLoaded === totalSounds) {
                         playBtn.disabled = false;
                         playBtn.innerText = 'Reproducir';
-                        console.log("--- ¡Precarga de sonidos completada! ---");
                     }
                 };
+                
+                const metronomeSound = new Audio(`assets/notas-de-bajo/${metronomeFileName}`);
+                metronomeSound.addEventListener('canplaythrough', onSoundLoad, { once: true });
+                metronomeSound.addEventListener('error', onSoundLoad, { once: true });
+                audioCache['metronome'] = metronomeSound;
 
                 soundNoteNames.forEach(noteName => {
                     let fileName = noteName.replace('#', 's').toLowerCase() + '.wav';
                     let audioPath = `assets/notas-de-bajo/${fileName}`;
-                    
                     const sound = new Audio(audioPath);
-                    
-                    sound.addEventListener('canplaythrough', () => onSoundLoad(fileName), { once: true });
-                    sound.addEventListener('error', () => {
-                        console.error(`❌ Error al cargar ${audioPath}.`);
-                        onSoundLoad(fileName);
-                    }, { once: true });
+                    sound.addEventListener('canplaythrough', onSoundLoad, { once: true });
+                    sound.addEventListener('error', onSoundLoad, { once: true });
                     audioCache[noteName] = sound;
                 });
             }
@@ -169,14 +210,13 @@
                 if (currentlyPlayingSound) {
                     currentlyPlayingSound.pause();
                     currentlyPlayingSound.currentTime = 0;
-                    currentlyPlayingSound = null;
                 }
                 scheduledTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
                 scheduledTimeouts = [];
             }
 
-            function playNotes() {
-                if (currentNotes.length === 0) return;
+            function playSequence() {
+                if (currentPlaybackSequence.length === 0) return;
 
                 stopAllSounds();
                 isPlaying = true;
@@ -184,78 +224,148 @@
                 const quarterNoteDuration = (60 / bpm) * 1000;
                 let accumulatedDelay = 0;
 
-                currentNotes.forEach((noteObject, index) => {
-                    const timeoutId = setTimeout(() => {
+                if (isMetronomeOn) {
+                    const totalBeats = 4 * 4;
+                    for (let i = 0; i < totalBeats; i++) {
+                        scheduledTimeouts.push(setTimeout(() => {
+                            const metronomeSound = audioCache['metronome'];
+                            if (metronomeSound) {
+                                metronomeSound.currentTime = 0;
+                                metronomeSound.play();
+                            }
+                        }, i * quarterNoteDuration));
+                    }
+                }
+
+                currentPlaybackSequence.forEach((item, index) => {
+                    scheduledTimeouts.push(setTimeout(() => {
                         if (currentlyPlayingSound) {
                             currentlyPlayingSound.pause();
                             currentlyPlayingSound.currentTime = 0;
                         }
-
-                        const audioNote = getAudioNoteName(noteObject.note);
-                        const noteLetter = audioNote.slice(0, -1);
-                        const writtenOctave = parseInt(audioNote.slice(-1), 10);
-                        const soundOctave = writtenOctave + 1;
-                        const soundNoteName = noteLetter + soundOctave;
                         
-                        const sound = audioCache[soundNoteName];
-                        if (sound) {
-                            sound.currentTime = 0;
-                            currentlyPlayingSound = sound;
-                            sound.play().catch(e => console.error(`No se pudo reproducir ${sound.src}:`, e));
+                        if (item.note !== 'rest') {
+                            const soundNoteName = getAudioNoteName(item.note);
+                            
+                            const sound = audioCache[soundNoteName];
+                            if (sound) {
+                                sound.volume = 1.0;
+                                sound.currentTime = 0;
+                                currentlyPlayingSound = sound;
+                                sound.play().catch(e => console.error(`No se pudo reproducir ${sound.src}:`, e));
+                            }
                         }
 
-                        if (index === currentNotes.length - 1) {
-                            const lastNoteDuration = quarterNoteDuration * (4 / noteObject.duration);
-                            const finalTimeout = setTimeout(stopAllSounds, lastNoteDuration);
-                            scheduledTimeouts.push(finalTimeout);
+                        if (index === currentPlaybackSequence.length - 1) {
+                            const lastNoteDuration = quarterNoteDuration * (4 / item.duration);
+                            scheduledTimeouts.push(setTimeout(stopAllSounds, lastNoteDuration));
                         }
-                    }, accumulatedDelay);
+                    }, accumulatedDelay));
                     
-                    const noteDuration = quarterNoteDuration * (4 / noteObject.duration);
+                    const noteDuration = quarterNoteDuration * (4 / item.duration);
                     accumulatedDelay += noteDuration;
-                    scheduledTimeouts.push(timeoutId);
                 });
             }
 
             function generateSheetMusic() {
-                if (!api) return;
-                
-                currentNotes = [];
-                let scoreString = '';
+                let newPlaybackSequence = [];
+                const numMeasures = 4;
 
-                for (let i = 0; i < 4; i++) {
-                    let beatsInMeasure = 0;
-                    let measureNotes = [];
-                    while (beatsInMeasure < 4) {
-                        const rand = Math.random();
-                        // Decidir aleatoriamente entre negra, corcheas o semicorcheas
-                        if (rand < 0.5) { // 50% Negra
-                            const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
-                            currentNotes.push({ note: randomNote, duration: 4 });
-                            measureNotes.push(randomNote + '.4');
-                            beatsInMeasure += 1;
-                        } else if (rand < 0.85) { // 35% Corcheas
-                            const randomNote1 = notePool[Math.floor(Math.random() * notePool.length)];
-                            const randomNote2 = notePool[Math.floor(Math.random() * notePool.length)];
-                            currentNotes.push({ note: randomNote1, duration: 8 });
-                            currentNotes.push({ note: randomNote2, duration: 8 });
-                            measureNotes.push(randomNote1 + '.8');
-                            measureNotes.push(randomNote2 + '.8');
-                            beatsInMeasure += 1;
-                        } else { // 15% Semicorcheas
-                            for(let j=0; j<4; j++){
-                                const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
-                                currentNotes.push({ note: randomNote, duration: 16 });
-                                measureNotes.push(randomNote + '.16');
-                            }
-                            beatsInMeasure += 1;
-                        }
+                const allPatterns = {
+                    blanca: { value: 8, pattern: [{ duration: 'h', isNote: true }] },
+                    negra: { value: 4, pattern: [{ duration: 'q', isNote: true }] },
+                    corcheas: { value: 4, pattern: [{ duration: '8', isNote: true }, { duration: '8', isNote: true }] },
+                    semicorcheas: { value: 4, pattern: [{ duration: '16', isNote: true }, { duration: '16', isNote: true }, { duration: '16', isNote: true }, { duration: '16', isNote: true }] },
+                    'silencio-corchea': { value: 4, pattern: [{ duration: '8r', isNote: false }, { duration: '8', isNote: true }] },
+                    'corchea-silencio': { value: 4, pattern: [{ duration: '8', isNote: true }, { duration: '8r', isNote: false }] },
+                    'corchea-semis': { value: 4, pattern: [{ duration: '8', isNote: true }, { duration: '16', isNote: true }, { duration: '16', isNote: true }] },
+                    'semis-corchea': { value: 4, pattern: [{ duration: '16', isNote: true }, { duration: '16', isNote: true }, { duration: '8', isNote: true }] }
+                };
+                
+                let activePatterns = [];
+                for (const key in allPatterns) {
+                    const checkbox = document.getElementById(`pattern-${key}`);
+                    if (checkbox && checkbox.checked) {
+                        activePatterns.push(allPatterns[key]);
                     }
-                    scoreString += measureNotes.join(' ') + ' | ';
+                }
+                
+                if (activePatterns.length === 0) {
+                    activePatterns.push(allPatterns.negra); // Failsafe
                 }
 
-                const score = `\\clef f4 \\ts 4 4 ${scoreString}`;
-                api.tex(score);
+                let measures = [];
+                for (let i = 0; i < numMeasures; i++) {
+                    let sixteenthsInMeasure = 0;
+                    let measureNotes = [];
+                    while (sixteenthsInMeasure < 16) {
+                        const sixteenthsLeft = 16 - sixteenthsInMeasure;
+                        const possiblePatterns = activePatterns.filter(p => p.value <= sixteenthsLeft);
+                        
+                        if (possiblePatterns.length === 0) {
+                             const restValue = Math.min(sixteenthsLeft, 4);
+                             const restDuration = {4: 'qr', 2: '8r', 1: '16r'}[restValue] || '16r';
+                             measureNotes.push(new StaveNote({ keys: ['d/3'], duration: restDuration, clef: 'bass' }));
+                             newPlaybackSequence.push({ note: 'rest', duration: parseInt(restDuration.replace('r','')) });
+                             sixteenthsInMeasure += restValue;
+                             continue;
+                        }
+
+                        const pattern = possiblePatterns[Math.floor(Math.random() * possiblePatterns.length)];
+                        
+                        pattern.pattern.forEach(block => {
+                            const isRest = !block.isNote;
+                            const randomNote = isRest ? 'd/3' : notePool[Math.floor(Math.random() * notePool.length)];
+                            
+                            const vexNote = new StaveNote({
+                                keys: [isRest ? 'd/3' : randomNote.replace(/([A-G])(#|b)?(\d)/, '$1$2/$3').toLowerCase()],
+                                duration: block.duration,
+                                clef: 'bass',
+                                auto_stem: true
+                            });
+
+                            if (!isRest) {
+                                const noteName = randomNote.slice(0, -1);
+                                if (noteName.includes('#')) vexNote.addModifier(new Accidental('#'));
+                                if (noteName.includes('b')) vexNote.addModifier(new Accidental('b'));
+                                newPlaybackSequence.push({ note: randomNote, duration: parseInt(block.duration.replace('r','').replace('h','2').replace('q','4')) });
+                            } else {
+                                newPlaybackSequence.push({ note: 'rest', duration: parseInt(block.duration.replace('r','').replace('h','2').replace('q','4')) });
+                            }
+                            measureNotes.push(vexNote);
+                        });
+                        sixteenthsInMeasure += pattern.value;
+                    }
+                    measures.push(measureNotes);
+                }
+                
+                currentPlaybackSequence = newPlaybackSequence;
+
+                context.clear();
+                const measuresPerLine = 2; // <-- CORRECCIÓN CLAVE
+                const staveWidth = (outputDiv.clientWidth / measuresPerLine) - 15;
+                const totalHeight = 150 * Math.ceil(numMeasures / measuresPerLine);
+                renderer.resize(outputDiv.clientWidth, totalHeight);
+
+                let staveX = 5;
+                let staveY = 20;
+                measures.forEach((notes, i) => {
+                    if (i > 0 && i % measuresPerLine === 0) {
+                        staveX = 5;
+                        staveY += 150;
+                    }
+                    const stave = new Stave(staveX, staveY, staveWidth);
+                    if(i === 0) stave.addClef('bass').addTimeSignature('4/4');
+                    stave.setContext(context).draw();
+
+                    const beams = Beam.generateBeams(notes, {
+                        groups: [new Vex.Flow.Fraction(2, 8)]
+                    });
+                    Formatter.FormatAndDraw(context, stave, notes);
+                    beams.forEach(beam => beam.setContext(context).draw());
+                    
+                    staveX += stave.getWidth();
+                });
             }
 
             generateBtn.addEventListener('click', () => {
@@ -267,7 +377,7 @@
                 if (isPlaying) {
                     stopAllSounds();
                 } else {
-                    playNotes();
+                    playSequence();
                 }
             });
 
@@ -277,6 +387,10 @@
                 if (isPlaying) {
                     stopAllSounds();
                 }
+            });
+
+            metronomeToggle.addEventListener('change', (e) => {
+                isMetronomeOn = e.target.checked;
             });
 
             generateSheetMusic();

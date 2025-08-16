@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Práctica de Lectura a Primera Vista con alphaTab</title>
+    <title>Práctica de Lectura a Primera Vista (Híbrido)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
@@ -39,116 +39,167 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        button:disabled {
-            background-color: #9ca3af;
-            cursor: not-allowed;
-        }
-        #error-log {
-            color: #ef4444;
-            margin-top: 1rem;
-            font-weight: 500;
-        }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Práctica con alphaTab</h1>
-            <p class="text-gray-600 mt-2">Genera y escucha 4 notas aleatorias en clave de Fa.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Lector de Partituras Híbrido</h1>
+            <p class="text-gray-600 mt-2">Genera 4 compases de notas aleatorias y escúchalas.</p>
         </header>
 
         <div id="alpha-tab-container"></div>
-        <div id="error-log"></div>
 
-        <footer class="mt-8 flex flex-wrap justify-center gap-4">
+        <footer class="mt-8 flex flex-wrap justify-center items-center gap-6">
             <button id="generate-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
                 Generar Partitura
             </button>
-            <button id="play-pause-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md" disabled>
-                Cargando Audio...
+            <button id="play-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
+                Reproducir
             </button>
+            <div class="flex items-center gap-2 text-gray-700">
+                <label for="bpm-slider" class="font-medium">BPM:</label>
+                <input id="bpm-slider" type="range" min="40" max="220" value="120" class="w-32 cursor-pointer">
+                <span id="bpm-value" class="font-bold text-lg w-10 text-left">120</span>
+            </div>
         </footer>
     </div>
 
+    <!-- Librería para visuales -->
     <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.js"></script>
+    <!-- Librería para audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.min.js"></script>
+
     <script>
         window.addEventListener('load', () => {
             const container = document.querySelector('#alpha-tab-container');
             const generateBtn = document.getElementById('generate-btn');
-            const playPauseBtn = document.getElementById('play-pause-btn');
-            const errorLog = document.getElementById('error-log');
+            const playBtn = document.getElementById('play-btn');
+            const bpmSlider = document.getElementById('bpm-slider');
+            const bpmValue = document.getElementById('bpm-value');
             
-            const notePool = ['G2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3'];
+            const notePool = [
+                'B0', 'C1', 'D1', 'E1', 'F1', 'G1', 'A1', 'B1',
+                'C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2',
+                'C3', 'D3', 'E3'
+            ];
             let api = null;
-            let isAudioReady = false; // Flag para controlar si el audio cargó
+            let currentNotes = [];
+            let bpm = 120;
 
-            const settings = {
-                core: { tex: true },
-                player: {
-                    enablePlayer: true,
-                    soundFont: "https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/soundfonts/sonivox.sf2",
-                }
-            };
+            let isPlaying = false;
+            let scheduledTimeouts = [];
+            let activeSounds = [];
 
             try {
-                api = new alphaTab.AlphaTabApi(container, settings);
+                api = new alphaTab.AlphaTabApi(container, { core: { tex: true } });
             } catch (e) {
                 console.error("Error al inicializar alphaTab:", e);
-                errorLog.innerText = "Error crítico al iniciar. Si usas Brave, prueba a desactivar los escudos.";
+                container.innerText = "Hubo un error al cargar el renderizador de partituras.";
                 return;
+            }
+
+            const noteFrequencies = {
+                'B0': 30.87, 'C1': 32.70, 'D1': 36.71, 'E1': 41.20, 'F1': 43.65, 'G1': 49.00, 'A1': 55.00, 'B1': 61.74,
+                'C2': 65.41, 'D2': 73.42, 'E2': 82.41, 'F2': 87.31, 'G2': 98.00, 'A2': 110.00, 'B2': 123.47,
+                'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+                'C4': 261.63, 'D4': 293.66, 'E4': 329.63
+            };
+
+            function stopAllSounds() {
+                isPlaying = false;
+                playBtn.innerText = 'Reproducir';
+                activeSounds.forEach(sound => sound.stop());
+                activeSounds = [];
+                scheduledTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+                scheduledTimeouts = [];
+            }
+
+            function playNotes() {
+                if (currentNotes.length === 0) return;
+
+                stopAllSounds();
+                isPlaying = true;
+                playBtn.innerText = 'Detener';
+                const noteDuration = 0.3;
+                // La duración entre notas ahora depende del BPM
+                const delayBetweenNotes = (60 / bpm) * 1000;
+
+                currentNotes.forEach((noteName, index) => {
+                    const timeoutId = setTimeout(() => {
+                        const noteLetter = noteName.slice(0, -1);
+                        const writtenOctave = parseInt(noteName.slice(-1), 10);
+                        const soundOctave = writtenOctave + 1;
+                        const soundNoteName = noteLetter + soundOctave;
+                        const freq = noteFrequencies[soundNoteName];
+
+                        if (freq) {
+                            const sound = new Pz.Sound({
+                                source: 'wave',
+                                options: { type: 'sine', frequency: freq, attack: 0.01, release: 0.2 }
+                            });
+                            activeSounds.push(sound);
+                            sound.play();
+                            setTimeout(() => {
+                                sound.stop();
+                                const soundIndex = activeSounds.indexOf(sound);
+                                if (soundIndex > -1) activeSounds.splice(soundIndex, 1);
+                            }, noteDuration * 1000);
+                        } else {
+                            console.warn(`Frecuencia no encontrada para: ${soundNoteName}`);
+                        }
+
+                        if (index === currentNotes.length - 1) {
+                            setTimeout(stopAllSounds, noteDuration * 1000 + 100);
+                        }
+                    }, index * delayBetweenNotes);
+                    scheduledTimeouts.push(timeoutId);
+                });
             }
 
             function generateSheetMusic() {
                 if (!api) return;
-                try {
-                    if (api.player) {
-                        api.player.stop();
-                    }
-                    let notes = [];
-                    for (let i = 0; i < 4; i++) {
-                        const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
-                        notes.push(randomNote + '.4');
-                    }
-                    const score = `\\clef f4 \\ts 4 4 ${notes.join(' ')}`;
-                    api.tex(score);
-                    errorLog.innerText = ""; 
-                } catch(e) {
-                    console.error("Error al generar la partitura:", e);
-                    errorLog.innerText = "No se pudo generar la partitura. La librería podría estar bloqueada.";
+                
+                let notesForScore = [];
+                currentNotes = [];
+
+                for (let i = 0; i < 16; i++) {
+                    const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
+                    currentNotes.push(randomNote);
+                    notesForScore.push(randomNote + '.4');
                 }
+                
+                let scoreString = notesForScore.slice(0, 4).join(' ') + ' | ' +
+                                  notesForScore.slice(4, 8).join(' ') + ' | ' +
+                                  notesForScore.slice(8, 12).join(' ') + ' | ' +
+                                  notesForScore.slice(12, 16).join(' ');
+
+                const score = `\\clef f4 \\ts 4 4 ${scoreString}`;
+                api.tex(score);
             }
 
-            // --- LÓGICA DE REPRODUCCIÓN CON TIMEOUT ---
-            api.playerReady.on(ready => {
-                if (ready) {
-                    isAudioReady = true; // El audio cargó exitosamente
-                    playPauseBtn.disabled = false;
-                    playPauseBtn.innerText = 'Reproducir';
+            // --- EVENTOS ---
+            generateBtn.addEventListener('click', () => {
+                stopAllSounds();
+                generateSheetMusic();
+            });
+
+            playBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    stopAllSounds();
+                } else {
+                    playNotes();
                 }
             });
 
-            api.playerStateChanged.on(e => {
-                const isPlaying = e.state === alphaTab.model.PlayerState.Playing;
-                if (!playPauseBtn.disabled) {
-                    playPauseBtn.innerText = isPlaying ? 'Detener' : 'Reproducir';
+            bpmSlider.addEventListener('input', (e) => {
+                bpm = parseInt(e.target.value, 10);
+                bpmValue.innerText = bpm;
+                if (isPlaying) {
+                    stopAllSounds();
                 }
             });
-            
-            playPauseBtn.addEventListener('click', () => {
-                if(api && isAudioReady) api.player.playPause();
-            });
-
-            generateBtn.addEventListener('click', generateSheetMusic);
-
-            // Temporizador para manejar el fallo de carga del audio
-            setTimeout(() => {
-                if (!isAudioReady) {
-                    playPauseBtn.innerText = 'Audio no disponible';
-                    playPauseBtn.disabled = true;
-                    errorLog.innerText = 'El audio no pudo cargar. Si usas Brave, desactiva los escudos y recarga la página.';
-                }
-            }, 15000); // 15 segundos de espera
 
             generateSheetMusic();
         });

@@ -388,3 +388,27 @@ footer {
 #metronome-volume {
     width: 100px;
 }
+
+nav ul{
+    padding: 0;                   ;
+    display: flex;
+    gap: 1em;
+    justify-content:center;
+    align-items: center;
+    list-style: none;
+    background-color: #212121;
+    height: 4em;
+}
+
+nav ul li a{
+    text-decoration: none;
+    color:#e0e0e0;
+    border: 1px solid white;
+    border-radius: 0.5em;
+    padding: 0.5em;
+    text-align: center;
+}
+
+nav ul li a:hover{
+    background-color:#7b2edb;
+}

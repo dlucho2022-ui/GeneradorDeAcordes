@@ -39,6 +39,10 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -55,8 +59,8 @@
             <button id="generate-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
                 Generar Partitura
             </button>
-            <button id="play-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
-                Reproducir
+            <button id="play-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md" disabled>
+                Cargando...
             </button>
             <div class="flex items-center gap-2 text-gray-700">
                 <label for="bpm-slider" class="font-medium">BPM:</label>
@@ -71,12 +75,10 @@
     
     <script>
         window.addEventListener('load', () => {
-            // --- VERIFICACIÓN ROBUSTA DE LA LIBRERÍA ---
             if (typeof alphaTab === 'undefined') {
                 const container = document.querySelector('#alpha-tab-container');
-                container.innerText = "Error: La librería alphaTab no se pudo cargar. Revisa tu conexión o el bloqueador de scripts.";
-                console.error("El objeto alphaTab no está definido. La librería no se cargó.");
-                return; // Detener la ejecución si la librería no está
+                container.innerText = "Error: La librería alphaTab no se pudo cargar.";
+                return;
             }
 
             const container = document.querySelector('#alpha-tab-container');
@@ -96,24 +98,69 @@
 
             let isPlaying = false;
             let scheduledTimeouts = [];
-            let activeSounds = [];
+            let currentlyPlayingSound = null;
+            
+            const audioCache = {};
 
             try {
                 api = new alphaTab.AlphaTabApi(container, { core: { tex: true } });
             } catch (e) {
                 console.error("Error al inicializar alphaTab:", e);
-                container.innerText = "Hubo un error al inicializar el renderizador de partituras.";
+                container.innerText = "Hubo un error al inicializar el renderizador.";
                 return;
+            }
+
+            function preloadSounds() {
+                const notesToPreload = new Set();
+                notePool.forEach(noteName => {
+                    const noteLetter = noteName.slice(0, -1);
+                    const writtenOctave = parseInt(noteName.slice(-1), 10);
+                    const soundOctave = writtenOctave + 1;
+                    notesToPreload.add(noteLetter + soundOctave);
+                });
+
+                const uniqueNotes = Array.from(notesToPreload);
+                let soundsLoaded = 0;
+                const totalSounds = uniqueNotes.length;
+
+                if (totalSounds === 0) {
+                    playBtn.disabled = false;
+                    playBtn.innerText = 'Reproducir';
+                    return;
+                }
+                playBtn.innerText = `Cargando 0/${totalSounds}`;
+
+                const onSoundLoad = (fileName) => {
+                    soundsLoaded++;
+                    playBtn.innerText = `Cargando ${soundsLoaded}/${totalSounds}`;
+                    if (soundsLoaded === totalSounds) {
+                        playBtn.disabled = false;
+                        playBtn.innerText = 'Reproducir';
+                    }
+                };
+
+                uniqueNotes.forEach(noteName => {
+                    let fileName = noteName.replace('#', 's').toLowerCase() + '.wav';
+                    let audioPath = `assets/notas-de-bajo/${fileName}`;
+                    
+                    const sound = new Audio(audioPath);
+                    
+                    sound.addEventListener('canplaythrough', () => onSoundLoad(fileName), { once: true });
+                    sound.addEventListener('error', () => {
+                        onSoundLoad(fileName);
+                    }, { once: true });
+                    audioCache[noteName] = sound;
+                });
             }
 
             function stopAllSounds() {
                 isPlaying = false;
                 playBtn.innerText = 'Reproducir';
-                activeSounds.forEach(sound => {
-                    sound.pause();
-                    sound.currentTime = 0;
-                });
-                activeSounds = [];
+                if (currentlyPlayingSound) {
+                    currentlyPlayingSound.pause();
+                    currentlyPlayingSound.currentTime = 0;
+                    currentlyPlayingSound = null;
+                }
                 scheduledTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
                 scheduledTimeouts = [];
             }
@@ -128,20 +175,29 @@
 
                 currentNotes.forEach((noteName, index) => {
                     const timeoutId = setTimeout(() => {
+                        if (currentlyPlayingSound) {
+                            currentlyPlayingSound.pause();
+                        }
+
                         const noteLetter = noteName.slice(0, -1);
                         const writtenOctave = parseInt(noteName.slice(-1), 10);
                         const soundOctave = writtenOctave + 1;
-                        let soundNoteName = noteLetter + soundOctave;
+                        const soundNoteName = noteLetter + soundOctave;
                         
-                        let fileName = soundNoteName.replace('#', 's') + '.mp3';
-                        let audioPath = `assets/notas-de-bajo/${fileName}`;
-
-                        const sound = new Audio(audioPath);
-                        activeSounds.push(sound);
-                        sound.play().catch(e => console.error(`No se pudo reproducir ${audioPath}:`, e));
+                        const sound = audioCache[soundNoteName];
+                        if (sound) {
+                            // CORRECCIÓN CLAVE: Resetear siempre el tiempo a 0 antes de reproducir.
+                            // Esto asegura que las notas repetidas se reinicien.
+                            sound.currentTime = 0; 
+                            currentlyPlayingSound = sound;
+                            sound.play().catch(e => console.error(`No se pudo reproducir ${sound.src}:`, e));
+                        } else {
+                            console.warn(`Sonido no precargado para: ${soundNoteName}`);
+                        }
 
                         if (index === currentNotes.length - 1) {
-                            setTimeout(stopAllSounds, delayBetweenNotes);
+                            const finalTimeout = setTimeout(stopAllSounds, delayBetweenNotes);
+                            scheduledTimeouts.push(finalTimeout);
                         }
                     }, index * delayBetweenNotes);
                     scheduledTimeouts.push(timeoutId);
@@ -191,6 +247,7 @@
             });
 
             generateSheetMusic();
+            preloadSounds();
         });
     </script>
 </body>

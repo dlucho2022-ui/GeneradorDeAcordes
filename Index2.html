@@ -104,6 +104,14 @@
                 <input type="checkbox" id="pattern-semis-corchea" class="h-4 w-4 rounded text-blue-600" checked>
                 <label for="pattern-semis-corchea" class="font-medium">2 Semicorcheas, Corchea</label>
             </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-negra-puntillo" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-negra-puntillo" class="font-medium">Negra con puntillo, Corchea</label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="pattern-corchea-puntillo" class="h-4 w-4 rounded text-blue-600" checked>
+                <label for="pattern-corchea-puntillo" class="font-medium">Corchea con puntillo, Semicorchea</label>
+            </div>
         </div>
 
         <footer class="mt-8 flex flex-wrap justify-center items-center gap-6">
@@ -137,7 +145,7 @@
                 return;
             }
 
-            const { Renderer, Stave, StaveNote, Beam, Formatter, Voice, Accidental } = Vex.Flow;
+            const { Renderer, Stave, StaveNote, Beam, Formatter, Voice, Accidental, Dot } = Vex.Flow;
             const outputDiv = document.getElementById('vexflow-output');
             const generateBtn = document.getElementById('generate-btn');
             const playBtn = document.getElementById('play-btn');
@@ -257,12 +265,14 @@
                         }
 
                         if (index === currentPlaybackSequence.length - 1) {
-                            const lastNoteDuration = quarterNoteDuration * (4 / item.duration);
+                            const durationValue = item.value / 4; // Convertir 16ths a negras
+                            const lastNoteDuration = quarterNoteDuration * durationValue;
                             scheduledTimeouts.push(setTimeout(stopAllSounds, lastNoteDuration));
                         }
                     }, accumulatedDelay));
                     
-                    const noteDuration = quarterNoteDuration * (4 / item.duration);
+                    const durationValue = item.value / 4; // Convertir 16ths a negras
+                    const noteDuration = quarterNoteDuration * durationValue;
                     accumulatedDelay += noteDuration;
                 });
             }
@@ -272,14 +282,16 @@
                 const numMeasures = 4;
 
                 const allPatterns = {
-                    blanca: { value: 8, pattern: [{ duration: 'h', isNote: true }] },
-                    negra: { value: 4, pattern: [{ duration: 'q', isNote: true }] },
-                    corcheas: { value: 4, pattern: [{ duration: '8', isNote: true }, { duration: '8', isNote: true }] },
-                    semicorcheas: { value: 4, pattern: [{ duration: '16', isNote: true }, { duration: '16', isNote: true }, { duration: '16', isNote: true }, { duration: '16', isNote: true }] },
-                    'silencio-corchea': { value: 4, pattern: [{ duration: '8r', isNote: false }, { duration: '8', isNote: true }] },
-                    'corchea-silencio': { value: 4, pattern: [{ duration: '8', isNote: true }, { duration: '8r', isNote: false }] },
-                    'corchea-semis': { value: 4, pattern: [{ duration: '8', isNote: true }, { duration: '16', isNote: true }, { duration: '16', isNote: true }] },
-                    'semis-corchea': { value: 4, pattern: [{ duration: '16', isNote: true }, { duration: '16', isNote: true }, { duration: '8', isNote: true }] }
+                    blanca: { value: 8, pattern: [{ duration: 'h', isNote: true, value: 8 }] },
+                    negra: { value: 4, pattern: [{ duration: 'q', isNote: true, value: 4 }] },
+                    corcheas: { value: 4, pattern: [{ duration: '8', isNote: true, value: 2 }, { duration: '8', isNote: true, value: 2 }] },
+                    semicorcheas: { value: 4, pattern: [{ duration: '16', isNote: true, value: 1 }, { duration: '16', isNote: true, value: 1 }, { duration: '16', isNote: true, value: 1 }, { duration: '16', isNote: true, value: 1 }] },
+                    'silencio-corchea': { value: 4, pattern: [{ duration: '8r', isNote: false, value: 2 }, { duration: '8', isNote: true, value: 2 }] },
+                    'corchea-silencio': { value: 4, pattern: [{ duration: '8', isNote: true, value: 2 }, { duration: '8r', isNote: false, value: 2 }] },
+                    'corchea-semis': { value: 4, pattern: [{ duration: '8', isNote: true, value: 2 }, { duration: '16', isNote: true, value: 1 }, { duration: '16', isNote: true, value: 1 }] },
+                    'semis-corchea': { value: 4, pattern: [{ duration: '16', isNote: true, value: 1 }, { duration: '16', isNote: true, value: 1 }, { duration: '8', isNote: true, value: 2 }] },
+                    'negra-puntillo': { value: 8, pattern: [{ duration: 'qd', isNote: true, value: 6 }, { duration: '8', isNote: true, value: 2 }] },
+                    'corchea-puntillo': { value: 4, pattern: [{ duration: '8d', isNote: true, value: 3 }, { duration: '16', isNote: true, value: 1 }] }
                 };
                 
                 let activePatterns = [];
@@ -306,7 +318,7 @@
                              const restValue = Math.min(sixteenthsLeft, 4);
                              const restDuration = {4: 'qr', 2: '8r', 1: '16r'}[restValue] || '16r';
                              measureNotes.push(new StaveNote({ keys: ['d/3'], duration: restDuration, clef: 'bass' }));
-                             newPlaybackSequence.push({ note: 'rest', duration: parseInt(restDuration.replace('r','')) });
+                             newPlaybackSequence.push({ note: 'rest', duration: restDuration, value: restValue });
                              sixteenthsInMeasure += restValue;
                              continue;
                         }
@@ -319,18 +331,22 @@
                             
                             const vexNote = new StaveNote({
                                 keys: [isRest ? 'd/3' : randomNote.replace(/([A-G])(#|b)?(\d)/, '$1$2/$3').toLowerCase()],
-                                duration: block.duration,
+                                duration: block.duration.replace('d',''),
                                 clef: 'bass',
                                 auto_stem: true
                             });
+
+                            if (block.duration.includes('d')) {
+                                Dot.buildAndAttach([vexNote], { all: true });
+                            }
 
                             if (!isRest) {
                                 const noteName = randomNote.slice(0, -1);
                                 if (noteName.includes('#')) vexNote.addModifier(new Accidental('#'));
                                 if (noteName.includes('b')) vexNote.addModifier(new Accidental('b'));
-                                newPlaybackSequence.push({ note: randomNote, duration: parseInt(block.duration.replace('r','').replace('h','2').replace('q','4')) });
+                                newPlaybackSequence.push({ note: randomNote, duration: block.duration, value: block.value });
                             } else {
-                                newPlaybackSequence.push({ note: 'rest', duration: parseInt(block.duration.replace('r','').replace('h','2').replace('q','4')) });
+                                newPlaybackSequence.push({ note: 'rest', duration: block.duration, value: block.value });
                             }
                             measureNotes.push(vexNote);
                         });
@@ -342,15 +358,14 @@
                 currentPlaybackSequence = newPlaybackSequence;
 
                 context.clear();
-                const measuresPerLine = 2; // <-- CORRECCIÓN CLAVE
-                const staveWidth = (outputDiv.clientWidth / measuresPerLine) - 15;
-                const totalHeight = 150 * Math.ceil(numMeasures / measuresPerLine);
+                const staveWidth = (outputDiv.clientWidth / Math.min(numMeasures, 2)) - 15;
+                const totalHeight = 150 * Math.ceil(numMeasures / 2);
                 renderer.resize(outputDiv.clientWidth, totalHeight);
 
                 let staveX = 5;
                 let staveY = 20;
                 measures.forEach((notes, i) => {
-                    if (i > 0 && i % measuresPerLine === 0) {
+                    if (i > 0 && i % 2 === 0) {
                         staveX = 5;
                         staveY += 150;
                     }

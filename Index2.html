@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Lectura a Primera Vista con alphaTab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #1a202c;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        .at-viewport {
+             border-radius: 0.5rem;
+        }
+        button {
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        #error-log {
+            color: #ef4444;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Práctica con alphaTab</h1>
+            <p class="text-gray-600 mt-2">Genera y escucha 4 notas aleatorias en clave de Fa.</p>
+        </header>
+
+        <div id="alpha-tab-container"></div>
+        <div id="error-log"></div>
+
+        <footer class="mt-8 flex flex-wrap justify-center gap-4">
+            <button id="generate-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
+                Generar Partitura
+            </button>
+            <button id="play-pause-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md" disabled>
+                Cargando Audio...
+            </button>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const container = document.querySelector('#alpha-tab-container');
+            const generateBtn = document.getElementById('generate-btn');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const errorLog = document.getElementById('error-log');
+            
+            const notePool = ['G2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3'];
+            let api = null;
+            let isAudioReady = false; // Flag para controlar si el audio cargó
+
+            const settings = {
+                core: { tex: true },
+                player: {
+                    enablePlayer: true,
+                    soundFont: "https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/soundfonts/sonivox.sf2",
+                }
+            };
+
+            try {
+                api = new alphaTab.AlphaTabApi(container, settings);
+            } catch (e) {
+                console.error("Error al inicializar alphaTab:", e);
+                errorLog.innerText = "Error crítico al iniciar. Si usas Brave, prueba a desactivar los escudos.";
+                return;
+            }
+
+            function generateSheetMusic() {
+                if (!api) return;
+                try {
+                    if (api.player) {
+                        api.player.stop();
+                    }
+                    let notes = [];
+                    for (let i = 0; i < 4; i++) {
+                        const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
+                        notes.push(randomNote + '.4');
+                    }
+                    const score = `\\clef f4 \\ts 4 4 ${notes.join(' ')}`;
+                    api.tex(score);
+                    errorLog.innerText = ""; 
+                } catch(e) {
+                    console.error("Error al generar la partitura:", e);
+                    errorLog.innerText = "No se pudo generar la partitura. La librería podría estar bloqueada.";
+                }
+            }
+
+            // --- LÓGICA DE REPRODUCCIÓN CON TIMEOUT ---
+            api.playerReady.on(ready => {
+                if (ready) {
+                    isAudioReady = true; // El audio cargó exitosamente
+                    playPauseBtn.disabled = false;
+                    playPauseBtn.innerText = 'Reproducir';
+                }
+            });
+
+            api.playerStateChanged.on(e => {
+                const isPlaying = e.state === alphaTab.model.PlayerState.Playing;
+                if (!playPauseBtn.disabled) {
+                    playPauseBtn.innerText = isPlaying ? 'Detener' : 'Reproducir';
+                }
+            });
+            
+            playPauseBtn.addEventListener('click', () => {
+                if(api && isAudioReady) api.player.playPause();
+            });
+
+            generateBtn.addEventListener('click', generateSheetMusic);
+
+            // Temporizador para manejar el fallo de carga del audio
+            setTimeout(() => {
+                if (!isAudioReady) {
+                    playPauseBtn.innerText = 'Audio no disponible';
+                    playPauseBtn.disabled = true;
+                    errorLog.innerText = 'El audio no pudo cargar. Si usas Brave, desactiva los escudos y recarga la página.';
+                }
+            }, 15000); // 15 segundos de espera
+
+            generateSheetMusic();
+        });
+    </script>
+</body>
+</html>

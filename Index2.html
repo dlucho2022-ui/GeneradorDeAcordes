@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armonizar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="assets/images/iconapp.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="body-sheet-music">
+
+    <div class="wrapper">
+       <header>
+      
+        <nav>
+            <ul>
+                <li><a href="index.html">Generador de progresiones</a></li>
+                <li><a href="#" class="active-nav-link">Generador de partituras</a></li>
+                <li><a href="Index3.html">Generador de ondas</a></li>
+            </ul>
+        </nav>
+    </header>
+
+        <div id="osmd-container"></div>
+
+    </div>
+    
+    <!-- New PDF viewer container -->
+    <div id="pdf-viewer-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.9); z-index: 1000;">
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay"></div>
+    
+    <div id="controls-modal" class="control-section">
+        <div class="selector-container">
+            <label for="bpm-slider">BPM:</label>
+            <input type="range" id="bpm-slider" min="40" max="200" value="60">
+            <span id="bpm-value">60</span>
+        </div>
+        <div class="selector-container">
+            <label for="zoom-slider">Zoom:</label>
+            <input type="range" id="zoom-slider" min="0.5" max="1.5" value="1.0" step="0.1">
+            <span id="zoom-value">100%</span>
+        </div>
+         <div class="selector-container">
+            <label for="visual-guide-checkbox">Guía Visual</label>
+            <input type="checkbox" id="visual-guide-checkbox" checked>
+        </div>
+        <div class="selector-container">
+            <label for="autoscroll-checkbox">Autoscroll</label>
+            <input type="checkbox" id="autoscroll-checkbox" checked>
+        </div>
+        <div class="selector-container">
+            <label for="melody-volume-slider">Vol. Melodía:</label>
+            <input type="range" id="melody-volume-slider" min="-48" max="6" value="0" step="1">
+            <span id="melody-volume-value">0 dB</span>
+        </div>
+        <div class="selector-container">
+            <label for="metronome-volume-slider">Metrónomo:</label>
+            <input type="range" id="metronome-volume-slider" min="-48" max="0" value="-48" step="1">
+            <span id="metronome-volume-value">-Inf</span>
+        </div>
+        <div class="selector-container">
+            <label for="accompaniment-volume-slider">Acompañ.:</label>
+            <input type="range" id="accompaniment-volume-slider" min="-48" max="0" value="-48" step="1">
+            <span id="accompaniment-volume-value">-Inf</span>
+        </div>
+        <div class="selector-container">
+            <label for="fullscreen-button">Pantalla Completa</label>
+            <button id="fullscreen-button" class="button" style="flex-grow: 0; padding: 5px 15px; background-color: #333">Activar</button>
+        </div>
+    </div>
+
+    <div id="gear-modal" class="control-section">
+        <div class="selector-container">
+            <label for="key-selector">Tonalidad:</label>
+            <select id="key-selector">
+                <option value="C">Do Mayor</option>
+                <option value="G">Sol Mayor</option>
+                <option value="D">Re Mayor</option>
+                <option value="A">La Mayor</option>
+                <option value="E">Mi Mayor</option>
+                <option value="B">Si Mayor</option>
+                <option value="F#">Fa# Mayor</option>
+                <option value="C#">Do# Mayor</option>
+                <hr>
+                <option value="F">Fa Mayor</option>
+                <option value="Bb">Si♭ Mayor</option>
+                <option value="Eb">Mi♭ Mayor</option>
+                <option value="Ab">La♭ Mayor</option>
+                <option value="Db">Re♭ Mayor</option>
+                <option value="Gb">Sol♭ Mayor</option>
+                <option value="Cb">Do♭ Mayor</option>
+            </select>
+        </div>
+        <div class="selector-container">
+            <label for="measure-selector">Nº Compases:</label>
+            <input type="number" id="measure-selector" value="8" min="1" max="100" style="width: 70px; text-align: center;">
+        </div>
+        <div class="selector-container">
+            <label for="interval-slider">Salto Máx (semit.):</label>
+            <input type="range" id="interval-slider" min="1" max="12" value="5">
+            <span id="interval-value">5</span>
+        </div>
+         <div class="selector-container">
+            <label for="include-accidentals">Accidentales</label>
+            <input type="checkbox" id="include-accidentals">
+        </div>
+    </div>
+
+    <div id="notes-modal" class="control-section">
+        <div class="tabs">
+            <button class="tab-button active" data-tab="simple">Compás Simple</button>
+            <button class="tab-button" data-tab="compound">Compás Compuesto</button>
+        </div>
+        <div class="rhythm-patterns-container">
+            <div id="simple-rhythms" class="rhythm-patterns active">
+                <div class="selector-container">
+                    <label for="time-signature-selector-simple">Compás:</label>
+                    <select id="time-signature-selector-simple">
+                        <option value="4/4">4/4</option>
+                        <option value="3/4">3/4</option>
+                        <option value="5/4">5/4</option>
+                    </select>
+                </div>
+                <div class="selector-container"><label for="include-quarters">Negras</label><input type="checkbox" id="include-quarters" checked></div>
+                <div class="selector-container"><label for="include-eighths">Corcheas</label><input type="checkbox" id="include-eighths" checked></div>
+                <div class="selector-container"><label for="include-sixteenth-patterns">Patrones con Semicorcheas</label><input type="checkbox" id="include-sixteenth-patterns" checked></div>
+                <div class="selector-container"><label for="include-triplets">Tresillo de Corcheas</label><input type="checkbox" id="include-triplets" checked></div>
+                <div class="selector-container"><label for="include-quarter-triplets">Tresillo de Negras</label><input type="checkbox" id="include-quarter-triplets" checked></div>
+                <div class="selector-container"><label for="include-two-dotted-quarters">2 Negras con puntillo</label><input type="checkbox" id="include-two-dotted-quarters" checked></div>
+                <div class="selector-container"><label for="include-syncopations">Síncopas (varias)</label><input type="checkbox" id="include-syncopations" checked></div>
+            </div>
+            <div id="compound-rhythms" class="rhythm-patterns">
+                <div class="selector-container">
+                    <label for="time-signature-selector-compound">Compás:</label>
+                    <select id="time-signature-selector-compound">
+                        <option value="3/8">3/8</option>
+                        <option value="6/8" selected>6/8</option>
+                        <option value="9/8">9/8</option>
+                        <option value="12/8">12/8</option>
+                    </select>
+                </div>
+                <div class="selector-container"><label for="include-dotted-quarter">Negra con puntillo</label><input type="checkbox" id="include-dotted-quarter" checked></div>
+                <div class="selector-container"><label for="include-three-eighths">3 Corcheas</label><input type="checkbox" id="include-three-eighths" checked></div>
+                <div class="selector-container"><label for="include-eighth-duplet">Dosillo de Corcheas</label><input type="checkbox" id="include-eighth-duplet" checked></div>
+                <div class="selector-container"><label for="include-compound-rests">Patrones con Silencios</label><input type="checkbox" id="include-compound-rests" checked></div>
+                <div class="selector-container"><label for="include-compound-sixteenths">Patrones con Semicorcheas</label><input type="checkbox" id="include-compound-sixteenths" checked></div>
+            </div>
+        </div>
+    </div>
+
+
+    <button id="floating-play-stop-button" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M8 5v14l11-7z"/>
+        </svg>
+    </button>
+    <button id="floating-generate-button" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+    </button>
+    <button id="floating-settings-button" class="button">
+         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+        </svg>
+    </button>
+    <button id="floating-gear-button" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V2h-2v1.06C6.83 3.52 3.52 6.83 3.06 11H2v2h1.06c.46 4.17 3.77 7.48 7.94 7.94V22h2v-1.06c4.17-.46 7.48-3.77 7.94-7.94H22v-2h-1.06zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+        </svg>
+    </button>
+    <button id="floating-notes-button" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6zm-2 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+        </svg>
+    </button>
+
+    <!-- New floating button for Random PDF -->
+    <button id="floating-random-pdf-button" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M13 9h-2V7h2v2zm0 4h-2v-2h2v2zm0 4h-2v-2h2v2zm-2 4H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2h-6l-2 2z"/>
+        </svg>
+    </button>
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="assets/pdf_viewer.js"></script> <!-- Added this line -->
+    <script src="assets/scripts.js"></script>
+    <script src="assets/pdf_viewer.js"></script>
+    <script src="assets/scripts.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- CONFIGURACIÓN INICIAL ---
+            const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("osmd-container", 
+            {
+                autoResize: true, drawMeasureNumbers: false, drawTitle: false, drawPartNames: false, defaultColorMusic: "#111111", pageBackgroundColor: "#FFFFFF", followCursor: true, cursorsOptions: [{ type: 0, color: "rgb(128,0,128)", alpha: 0.3 }] 
+            });
+            
+            const sampler = new Tone.Sampler({
+                urls: { 'A0': 'A0.mp3', 'C1': 'C1.mp3', 'D#1': 'Ds1.mp3', 'F#1': 'Fs1.mp3', 'A1': 'A1.mp3', 'C2': 'C2.mp3', 'D#2': 'Ds2.mp3', 'F#2': 'Fs2.mp3', 'A2': 'A2.mp3', 'C3': 'C3.mp3', 'D#3': 'Ds3.mp3', 'F#3': 'Fs3.mp3', 'A3': 'A3.mp3', 'C4': 'C4.mp3', 'D#4': 'Ds4.mp3', 'F#4': 'Fs4.mp3', 'A4': 'A4.mp3', 'C5': 'C5.mp3', 'D#5': 'Ds5.mp3', 'F#5': 'Fs5.mp3', 'A5': 'A5.mp3', 'C6': 'C6.mp3', 'D#6': 'Ds6.mp3', 'F#6': 'Fs6.mp3', 'A6': 'A6.mp3', 'C7': 'C7.mp3', 'D#7': 'Ds7.mp3', 'F#7': 'Fs7.mp3', 'A7': 'A7.mp3', 'C8': 'C8.mp3' },
+                release: 1, baseUrl: "https://tonejs.github.io/audio/salamander/",
+            }).toDestination();
+
+            const metronomePlayer = new Tone.Player("assets/audios/metronome_click.wav").toDestination();
+            const accompanimentChords = { 'C': ['c-maj7.mp3', 'a-m7.mp3'], 'G': ['g-maj7.mp3', 'e-m7.mp3'], 'D': ['d-maj7.mp3', 'b-m7.mp3'], 'A': ['a-maj7.mp3', 'f-sharp-m7.mp3'], 'E': ['e-maj7.mp3', 'c-sharp-m7.mp3'], 'B': ['b-maj7.mp3', 'g-sharp-m7.mp3'], 'F#': ['f-sharp-maj7.mp3', 'd-sharp-m7.mp3'], 'C#': ['c-sharp-maj7.mp3', 'a-sharp-m7.mp3'], 'F': ['f-maj7.mp3', 'd-m7.mp3'], 'Bb': ['a-sharp-maj7.mp3', 'g-m7.mp3'], 'Eb': ['d-sharp-maj7.mp3', 'c-m7.mp3'], 'Ab': ['g-sharp-maj7.mp3', 'f-m7.mp3'], 'Db': ['c-sharp-maj7.mp3', 'a-sharp-m7.mp3'], 'Gb': ['f-sharp-maj7.mp3', 'd-sharp-m7.mp3'], 'Cb': ['b-maj7.mp3', 'g-sharp-m7.mp3'], };
+            const players = { 'chord1': new Tone.Player().toDestination(), 'chord2': new Tone.Player().toDestination() };
+
+            let allGeneratedNotes = []; 
+            let activeAudio = {}; 
+
+            const floatingPlayStopButton = document.getElementById('floating-play-stop-button');
+            const floatingGenerateButton = document.getElementById('floating-generate-button');
+            const floatingSettingsButton = document.getElementById('floating-settings-button');
+            const floatingGearButton = document.getElementById('floating-gear-button');
+            const floatingNotesButton = document.getElementById('floating-notes-button');
+            const fullscreenButton = document.getElementById('fullscreen-button');
+            
+            const controlsModal = document.getElementById('controls-modal');
+            const gearModal = document.getElementById('gear-modal');
+            const notesModal = document.getElementById('notes-modal');
+            const modalOverlay = document.getElementById('modal-overlay');
+
+            const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>`;
+            const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
+
+            function loadChords(key) {
+                const chordsData = accompanimentChords[key];
+                if (chordsData) {
+                    players.chord1.load(`assets/audios/${chordsData[0]}`).catch(e => console.error("Error al cargar acorde 1:", e));
+                    players.chord2.load(`assets/audios/${chordsData[1]}`).catch(e => console.error("Error al cargar acorde 2:", e));
+                }
+            }
+
+            const pitchMap = { 'Cb2': 23, 'B#1': 24, 'C2': 24, 'C#2': 25, 'Db2': 25, 'D2': 26, 'D#2': 27, 'Eb2': 27, 'E2': 28, 'Fb2': 28, 'E#2': 29, 'F2': 29, 'F#2': 30, 'Gb2': 30, 'G2': 31, 'G#2': 32, 'Ab2': 32, 'A2': 33, 'A#2': 34, 'Bb2': 34, 'B2': 35, 'Cb3': 35, 'B#2': 36, 'C3': 36, 'C#3': 37, 'Db3': 37, 'D3': 38, 'D#3': 39, 'Eb3': 39, 'E3': 40, 'Fb3': 40, 'E#3': 41, 'F3': 41, 'F#3': 42, 'Gb3': 42, 'G3': 43, 'G#3': 44, 'Ab3': 44, 'A3': 45, 'A#3': 46, 'Bb3': 46, 'B3': 47, 'Cb4': 47, 'B#3': 48, 'C4': 48, 'C#4': 49, 'Db4': 49, 'D4': 50, 'D#4': 51, 'Eb4': 51, 'E4': 52, 'Fb4': 52, 'F4': 53, 'E#4': 53, 'F#4': 54, 'Gb4': 54, 'G4': 55, 'G#4': 56, 'Ab4': 56, 'A4': 57, 'A#4': 58, 'Bb4': 58, 'B4': 59, 'Cb5': 59, 'B#4': 60, 'C5': 60 };
+            const keyData = { 'C':{fifths:0,notes:['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4']},'G':{fifths:1,notes:['C2','D2','E2','F#2','G2','A2','B2','C3','D3','E3','F#3','G3','A3','B3','C4','D4','E4','F#4','G4']},'D':{fifths:2,notes:['C#2','D2','E2','F#2','G2','A2','B2','C#3','D3','E3','F#3','G3','A3','B3','C#4','D4','E4','F#4','G4']},'A':{fifths:3,notes:['C#2','D2','E2','F#2','G#2','A2','B2','C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4','E4','F#4','G#4']},'E':{fifths:4,notes:['C#2','D#2','E2','F#2','G#2','A2','B2','C#3','D#3','E3','F#3','G#3','A3','B3','C#4','D#4','E4','F#4','G#4']},'B':{fifths:5,notes:['C#2','D#2','E2','F#2','G#2','A#2','B2','C#3','D#3','E3','F#3','G#3','A#3','B3','C#4','D#4','E4','F#4','G#4']},'F#':{fifths:6,notes:['C#2','D#2','E#2','F#2','G#2','A#2','B2','C#3','D#3','E#3','F#3','G#3','A#3','B3','C#4','D#4','E#4','F#4','G#4']},'C#':{fifths:7,notes:['C#2','D#2','E#2','F#2','G#2','A#2','B#2','C#3','D#3','E#3','F#3','G#3','A#3','B#3','C#4','D#4','E#4','F#4','G#4']},'F':{fifths:-1,notes:['C2','D2','E2','F2','G2','A2','Bb2','C3','D3','E3','F3','G3','A3','Bb3','C4','D4','E4','F4','G4']},'Bb':{fifths:-2,notes:['C2','D2','Eb2','F2','G2','A2','Bb2','C3','D3','Eb3','F3','G3','A3','Bb3','C4','D4','Eb4','F4','G4']},'Eb':{fifths:-3,notes:['C2','D2','Eb2','F2','G2','Ab2','Bb2','C3','D3','Eb3','F3','G3','Ab3','Bb3','C4','D4','Eb4','F4','G4']},'Ab':{fifths:-4,notes:['C2','Db2','Eb2','F2','G2','Ab2','Bb2','C3','Db3','Eb3','F3','G3','Ab3','Bb3','C4','Db4','Eb4','F4','G4']},'Db':{fifths:-5,notes:['C2','Db2','Eb2','F2','Gb2','Ab2','Bb2','C3','Db3','Eb3','F3','Gb3','Ab3','Bb3','C4','Db4','Eb4','F4','Gb4']},'Gb':{fifths:-6,notes:['Cb2','Db2','Eb2','F2','Gb2','Ab2','Bb2','Cb3','Db3','Eb3','F3','Gb3','Ab3','Bb3','Cb4','Db4','Eb4','F4','Gb4']},'Cb':{fifths:-7,notes:['Cb2','Db2','Eb2','Fb2','Gb2','Ab2','Bb2','Cb3','Db3','Eb3','Fb3','Gb3','Ab3','Bb3','Cb4','Db4','Eb4','Fb4','Gb4']} };
+            const simpleRhythmicBlocks = { 'quarters':{beats:1,notes:[{duration:'4n',type:'quarter',xml:12}]},'eighths':{beats:1,notes:[{duration:'8n',type:'eighth',xml:6},{duration:'8n',type:'eighth',xml:6}]},'sixteenths':{beats:1,notes:[{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3}]},'eighth-sixteenths':{beats:1,notes:[{duration:'8n',type:'eighth',xml:6},{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3}]},'sixteenths-eighth':{beats:1,notes:[{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3},{duration:'8n',type:'eighth',xml:6}]},'sixteenth-eighth-sixteenth':{beats:1,notes:[{duration:'16n',type:'16th',xml:3},{duration:'8n',type:'eighth',xml:6},{duration:'16n',type:'16th',xml:3}]},'syncopation':{beats:1,notes:[{duration:'8n',type:'eighth',xml:6,isRest:true},{duration:'8n',type:'eighth',xml:6}]},'triplets':{beats:1,notes:[{duration:'8t',type:'eighth',xml:4,isTuplet:'triplet'},{duration:'8t',type:'eighth',xml:4,isTuplet:'triplet'},{duration:'8t',type:'eighth',xml:4,isTuplet:'triplet'}]},'quarter-triplets':{beats:2,notes:[{duration:'4t',type:'quarter',xml:8,isTuplet:'triplet'},{duration:'4t',type:'quarter',xml:8,isTuplet:'triplet'},{duration:'4t',type:'quarter',xml:8,isTuplet:'triplet'}]},'two-dotted-quarters':{beats:3,notes:[{duration:'4n.',type:'quarter',xml:18,dot:true},{duration:'4n.',type:'quarter',xml:18,dot:true}]},'sixteenth-syncopation':{beats:1,notes:[{duration:'16n',type:'16th',xml:3,isRest:true},{duration:'8n.',type:'eighth',xml:9,dot:true}]},'long-syncopation':{beats:2,notes:[{duration:'8n',type:'eighth',xml:6},{duration:'4n',type:'quarter',xml:12},{duration:'8n',type:'eighth',xml:6}]} };
+            const compoundRhythmicBlocks = { 'dotted-quarter': { beats: 1.5, notes: [{ duration: '4n.', type: 'quarter', xml: 18, dot: true }] }, 'three-eighths': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'rest-quarter-eighth': { beats: 1.5, notes: [{ duration: '4n', type: 'quarter', xml: 12, isRest: true }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'rest-eighth-quarter': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6, isRest: true }, { duration: '4n', type: 'quarter', xml: 12 }] }, 'rest-eighth-two-eighths': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6, isRest: true }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'two-eighths-rest-eighth': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6, isRest: true }] }, 'eighth-rest-eighth': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6, isRest: true }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'eighth-duplet': { beats: 1.5, notes: [{ duration: '8n.', type: 'eighth', xml: 9, isTuplet: 'duplet' }, { duration: '8n.', type: 'eighth', xml: 9, isTuplet: 'duplet' }] }, 'two-sixteenths-two-eighths': { beats: 1.5, notes: [{ duration: '16n', type: '16th', xml: 3 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'two-eighths-sixteenths': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '16n', type: '16th', xml: 3 }] }, 'eighth-sixteenth-eighth': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '8n', type: 'eighth', xml: 6 }] } };
+
+            function generateAndRenderMeasure() {
+                if (Tone.Transport.state === 'started') { stopPlayback(); }
+                const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+                const numMeasures = parseInt(document.getElementById('measure-selector').value, 10);
+                const selectedKey = document.getElementById('key-selector').value;
+                const currentKeyData = keyData[selectedKey];
+                const diatonicNotePool = currentKeyData.notes;
+                const includeAccidentals = document.getElementById('include-accidentals').checked;
+                const maxDistance = parseInt(document.getElementById('interval-slider').value, 10);
+                let timeSignature, beatsPerMeasure, allowedBlocks, rhythmicBlocks;
+                if (activeTab === 'simple') { 
+                    timeSignature = document.getElementById('time-signature-selector-simple').value; 
+                    beatsPerMeasure = parseInt(timeSignature.split('/')[0], 10); 
+                    rhythmicBlocks = simpleRhythmicBlocks; 
+                    let blocks = [];
+                    if (document.getElementById('include-quarters')?.checked) blocks.push('quarters');
+                    if (document.getElementById('include-eighths')?.checked) blocks.push('eighths');
+                    if (document.getElementById('include-triplets')?.checked) blocks.push('triplets');
+                    if (document.getElementById('include-quarter-triplets')?.checked) blocks.push('quarter-triplets');
+                    if (document.getElementById('include-two-dotted-quarters')?.checked) blocks.push('two-dotted-quarters');
+                    if (document.getElementById('include-sixteenth-patterns')?.checked) blocks.push('sixteenths', 'sixteenths-eighth', 'eighth-sixteenths', 'sixteenth-eighth-sixteenth');
+                    if (document.getElementById('include-syncopations')?.checked) blocks.push('syncopation', 'sixteenth-syncopation', 'long-syncopation');
+                    allowedBlocks = blocks;
+                } else { 
+                    timeSignature = document.getElementById('time-signature-selector-compound').value; 
+                    const [beats, beatType] = timeSignature.split('/').map(Number); 
+                    beatsPerMeasure = beats / 3; 
+                    rhythmicBlocks = compoundRhythmicBlocks; 
+                    let blocks = [];
+                    if (document.getElementById('include-dotted-quarter')?.checked) blocks.push('dotted-quarter');
+                    if (document.getElementById('include-three-eighths')?.checked) blocks.push('three-eighths');
+                    if (document.getElementById('include-eighth-duplet')?.checked) blocks.push('eighth-duplet');
+                    if (document.getElementById('include-compound-rests')?.checked) {
+                        blocks.push('rest-quarter-eighth', 'rest-eighth-quarter', 'rest-eighth-two-eighths', 'two-eighths-rest-eighth', 'eighth-rest-eighth');
+                    }
+                    if (document.getElementById('include-compound-sixteenths')?.checked) {
+                        blocks.push('two-sixteenths-two-eighths', 'two-eighths-sixteenths', 'eighth-sixteenth-eighth');
+                    }
+                    allowedBlocks = blocks;
+                } 
+                if (allowedBlocks.length === 0) { allowedBlocks.push(activeTab === 'simple' ? 'quarters' : 'three-eighths'); }
+                let currentGeneratedNotes = []; let lastNoteName = null; for (let i = 0; i < numMeasures; i++) { let beatsInCurrentMeasure = 0; const totalBeatsInMeasure = activeTab === 'simple' ? beatsPerMeasure : beatsPerMeasure * 1.5; while (beatsInCurrentMeasure < totalBeatsInMeasure) { const remainingBeats = totalBeatsInMeasure - beatsInCurrentMeasure; let possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats <= remainingBeats); if (possibleBlocks.length === 0) { possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats === Math.min(...allowedBlocks.map(k => rhythmicBlocks[k].beats))); if (possibleBlocks.length === 0) possibleBlocks = [activeTab === 'simple' ? 'quarters' : 'three-eighths']; } const randomBlockKey = possibleBlocks[Math.floor(Math.random() * possibleBlocks.length)]; const blockInfo = rhythmicBlocks[randomBlockKey]; const blockNotes = []; blockInfo.notes.forEach((noteInfo, index) => { let currentNoteName, isChromatic = false; if (noteInfo.isRest) { currentNoteName = null; } else { if (lastNoteName === null) { currentNoteName = diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)]; } else { const lastNotePitch = pitchMap[lastNoteName]; const candidateNotes = diatonicNotePool.filter(noteName => { if (pitchMap[noteName] === undefined) return false; const notePitch = pitchMap[noteName]; return Math.abs(notePitch - lastNotePitch) <= maxDistance; }); currentNoteName = candidateNotes.length > 0 ? candidateNotes[Math.floor(Math.random() * candidateNotes.length)] : diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)]; } if (includeAccidentals && Math.random() < 0.05) { const currentPitch = pitchMap[currentNoteName]; const direction = Math.random() < 0.5 ? -1 : 1; const newPitch = currentPitch + direction; const allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch); if (allPossibleNames.length > 0) { const alteredNoteName = allPossibleNames[0]; if (!diatonicNotePool.includes(alteredNoteName)) { currentNoteName = alteredNoteName; isChromatic = true; } } } lastNoteName = currentNoteName; } const note = { name: currentNoteName, isChromatic, ...noteInfo }; if (note.isTuplet === 'triplet' || note.isTuplet === 'duplet' || note.isTuplet === 'quadruplet') { if (index === 0) note.tupletPosition = 'start'; if (index === blockInfo.notes.length - 1) note.tupletPosition = 'stop'; } blockNotes.push(note); }); addBeaming(blockNotes); currentGeneratedNotes.push(...blockNotes); beatsInCurrentMeasure += blockInfo.beats; } }
+                allGeneratedNotes = currentGeneratedNotes;
+                const musicXML = createMusicXML(allGeneratedNotes, numMeasures, currentKeyData.fifths, selectedKey, timeSignature);
+                osmd.load(musicXML).then(() => { osmd.zoom = parseFloat(document.getElementById('zoom-slider').value); osmd.render(); osmd.cursor.reset(); }).catch(e => console.error(e));
+                const [beats, beatType] = timeSignature.split('/').map(Number);
+                Tone.Transport.timeSignature = [beats, beatType];
+            }
+            function addBeaming(notes) {
+                const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+                if (activeTab === 'compound') {
+                    let beamGroups = [], currentGroup = [], groupBeats = 0; const beatsPerPulse = 1.5;
+                    notes.forEach(note => {
+                        let noteBeats = 0;
+                        if(note.type === 'eighth') noteBeats = 1.5 / 3;
+                        if(note.type === '16th') noteBeats = 1.5 / 6;
+                        if (!note.isRest && noteBeats > 0 && (groupBeats + noteBeats <= beatsPerPulse + 0.001)) { currentGroup.push(note); groupBeats += noteBeats; } else { if (currentGroup.length > 1) beamGroups.push(currentGroup); currentGroup = []; groupBeats = 0; if (!note.isRest && noteBeats > 0) { currentGroup.push(note); groupBeats += noteBeats; } }
+                    });
+                    if (currentGroup.length > 1) beamGroups.push(currentGroup);
+                    beamGroups.forEach(group => { group.forEach((note, index) => { note.beams = []; if (index === 0) note.beams.push({ number: 1, type: 'begin' }); else if (index === group.length - 1) note.beams.push({ number: 1, type: 'end' }); else note.beams.push({ number: 1, type: 'continue' }); if (note.type === '16th') { const prevIs16th = index > 0 && group[index - 1].type === '16th'; const nextIs16th = index < group.length - 1 && group[index + 1].type === '16th'; if (!prevIs16th) note.beams.push({ number: 2, type: 'begin' }); else if (!nextIs16th) note.beams.push({ number: 2, type: 'end' }); else note.beams.push({ number: 2, type: 'continue' }); } }); });
+                } else {
+                    let beamGroups = []; let currentGroup = [];
+                    notes.forEach(note => { if ((note.type === 'eighth' || note.type === '16th') && !note.isRest) { currentGroup.push(note); } else { if (currentGroup.length > 1) beamGroups.push(currentGroup); currentGroup = []; } });
+                    if (currentGroup.length > 1) beamGroups.push(currentGroup);
+                    beamGroups.forEach(group => { group.forEach((note, index) => { note.beams = []; const isFirstInGroup = index === 0; const isLastInGroup = index === group.length - 1; if (isFirstInGroup) note.beams.push({ number: 1, type: 'begin' }); else if (isLastInGroup) note.beams.push({ number: 1, type: 'end' }); else note.beams.push({ number: 1, type: 'continue' }); if (note.type === '16th') { const prevNote = group[index - 1]; const nextNote = group[index + 1]; const prevIs16th = prevNote && prevNote.type === '16th'; const nextIs16th = nextNote && nextNote.type === '16th'; if (!prevIs16th) note.beams.push({ number: 2, type: 'begin' }); else if (!nextIs16th) note.beams.push({ number: 2, type: 'end' }); else note.beams.push({ number: 2, type: 'continue' }); } }); });
+                }
+            }
+            function createMusicXML(notes, numMeasures, fifths, selectedKey, timeSignature) { const [beats, beatType] = timeSignature.split('/'); let measuresXML = '', noteIndex = 0; const measureCapacity = parseInt(beats, 10) * (beatType === '4' ? 12 : 6); for (let i = 0; i < numMeasures; i++) { measuresXML += `<measure number="${i + 1}">`; if (i === 0) measuresXML += `<attributes><divisions>12</divisions><key><fifths>${fifths}</fifths></key><time><beats>${beats}</beats><beat-type>${beatType}</beat-type></time><clef><sign>F</sign><line>4</line></clef></attributes>`; let currentMeasureDuration = 0; while (noteIndex < notes.length && currentMeasureDuration < measureCapacity) { const note = notes[noteIndex]; if (note.isRest) { measuresXML += `<note><rest/><duration>${note.xml}</duration><type>${note.type}</type></note>`; } else { const step = note.name.charAt(0); const octave = note.name.replace(/[^0-9]/g, ''); let alter = 0; if (note.name.includes('##') || note.name.includes('x')) { alter = 2; } else if (note.name.includes('#')) { alter = 1; } else if (note.name.includes('bb')) { alter = -2; } else if (note.name.includes('b')) { alter = -1; } let accidentalTag = ''; if (note.isChromatic) { if (alter > 0) { accidentalTag = `<accidental>${alter === 2 ? 'double-' : ''}sharp</accidental>`; } else if (alter < 0) { accidentalTag = `<accidental>${alter === -2 ? 'flat-' : ''}flat</accidental>`; } else { const diatonicNotesInKey = keyData[selectedKey].notes; if (diatonicNotesInKey.some(n => n.startsWith(step) && (n.includes('#') || n.includes('b')))) { accidentalTag = '<accidental>natural</accidental>'; } } } measuresXML += `<note><pitch><step>${step}</step><alter>${alter}</alter><octave>${octave}</octave></pitch><duration>${note.xml}</duration><type>${note.type}</type>`; let timeModificationTag = ''; if (note.isTuplet === 'triplet') { timeModificationTag = `<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>`; } else if (note.isTuplet === 'duplet') { timeModificationTag = `<time-modification><actual-notes>2</actual-notes><normal-notes>3</normal-notes></time-modification>`; }  else if (note.isTuplet === 'quadruplet') { timeModificationTag = `<time-modification><actual-notes>4</actual-notes><normal-notes>3</normal-notes></time-modification>`; } 
+                        const middleLinePitch = 38; const currentPitch = pitchMap[note.name]; const stemDirection = currentPitch >= middleLinePitch ? 'down' : 'up'; measuresXML += `${timeModificationTag}${accidentalTag}${note.dot ? '<dot/>' : ''}<stem>${stemDirection}</stem>`; 
+                        if (note.beams) { note.beams.forEach(beam => { measuresXML += `<beam number="${beam.number}">${beam.type}</beam>`; }); } if (note.tupletPosition) { measuresXML += `<notations><tuplet type="${note.tupletPosition}" number="1" bracket="yes"/></notations>`; } measuresXML += `</note>`; } currentMeasureDuration += note.xml; noteIndex++; if (noteIndex >= notes.length || currentMeasureDuration >= measureCapacity) break; } measuresXML += `</measure>`; } return `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd"><score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1">${measuresXML}</part></score-partwise>`; }
+
+            window.stopPlayback = function() {
+                if (Tone.Transport.state !== 'started') return;
+                Tone.Transport.stop(); Tone.Transport.cancel(); 
+                players.chord1.stop(); players.chord2.stop(); metronomePlayer.stop(); sampler.releaseAll();
+                if (activeAudio.part) activeAudio.part.dispose(); if (activeAudio.loop) activeAudio.loop.dispose(); if (activeAudio.sequence) activeAudio.sequence.dispose();
+                activeAudio = {};
+                if (osmd.cursor) osmd.cursor.hide();
+                floatingPlayStopButton.innerHTML = playIconSVG;
+                floatingPlayStopButton.classList.remove('is-playing');
+            }
+            
+            async function togglePlayback() {
+                await Tone.start();
+                if (Tone.Transport.state !== 'started') {
+                    const visualGuideCheckbox = document.getElementById('visual-guide-checkbox');
+                    
+                    const part = new Tone.Part((time, note) => {
+                        let duration = note.duration;
+                        if (note.isTuplet === 'quadruplet') {
+                            duration = Tone.Time('4n.').toSeconds() / 4;
+                        }
+                        if (!note.isRest) { sampler.triggerAttackRelease(note.name, duration, time); }
+                        Tone.Draw.schedule(() => { 
+                            if (osmd.cursor && Tone.Transport.state === 'started') {
+                                osmd.cursor.next();
+                                const autoscrollCheckbox = document.getElementById('autoscroll-checkbox');
+                                if (autoscrollCheckbox && autoscrollCheckbox.checked && osmd.cursor.cursorElement) {
+                                    osmd.cursor.cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            }
+                        }, time + Tone.Time(duration).toSeconds());
+                    });
+
+                    let currentTime = 0;
+                    allGeneratedNotes.forEach(note => { 
+                        let durationForScheduling = note.duration;
+                        if (note.isTuplet === 'quadruplet') {
+                            durationForScheduling = Tone.Time('4n.').toSeconds() / 4;
+                        }
+                        part.add(currentTime, note); 
+                        currentTime += Tone.Time(durationForScheduling).toSeconds(); 
+                    });
+                    activeAudio.part = part;
+                    part.start(0);
+                    
+                    const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+                    const metronomeInterval = activeTab === 'compound' ? '4n.' : '4n';
+                    const metronomeLoop = new Tone.Loop(time => { metronomePlayer.start(time); }, metronomeInterval).start(0);
+                    activeAudio.loop = metronomeLoop;
+
+                    const accompanimentSequence = new Tone.Sequence((time, chordIndex) => { const currentPlayer = chordIndex === 0 ? players.chord1 : players.chord2; const otherPlayer = chordIndex === 0 ? players.chord2 : players.chord1; otherPlayer.stop(time); if (currentPlayer.loaded) { currentPlayer.start(time); } }, [0, 1], '1m').start(0);
+                    accompanimentSequence.loop = true;
+                    activeAudio.sequence = accompanimentSequence;
+                    
+                    if (visualGuideCheckbox.checked) {
+                        osmd.cursor.cursorOptions.alpha = 0.3;
+                    } else {
+                        osmd.cursor.cursorOptions.alpha = 0.0;
+                    }
+                    osmd.cursor.show();
+                    osmd.cursor.reset();
+
+                    const numMeasures = parseInt(document.getElementById('measure-selector').value, 10);
+                    Tone.Transport.scheduleOnce(stopPlayback, `${numMeasures}m`);
+                    Tone.Transport.start('+0.1');
+                    floatingPlayStopButton.innerHTML = stopIconSVG;
+                    floatingPlayStopButton.classList.add('is-playing');
+                } else {
+                    stopPlayback();
+                }
+            }
+            
+            function toggleFullScreen() {
+                const doc = document.documentElement;
+                if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                    if (doc.requestFullscreen) { doc.requestFullscreen(); } 
+                    else if (doc.mozRequestFullScreen) { doc.mozRequestFullScreen(); } 
+                    else if (doc.webkitRequestFullscreen) { doc.webkitRequestFullscreen(); } 
+                    else if (doc.msRequestFullscreen) { doc.msRequestFullscreen(); }
+                    fullscreenButton.textContent = 'Salir';
+                } else {
+                    if (document.exitFullscreen) { document.exitFullscreen(); } 
+                    else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); } 
+                    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); } 
+                    else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+                    fullscreenButton.textContent = 'Activar';
+                }
+            }
+
+            floatingPlayStopButton.addEventListener('click', togglePlayback);
+            floatingGenerateButton.addEventListener('click', generateAndRenderMeasure);
+            fullscreenButton.addEventListener('click', toggleFullScreen);
+            
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) fullscreenButton.textContent = 'Activar';
+            });
+            
+            floatingSettingsButton.addEventListener('click', () => {
+                gearModal.style.display = 'none';
+                notesModal.style.display = 'none';
+                controlsModal.style.display = 'flex';
+                modalOverlay.classList.add('is-visible');
+            });
+
+            floatingGearButton.addEventListener('click', () => {
+                controlsModal.style.display = 'none';
+                notesModal.style.display = 'none';
+                gearModal.style.display = 'flex';
+                modalOverlay.classList.add('is-visible');
+            });
+
+            floatingNotesButton.addEventListener('click', () => {
+                controlsModal.style.display = 'none';
+                gearModal.style.display = 'none';
+                notesModal.style.display = 'flex';
+                modalOverlay.classList.add('is-visible');
+            });
+
+            modalOverlay.addEventListener('click', () => {
+                controlsModal.style.display = 'none';
+                gearModal.style.display = 'none';
+                notesModal.style.display = 'none';
+                modalOverlay.classList.remove('is-visible');
+            });
+
+            document.getElementById('key-selector').addEventListener('change', (e) => {
+                loadChords(e.target.value);
+                generateAndRenderMeasure();
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.rhythm-patterns').forEach(container => container.classList.remove('active'));
+                    button.classList.add('active');
+                    document.getElementById(`${button.dataset.tab}-rhythms`).classList.add('active');
+                    generateAndRenderMeasure();
+                });
+            });
+
+            const melodyVolumeSlider = document.getElementById('melody-volume-slider');
+            const melodyVolumeValue = document.getElementById('melody-volume-value');
+            sampler.volume.value = parseInt(melodyVolumeSlider.value, 10);
+            melodyVolumeSlider.addEventListener('input', e => {
+                const volumeDb = parseInt(e.target.value, 10);
+                sampler.volume.value = volumeDb;
+                melodyVolumeValue.textContent = `${volumeDb} dB`;
+            });
+
+            const metronomeSlider = document.getElementById('metronome-volume-slider');
+            const metronomeValueSpan = document.getElementById('metronome-volume-value');
+            metronomePlayer.volume.value = parseInt(metronomeSlider.value, 10);
+            metronomeSlider.addEventListener('input', e => {
+                const volumeDb = parseInt(e.target.value, 10);
+                metronomePlayer.volume.value = volumeDb;
+                metronomeValueSpan.textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
+            });
+
+            const accompanimentSlider = document.getElementById('accompaniment-volume-slider');
+            const accompanimentValueSpan = document.getElementById('accompaniment-volume-value');
+            const initialAccompanimentVol = parseInt(accompanimentSlider.value, 10);
+            players.chord1.volume.value = initialAccompanimentVol;
+            players.chord2.volume.value = initialAccompanimentVol;
+            accompanimentSlider.addEventListener('input', e => {
+                const volumeDb = parseInt(e.target.value, 10);
+                players.chord1.volume.value = volumeDb;
+                players.chord2.volume.value = volumeDb;
+                accompanimentValueSpan.textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
+            });
+
+            const bpmSlider = document.getElementById('bpm-slider');
+            const bpmValue = document.getElementById('bpm-value');
+            Tone.Transport.bpm.value = parseInt(bpmSlider.value, 10);
+            
+            bpmSlider.addEventListener('input', (e) => {
+                const newBpm = parseInt(e.target.value, 10);
+                Tone.Transport.bpm.value = newBpm;
+                bpmValue.textContent = newBpm;
+                stopPlayback();
+            });
+
+            const zoomSlider = document.getElementById('zoom-slider');
+            const zoomValue = document.getElementById('zoom-value');
+            zoomSlider.addEventListener('input', (e) => {
+                zoomValue.textContent = `${Math.round(parseFloat(e.target.value) * 100)}%`;
+            });
+            zoomSlider.addEventListener('change', (e) => {
+                osmd.zoom = parseFloat(e.target.value);
+                osmd.render();
+            });
+
+            const intervalSlider = document.getElementById('interval-slider');
+            const intervalValue = document.getElementById('interval-value');
+            intervalSlider.addEventListener('input', (e) => {
+                intervalValue.textContent = e.target.value;
+            });
+            
+            loadChords('C');
+            generateAndRenderMeasure();
+        });
+    </script>
+
+</body>
+</html>

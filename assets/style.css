@@ -1,0 +1,959 @@
+/* Estilos generales */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #212121; /* Gris muy oscuro */
+    color: #e0e0e0; /* Blanco apagado */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box; /* Añadido de Index2.html */
+    overflow-x: hidden; /* Añadido de Index2.html */
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: #2c2c2c; /* Gris oscuro */
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px; /* Añadido de Index2.html */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    color: #f0f0f0; /* Blanco */
+    margin-bottom: 15px;
+}
+
+header p {
+    margin: 5px 0 0;
+    font-size: 1.1em;
+    color: #b0b0b0; /* Gris claro */
+}
+
+main {
+    flex-grow: 1;
+    width: 90%;
+    max-width: 900px;
+    padding: 20px;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    background-color: #2c2c2c;
+    color: #b0b0b0;
+    margin-top: auto;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Navegación */
+nav ul {
+    padding: 0;
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    margin-top: 20px; /* Espacio adicional sobre la navegación */
+}
+
+nav ul li a{
+    text-decoration: none;
+    color:#bb86fc;
+    border-radius: 25px; /* Forma de píldora */
+    padding: 10px 20px; /* Relleno más generoso */
+    text-align: center;
+    font-weight: 700; /* Texto en negrita */
+    border: 1px solid #bb86fc; /* Borde sutil con el color del texto */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+nav ul li a:hover {
+    background-color: #7b2edb;
+    color: #f0f0f0; /* Cambia el color del texto al pasar el ratón */
+    border-color: #7b2edb; /* El borde coincide con el fondo */
+}
+
+nav ul li a.active-nav-link {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    font-weight: bold;
+    border-color: #6a0dad; /* El borde coincide con el fondo */
+}
+
+/* Pestañas (Tabs) - de index.html y Index2.html */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    width: 100%;
+    margin-bottom: -1px;
+}
+
+.tab-button {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-bottom: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-button:hover {
+    background-color: #444;
+}
+
+.tab-button.active {
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
+    color: #f0f0f0;
+    font-weight: bold;
+}
+
+/* Contenido de las pestañas - de index.html */
+.tab-content {
+    background-color: #2c2c2c;
+    padding: 30px;
+    border-radius: 0 5px 5px 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Controles del selector (tonalidad, escala, acorde) - de index.html */
+.selector-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.selector-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 150px;
+}
+
+.selector-group label {
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.selector-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #212121;
+    color: #f0f0f0;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.selector-group select:focus {
+    outline: none;
+    border-color: #6a0dad;
+    box-shadow: 0 0 5px #6a0dad;
+}
+
+/* Cajas de resultado y contexto - de index.html */
+.result-box, .context-box {
+    background-color: #212121;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #383838;
+    min-height: 80px;
+}
+
+.alteration {
+    font-size: 0.8em;
+    vertical-align: super;
+}
+
+.alteration.flat {
+    font-size: 1.1em;
+    vertical-align: baseline;
+}
+
+.no-chords-message {
+    color: #b0b0b0;
+}
+
+/* Acordes y progresión - de index.html */
+.acordes-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.acorde-btn {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    font-size: 1.1em;
+    display: inline-block;
+}
+
+.acorde-btn:hover {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    box-shadow: 0 0 8px #6a0dad;
+}
+
+.acorde-btn.playing-chord {
+    background-color: #ff6347; /* Tomate */
+    color: #212121;
+    box-shadow: 0 0 10px #ff6347;
+}
+
+.progression-section {
+    margin-top: 30px;
+}
+
+.progression-section h2 {
+    text-align: center;
+    border-bottom: 2px solid #6a0dad;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.progression-builder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    border: 2px dashed #444;
+    padding: 15px;
+    border-radius: 8px;
+    min-height: 60px;
+}
+
+.progression-chord {
+    background-color: #383838;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: center;
+    position: relative;
+    border: 1px solid #444;
+}
+
+.progression-chord:hover {
+    background-color: #ff6347;
+}
+
+.progression-chord.playing-chord {
+    background-color: #6a0dad;
+    animation: pulse 1s infinite alternate;
+}
+
+.chord-name-display {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.chord-notes-display {
+    font-size: 0.8em;
+    color: #b0b0b0;
+}
+
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 5px #6a0dad;
+    }
+    to {
+        box-shadow: 0 0 20px #6a0dad;
+    }
+}
+
+.progression-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Para que los botones se adapten en pantallas pequeñas */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.control-button {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.2s;
+}
+
+.control-button:hover {
+    background-color: #7b2edb;
+}
+
+.control-button.stopped .stop-icon { display: none; }
+.control-button.playing .play-icon { display: none; }
+.control-button.playing { background-color: #ff6347; }
+.control-button.playing:hover { background-color: #e5533c; }
+
+.drum-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.volume-slider {
+    width: 80px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: #444;
+    border-radius: 4px;
+    outline: none;
+    transition: opacity .2s;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #9370db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #9370db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Piano interactivo - de index.html */
+.piano-box {
+    text-align: center;
+}
+
+.piano-box h2 {
+    color: #6a0dad;
+    margin-bottom: 20px;
+}
+
+.piano-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.piano-keyboard {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.note-btn {
+    position: relative;
+    border: 1px solid #212121;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    font-weight: bold;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.note-btn.white {
+    background-color: #f0f0f0;
+    color: #212121;
+    width: 50px;
+    height: 180px;
+    z-index: 1;
+    margin-right: -10px;
+    padding-bottom: 10px;
+}
+
+.note-btn.white:hover, .note-btn.white.active {
+    background-color: #9370db;
+    color: #212121;
+}
+
+.note-btn.black {
+    background-color: #212121;
+    color: #f0f0f0;
+    width: 30px;
+    height: 120px;
+    margin-right: -10px;
+    z-index: 2;
+    margin-left: -15px;
+    padding-bottom: 5px;
+}
+
+.note-btn.black:hover, .note-btn.black.active {
+    background-color: #9370db;
+    color: #212121;
+}
+
+/* Nuevo estilo para el control de volumen del metrónomo - de index.html */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+}
+
+#metronome-volume {
+    width: 100px;
+}
+
+/* Player controls container - de index.html */
+.player-controls-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.control-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: #eee;
+}
+
+.control-box h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #eee;
+}
+
+.control-box .volume-control, .control-box .bpm-control, .control-box select {
+    margin-bottom: 10px;
+}
+
+.control-box label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.control-box input[type="range"] {
+    width: 150px;
+}
+
+.control-box select {
+    background-color: #555;
+    color: #eee;
+    border: 1px solid #777;
+    padding: 5px;
+    border-radius: 4px;
+}
+.control-box .control-button {
+    background-color: #555;
+    border: 1px solid #777;
+    color: #eee;
+}
+
+/* Estilos de Index2.html */
+#osmd-container {
+    width: 100%;
+    background-color: white;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.rhythm-patterns-container { width: 100%; }
+.rhythm-patterns { display: none; }
+.rhythm-patterns.active {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* .control-section ya está definido arriba, pero se repite en Index2.html con algunas propiedades */
+/* Se mantiene la definición de Index2.html para las propiedades específicas */
+.control-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    flex: 1;
+    min-width: 320px;
+    box-sizing: border-box;
+}
+
+.selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #383838;
+    padding: 8px 12px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
+}
+
+label, select, span, input[type="number"] { font-size: 16px; color: #e0e0e0; }
+
+select, input[type="number"] { 
+    border: 1px solid #444; 
+    border-radius: 5px; 
+    padding: 5px; 
+    background-color: #212121; 
+    color: #f0f0f0;
+}
+
+input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+input[type="range"] { width: 120px; cursor: pointer; }
+
+#bpm-value, #zoom-value, #interval-value, #metronome-volume-value, #accompaniment-volume-value, #melody-volume-value { 
+    font-weight: bold; 
+    min-width: 50px; 
+    text-align: right; 
+}
+
+.button {
+    border: none;
+    padding: 0px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    color: #f0f0f0;
+    flex-grow: 1;
+    max-width: 300px;
+}
+.button:active { transform: scale(0.98); }
+
+body.body-sheet-music #floating-play-stop-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background-color: #198754;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-playing */
+    background-color: #dc3545; /* Solid red for playing */
+    color: #fff;
+    animation: pulse 1s infinite;
+}
+#floating-play-stop-button:hover { opacity: 0.9; }
+
+#floating-generate-button {
+    position: fixed; top: 85px; left: 15px; z-index: 1000;
+    background-color: #6a0dad;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-generate-button:hover { background-color: #7b2edb; }
+
+#floating-settings-button {
+    position: fixed; top: 155px; left: 15px; z-index: 1000;
+    background-color: #0d6efd;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-settings-button:hover { background-color: #0b5ed7; }
+
+#floating-gear-button {
+    position: fixed; top: 225px; left: 15px; z-index: 1000;
+    background-color: #6c757d; /* Gris */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-gear-button:hover { background-color: #5a6268; }
+
+#floating-notes-button {
+    position: fixed; top: 295px; left: 15px; z-index: 1000;
+    background-color: #fd7e14; /* Naranja */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-notes-button:hover { background-color: #e66a00; }
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 1999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.modal-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+#controls-modal, #gear-modal, #notes-modal {
+    position: fixed;
+    top: 15px;
+    left: 85px;
+    z-index: 2000;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    body { padding: 15px 0; }
+    h1 { font-size: 1.8em; }
+    nav ul { flex-direction: column; gap: 10px; }
+    .button { width: 100%; max-width: 450px; }
+    #controls-modal, #gear-modal, #notes-modal {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 80px;
+    }
+}
+
+/* Estilos de Index3.html */
+.piano-container {
+    margin-top: 20px;
+    background-color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.piano-svg {
+    width: 100%;
+    max-width: 980px;
+    height: auto;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #222;
+}
+
+.white-key, .black-key {
+    stroke: #000;
+    stroke-width: 1;
+    cursor: pointer;
+    transition: fill 0.1s ease;
+}
+
+.white-key {
+    fill: #f0f0f0;
+}
+
+.black-key {
+    fill: #333;
+}
+
+.white-key.active {
+    fill: #9370db; /* MediumPurple */
+}
+
+.black-key.active {
+    fill: #9370db; /* MediumPurple */
+}
+
+.white-key:hover {
+    fill: #ccc;
+}
+
+.black-key:hover {
+    fill: #555;
+}
+
+/* Estilos para el control de volumen de piano en Index3.html */
+#piano-volume {
+    width: 200px;
+    margin-top: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: #444;
+    border-radius: 4px;
+    outline: none;
+    transition: opacity .2s;
+}
+
+#piano-volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #9370db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#piano-volume::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #9370db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+label[for="piano-volume"] {
+    color: #e0e0e0;
+    font-weight: bold;
+}
+
+/* Estilos para botones flotantes solo en index.html */
+body:not(.body-sheet-music) #floating-play-stop-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1001; /* Higher z-index */
+}
+
+body:not(.body-sheet-music) #floating-button-container {
+    position: fixed;
+    top: 85px; /* Position below the play button (15 + 60 + 10) */
+    left: 15px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+body:not(.body-sheet-music) .button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: #333; /* Default solid color */
+    color: #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+body:not(.body-sheet-music) .button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+body:not(.body-sheet-music) .button svg {
+    width: 24px;
+    height: 24px;
+}
+
+body:not(.body-sheet-music) #floating-play-stop-button.playing {
+    background-color: #dc3545; /* Solid red for playing */
+    color: #fff;
+    animation: pulse 1.5s infinite;
+}
+
+body:not(.body-sheet-music) #floating-play-stop-button.button.stopped {
+    background-color: #198754; /* Solid green for stopped */
+    color: #fff;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+}
+
+body:not(.body-sheet-music) .button svg {
+    transition: all 0.3s ease;
+}
+
+body:not(.body-sheet-music) .button.playing svg {
+    fill: #fff;
+}
+
+
+
+/* Estilos para selector de progresiones predefinidas */
+.predefined-selector-container {
+    margin-top: 15px;
+}
+
+.predefined-select {
+    width: 100%;
+    padding: 12px 15px;
+    background: linear-gradient(145deg, #2e2e2e, #1c1c1c);
+    color: #e0e0e0;
+    border: 2px solid #444;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.predefined-select:focus {
+    outline: none;
+    border-color: #bb86fc;
+    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
+}
+
+.predefined-select option {
+    background-color: #2e2e2e;
+    color: #e0e0e0;
+    padding: 8px;
+}
+
+/* Estilos para el preview de progresión */
+.progression-preview {
+    margin-top: 15px;
+    padding: 15px;
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    border-radius: 10px;
+    border: 1px solid #444;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.preview-chords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.chord-tag {
+    display: inline-block;
+    background: linear-gradient(145deg, #bb86fc, #9d4edd);
+    color: #121212;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+#floating-metronome-button {
+    background: orange;
+}
+
+/* Estilos para el contenedor de PDF a pantalla completa */
+#pdf-fullscreen-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #212121; /* Fondo oscuro */
+    z-index: 999; /* Por debajo de los botones flotantes (z-index: 1000) */
+    display: flex; /* Para centrar el iframe */
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Un poco de padding para el PDF */
+    box-sizing: border-box;
+}
+
+#floating-random-pdf-button {
+    position: fixed; top: 365px; left: 15px; z-index: 1000; /* Position below notes button (295 + 60 + 10) */
+    background-color: #20c997; /* A distinct green color */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-random-pdf-button:hover { background-color: #17a2b8; } /* A slightly different hover color */
+
+#floating-text-input {
+    width: 70px;
+    height: 70px; /* Cambiado a 70px */
+    border-radius: 50%; /* Cambiado a redondo */
+    border: none;
+    background: #333; /* Mismo fondo que los botones */
+    color: #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    resize: none; /* Evita que el usuario redimensione el textarea */
+    padding: 10px; /* Espacio interno */
+    box-sizing: border-box; /* Incluye padding en el width/height */
+    font-family: 'Roboto', sans-serif; /* Misma fuente que los acordes */
+    font-size: 1.2em; /* Fuente más grande */
+}
+
+#floating-text-input::placeholder {
+    color: #b0b0b0; /* Color del placeholder */
+}
+
+#floating-text-input:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}

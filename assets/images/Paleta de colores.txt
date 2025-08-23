@@ -1,0 +1,7 @@
+#b695c0, #9b7ba5, #5a9ac6, #00c1b3, #b4d82e
+
+AIzaSyDD9UseKRtTtySfF6X5H6KYQR_L1JVvcAw
+
+Api key
+
+Quiero que el tipo de "verde" que ultiliza el boton sea el mismo verde que en index2. es decir. exactamente el mismo color

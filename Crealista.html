@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramientas de Archivos</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 700px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .tool-section {
+            margin-bottom: 40px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        input[type="file"]::file-selector-button {
+            margin-right: 15px;
+            border: none;
+            background: #007bff;
+            padding: 12px 18px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: background .2s ease-in-out;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: #0056b3;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        #downloadBtn {
+            background-color: #17a2b8;
+            margin-top: 10px;
+        }
+        #downloadBtn:hover {
+            background-color: #138496;
+        }
+        #splitBtn {
+            background-color: #fd7e14;
+        }
+        #splitBtn:hover {
+            background-color: #e66b02;
+        }
+        pre#results {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "Courier New", Courier, monospace;
+        }
+        .loader {
+            display: none; /* Oculto por defecto */
+            text-align: center;
+            padding: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Herramientas de Archivos</h1>
+
+        <div class="tool-section">
+            <h2>Generador de Lista</h2>
+            <div class="input-group">
+                <label for="folderInput">1. Selecciona una carpeta:</label>
+                <input type="file" id="folderInput" webkitdirectory directory multiple>
+            </div>
+            <div class="input-group">
+                <label for="prefix">2. Prefijo (opcional):</label>
+                <input type="text" id="prefix" placeholder="Ej: 'sheets/">
+            </div>
+            <div class="input-group">
+                <label for="suffix">3. Sufijo (opcional):</label>
+                <input type="text" id="suffix" placeholder="Ej: .pdf',">
+            </div>
+            <button id="generateBtn">4. Generar Lista</button>
+            <button id="downloadBtn" disabled>5. Descargar .txt</button>
+            <pre id="results">La lista de archivos aparecerá aquí...</pre>
+        </div>
+
+        <div class="tool-section">
+            <h2>Divisor de PDF</h2>
+            <div class="input-group">
+                <label for="pdfInput">1. Selecciona un archivo PDF:</label>
+                <input type="file" id="pdfInput" accept=".pdf">
+            </div>
+            <div class="input-group">
+                <label for="baseName">2. Nombre base para las páginas (opcional):</label>
+                <input type="text" id="baseName" placeholder="Ej: blues">
+            </div>
+            <button id="splitBtn">3. Dividir PDF y Descargar .zip</button>
+            <div id="loader" class="loader">Procesando, por favor espera...</div>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA PARA EL GENERADOR DE LISTAS ---
+        const folderInput = document.getElementById('folderInput');
+        const prefixInput = document.getElementById('prefix');
+        const suffixInput = document.getElementById('suffix');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resultsDiv = document.getElementById('results');
+        let listContent = '';
+
+        generateBtn.addEventListener('click', () => {
+            if (folderInput.files.length === 0) {
+                alert('Por favor, selecciona una carpeta primero.');
+                return;
+            }
+            const prefix = prefixInput.value;
+            const suffix = suffixInput.value;
+            const fileNames = Array.from(folderInput.files).map(file => {
+                const cleanedName = file.name.replace(/'|´|`/g, '');
+                return `${prefix}${cleanedName}${suffix}`;
+            });
+            listContent = fileNames.join('\n');
+            resultsDiv.textContent = listContent;
+            downloadBtn.disabled = false;
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (listContent === '') return;
+            const blob = new Blob([listContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'lista_de_archivos.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // --- LÓGICA PARA EL DIVISOR DE PDF ---
+        const pdfInput = document.getElementById('pdfInput');
+        const splitBtn = document.getElementById('splitBtn');
+        const loader = document.getElementById('loader');
+        const baseNameInput = document.getElementById('baseName'); // Referencia al nuevo campo
+        
+        const { PDFDocument } = PDFLib;
+        
+        splitBtn.addEventListener('click', async () => {
+            if (pdfInput.files.length === 0) {
+                alert('Por favor, selecciona un archivo PDF.');
+                return;
+            }
+
+            const originalPdfFile = pdfInput.files[0];
+            loader.style.display = 'block';
+            splitBtn.disabled = true;
+
+            try {
+                const pdfBytes = await originalPdfFile.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(pdfBytes);
+                const pageCount = pdfDoc.getPageCount();
+                const zip = new JSZip();
+                
+                // *** CAMBIO REALIZADO AQUÍ ***
+                // Obtener el nombre base o usar 'pagina' por defecto
+                const baseName = baseNameInput.value.trim() || 'pagina';
+
+                for (let i = 0; i < pageCount; i++) {
+                    const newPdfDoc = await PDFDocument.create();
+                    const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [i]);
+                    newPdfDoc.addPage(copiedPage);
+                    const newPdfBytes = await newPdfDoc.save();
+                    
+                    // Usar el nombre base para crear el nombre del archivo
+                    const fileName = `${baseName} ${i + 1}.pdf`;
+                    zip.file(fileName, newPdfBytes);
+                }
+
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(zipBlob);
+                link.download = `${originalPdfFile.name.replace('.pdf', '')}_dividido.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                console.error('Error al procesar el PDF:', error);
+                alert('Hubo un error al dividir el PDF. Asegúrate de que el archivo no esté dañado.');
+            } finally {
+                loader.style.display = 'none';
+                splitBtn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>

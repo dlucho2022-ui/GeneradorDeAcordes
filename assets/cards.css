@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: linear-gradient(145deg, #2e2e2e, #1c1c1c);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.23);
+    padding: 20px;
+    width: 220px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+}
+
+.card-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.5em;
+    color: #bb86fc;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #bb86fc;
+    padding-bottom: 10px;
+}
+
+.card-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.card-option {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+}
+
+.card-option:hover {
+    background-color: #bb86fc;
+    color: #121212;
+}
+
+.card-option.selected {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    font-weight: 600;
+}
+
+/* Custom scrollbar for options */
+.card-options::-webkit-scrollbar {
+    width: 8px;
+}
+
+.card-options::-webkit-scrollbar-track {
+    background: #2c2c2c;
+    border-radius: 10px;
+}
+
+.card-options::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
+}
+
+.card-options::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}

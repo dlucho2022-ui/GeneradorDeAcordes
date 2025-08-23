@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Ondas</title>
+    <link rel="shortcut icon" href="assets/images/iconapp.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/style.css">
+    
+</head>
+<body class="body-waves">
+    <div class="wrapper">
+       <header>
+      
+        <nav>
+            <ul>
+                <li><a href="index.html">Generador de progresiones</a></li>
+                <li><a href="Index2.html">Generador de partituras</a></li>
+                <li><a href="#" class="active-nav-link">Generador de ondas</a></li>
+            </ul>
+        </nav>
+    </header>
+        <main>
+            <div class="piano-container">
+                <svg class="piano-svg" viewBox="0 0 980 200">
+                    <!-- White keys -->
+                    <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
+                    <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
+                    <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
+                    <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
+                    <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
+                    <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
+                    <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
+                    <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
+                    <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
+                    <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
+                    <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
+                    <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
+                    <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
+                    <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
+                    
+
+                    <!-- Black keys -->
+                    <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
+                    <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
+                    <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
+                    <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
+                    <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
+                    <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
+                    <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
+                    <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
+                    <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
+                    <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
+                </svg>
+            </div>
+        </main>
+    </div>
+    <footer>
+        <p> </p>
+    </footer>
+    <script src="https://unpkg.com/tone@14.7.58/build/Tone.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const noteFiles = {
+                "C4": "c.mp3", "C#4": "c-sharp.mp3", "D4": "d.mp3", "D#4": "d-sharp.mp3", "E4": "e.mp3", "F4": "f.mp3", "F#4": "f-sharp.mp3", "G4": "g.mp3", "G#4": "g-sharp.mp3", "A4": "a.mp3", "A#4": "a-sharp.mp3", "B4": "b.mp3",
+                "C5": "c.mp3", "C#5": "c-sharp.mp3", "D5": "d.mp3", "D#5": "d-sharp.mp3", "E5": "e.mp3", "F5": "f.mp3", "F#5": "f-sharp.mp3", "G5": "g.mp3", "G#5": "g-sharp.mp3", "A5": "a.mp3", "A#5": "a-sharp.mp3", "B5": "b.mp3"
+            };
+
+            let activeNote = {
+                noteName: null,
+                player1: null,
+                player2: null,
+                loopEvent: null,
+                currentPlayer: 1
+            };
+
+            const startDrone = (noteName) => {
+                if (activeNote.noteName) {
+                    stopDrone();
+                }
+
+                const audioFile = noteFiles[noteName];
+                if (!audioFile) return;
+
+                activeNote.noteName = noteName;
+                activeNote.player1 = new Tone.Player({ url: `assets/audios/${audioFile}`, fadeIn: 0.3, fadeOut: 0.3 }).toDestination();
+                activeNote.player2 = new Tone.Player({ url: `assets/audios/${audioFile}`, fadeIn: 0.3, fadeOut: 0.3 }).toDestination();
+
+                Tone.loaded().then(() => {
+                    activeNote.player1.start();
+                    activeNote.currentPlayer = 1;
+
+                    activeNote.loopEvent = Tone.Transport.scheduleRepeat(time => {
+                        if (activeNote.currentPlayer === 1) {
+                            activeNote.player2.start(time);
+                            activeNote.player1.stop("+5");
+                            activeNote.currentPlayer = 2;
+                        } else {
+                            activeNote.player1.start(time);
+                            activeNote.player2.stop("+5");
+                            activeNote.currentPlayer = 1;
+                        }
+                    }, 11);
+                    Tone.Transport.start();
+                });
+
+                document.querySelector(`[data-note="${noteName}"]`).classList.add('active');
+            };
+
+            const stopDrone = () => {
+                if (activeNote.noteName) {
+                    if (activeNote.player1) {
+                        activeNote.player1.stop();
+                        activeNote.player1.dispose();
+                    }
+                    if (activeNote.player2) {
+                        activeNote.player2.stop();
+                        activeNote.player2.dispose();
+                    }
+                    if (activeNote.loopEvent) {
+                        Tone.Transport.clear(activeNote.loopEvent);
+                        Tone.Transport.stop(); // Stop the transport when the drone is stopped
+                    }
+                    
+                    document.querySelector(`[data-note="${activeNote.noteName}"]`).classList.remove('active');
+
+                    activeNote = {
+                        noteName: null,
+                        player1: null,
+                        player2: null,
+                        loopEvent: null,
+                        currentPlayer: 1
+                    };
+                }
+            };
+
+            const noteButtons = document.querySelectorAll('rect[data-note]');
+            noteButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const noteName = button.getAttribute('data-note');
+                    if (activeNote.noteName === noteName) {
+                        stopDrone();
+                    } else {
+                        startDrone(noteName);
+                    }
+                });
+            });
+
+            const pianoVolumeControl = document.createElement('input');
+            pianoVolumeControl.type = 'range';
+            pianoVolumeControl.id = 'piano-volume';
+            pianoVolumeControl.min = '-30';
+            pianoVolumeControl.max = '0';
+            pianoVolumeControl.addEventListener('input', (event) => {
+                if(activeNote.player1) activeNote.player1.volume.value = event.target.value;
+                if(activeNote.player2) activeNote.player2.volume.value = event.target.value;
+            });
+
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                const volumeDiv = document.createElement('div');
+                volumeDiv.style.textAlign = 'center';
+                volumeDiv.style.marginTop = '20px';
+                volumeDiv.innerHTML = '<label for="piano-volume">Volumen:</label>';
+                volumeDiv.appendChild(pianoVolumeControl);
+                mainElement.appendChild(volumeDiv);
+            }
+        });
+    </script>
+</body>
+</html>

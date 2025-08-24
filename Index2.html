@@ -55,6 +55,10 @@
             <input type="checkbox" id="autoscroll-checkbox" checked>
         </div>
         <div class="selector-container">
+            <label for="loop-playback-checkbox">Reproducir en bucle</label>
+            <input type="checkbox" id="loop-playback-checkbox">
+        </div>
+        <div class="selector-container">
             <label for="melody-volume-slider">Vol. Melodía:</label>
             <input type="range" id="melody-volume-slider" min="-48" max="6" value="0" step="1">
             <span id="melody-volume-value">0 dB</span>
@@ -328,14 +332,15 @@
                 await Tone.start();
                 if (Tone.Transport.state !== 'started') {
                     const visualGuideCheckbox = document.getElementById('visual-guide-checkbox');
-                    
+                    const loopPlaybackCheckbox = document.getElementById('loop-playback-checkbox'); // Get the new checkbox
+
                     const part = new Tone.Part((time, note) => {
                         let duration = note.duration;
                         if (note.isTuplet === 'quadruplet') {
                             duration = Tone.Time('4n.').toSeconds() / 4;
                         }
                         if (!note.isRest) { sampler.triggerAttackRelease(note.name, duration, time); }
-                        Tone.Draw.schedule(() => { 
+                        Tone.Draw.schedule(() => {
                             if (osmd.cursor && Tone.Transport.state === 'started') {
                                 osmd.cursor.next();
                                 const autoscrollCheckbox = document.getElementById('autoscroll-checkbox');
@@ -347,17 +352,17 @@
                     });
 
                     let currentTime = 0;
-                    allGeneratedNotes.forEach(note => { 
+                    allGeneratedNotes.forEach(note => {
                         let durationForScheduling = note.duration;
                         if (note.isTuplet === 'quadruplet') {
                             durationForScheduling = Tone.Time('4n.').toSeconds() / 4;
                         }
-                        part.add(currentTime, note); 
-                        currentTime += Tone.Time(durationForScheduling).toSeconds(); 
+                        part.add(currentTime, note);
+                        currentTime += Tone.Time(durationForScheduling).toSeconds();
                     });
                     activeAudio.part = part;
                     part.start(0);
-                    
+
                     const activeTab = document.querySelector('.tab-button.active').dataset.tab;
                     const metronomeInterval = activeTab === 'compound' ? '4n.' : '4n';
                     const metronomeLoop = new Tone.Loop(time => { metronomePlayer.start(time); }, metronomeInterval).start(0);
@@ -366,7 +371,7 @@
                     const accompanimentSequence = new Tone.Sequence((time, chordIndex) => { const currentPlayer = chordIndex === 0 ? players.chord1 : players.chord2; const otherPlayer = chordIndex === 0 ? players.chord2 : players.chord1; otherPlayer.stop(time); if (currentPlayer.loaded) { currentPlayer.start(time); } }, [0, 1], '1m').start(0);
                     accompanimentSequence.loop = true;
                     activeAudio.sequence = accompanimentSequence;
-                    
+
                     if (visualGuideCheckbox.checked) {
                         osmd.cursor.cursorOptions.alpha = 0.3;
                     } else {
@@ -376,7 +381,23 @@
                     osmd.cursor.reset();
 
                     const numMeasures = parseInt(document.getElementById('measure-selector').value, 10);
-                    Tone.Transport.scheduleOnce(stopPlayback, `${numMeasures}m`);
+
+                    // Loop logic
+                    if (loopPlaybackCheckbox.checked) {
+                        Tone.Transport.loop = true;
+                        Tone.Transport.loopEnd = `${numMeasures}m`; // Loop for the total number of measures
+
+                        // Schedule cursor reset at the beginning of each loop
+                        Tone.Transport.scheduleRepeat(() => {
+                            if (osmd.cursor) {
+                                osmd.cursor.reset();
+                            }
+                        }, `${numMeasures}m`, 0); // Repeat every `numMeasures` at offset 0
+                    } else {
+                        Tone.Transport.loop = false; // Ensure loop is off if checkbox is unchecked
+                        Tone.Transport.scheduleOnce(stopPlayback, `${numMeasures}m`);
+                    }
+
                     Tone.Transport.start('+0.1');
                     floatingPlayStopButton.innerHTML = stopIconSVG;
                     floatingPlayStopButton.classList.add('is-playing');
@@ -402,8 +423,23 @@
                 }
             }
 
-            floatingPlayStopButton.addEventListener('click', togglePlayback);
-            floatingGenerateButton.addEventListener('click', generateAndRenderMeasure);
+            floatingPlayStopButton.addEventListener('click', () => {
+                const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+                if (pdfViewerContainer.style.display === 'flex') {
+                    window.closePdfViewer();
+                } else {
+                    togglePlayback();
+                }
+            });
+
+            floatingGenerateButton.addEventListener('click', () => {
+                const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+                if (pdfViewerContainer.style.display === 'flex') {
+                    window.closePdfViewer();
+                } else {
+                    generateAndRenderMeasure();
+                }
+            });
             fullscreenButton.addEventListener('click', toggleFullScreen);
             
             document.addEventListener('fullscreenchange', () => {

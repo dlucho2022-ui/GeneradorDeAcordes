@@ -451,16 +451,16 @@ nav ul li a.active-nav-link {
     margin-top: 20px;
 }
 
-.control-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px;
-    border: 1px solid #444;
+.modal-content {
+    background-color: red; /* Make it clearly visible */
+    padding: 20px;
     border-radius: 8px;
-    background-color: #333;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    color: #eee;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+    width: 300px; /* Fixed width for debugging */
+    height: 200px; /* Fixed height for debugging */
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
 }
 
 .control-box h2 {
@@ -844,12 +844,13 @@ body:not(.body-sheet-music) .button.playing svg {
 
 .predefined-select {
     width: 100%;
-    padding: 12px 15px;
+    max-width: 200px; /* Added max-width */
+    padding: 8px 10px; /* Smaller padding */
     background: linear-gradient(145deg, #2e2e2e, #1c1c1c);
     color: #e0e0e0;
     border: 2px solid #444;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 12px; /* Smaller font size */
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -956,4 +957,73 @@ body:not(.body-sheet-music) .button.playing svg {
 #floating-text-input:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Metronome Popup */
+.metronome-popup {
+    position: fixed; /* Changed to fixed to be relative to viewport */
+    top: 85px; /* Aligned with the top of the floating-button-container */
+    left: 85px; /* 15px (container left) + 60px (button width) + 10px (spacing) */
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000; /* Ensure it's above other content */
+    min-width: 320px; /* Changed from 200px to 320px */
+}
+
+.metronome-popup.visible {
+    display: flex;
+}
+
+.metronome-popup .metronome-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.metronome-popup label {
+    font-size: 0.9em;
+    color: var(--text-color-light);
+}
+
+.metronome-popup input[type="number"],
+.metronome-popup input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-background-color);
+    color: var(--text-color);
+}
+
+.metronome-popup .button-option {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.metronome-popup .button-option:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.metronome-popup #bpm-value-display {
+    font-weight: bold;
+    text-align: center;
+    margin-top: -5px;
+    margin-bottom: 5px;
+    color: var(--text-color);
 }

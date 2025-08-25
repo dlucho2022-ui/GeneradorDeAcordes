@@ -1136,6 +1136,35 @@ body:not(.body-sheet-music) .button.playing svg {
     background-color: #a72836;
 }
 
+/* Nuevos estilos para botones por función */
+.floating-controls-container .btn-measure-edit {
+    background-color: #6a0dad; /* Púrpura */
+}
+.floating-controls-container .btn-measure-edit:hover {
+    background-color: #7b2edb;
+}
+
+.floating-controls-container .btn-structure-edit {
+    background-color: #0d6efd; /* Azul */
+}
+.floating-controls-container .btn-structure-edit:hover {
+    background-color: #0b5ed7;
+}
+
+.floating-controls-container .btn-comment {
+    background-color: #20c997; /* Verde brillante */
+}
+.floating-controls-container .btn-comment:hover {
+    background-color: #17a2b8; /* Un poco más oscuro */
+}
+
+.floating-controls-container .btn-export {
+    background-color: #198754; /* Verde oscuro (éxito) */
+}
+.floating-controls-container .btn-export:hover {
+    background-color: #146c43;
+}
+
 .floating-controls-container label {
     color: #f0f0f0;
     font-size: 0.9em;

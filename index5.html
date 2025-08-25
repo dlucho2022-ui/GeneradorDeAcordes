@@ -23,8 +23,9 @@
 
 <!-- Controles Flotantes para Cifrados -->
 <div class="floating-controls-container">
-    <div class="control-group" id="chart-zoom-panel">
-        <label for="font-size-selector">Zoom</label>
+    <!-- Controles de Vista/Display -->
+    <div class="control-group">
+        <label for="font-size-selector">Zoom General</label>
         <select id="font-size-selector">
             <option value="50%">50%</option>
             <option value="60%">60%</option>
@@ -55,24 +56,27 @@
         <input type="range" id="measure-height-slider" min="40" max="120" step="5" value="80">
     </div>
 
-    
-
-    <div class="control-group" id="chart-structure-controls-panel">
-        <button id="add-row-btn">Agregar Fila</button>
-        <button id="add-section-btn">Agregar Sección</button>
-        
+    <!-- Controles de Edición de Compases -->
+    <div class="control-group">
+        <button id="add-start-repeat-btn" class="btn-measure-edit">Inicio Repetición</button>
+        <button id="add-end-repeat-btn" class="btn-measure-edit">Fin Repetición</button>
         <button id="clear-measure-btn" class="btn-danger">Limpiar Compás</button>
-        <button id="delete-row-btn" class="btn-danger">Eliminar Fila</button>
-        <button id="delete-section-btn" class="btn-danger">Eliminar Sección</button>
-        <button id="add-comment-btn">Insertar Comentario</button>
-        <button id="export-pdf-btn">Exportar como PDF</button>
-        <button id="reset-chart-btn" class="btn-danger">Reiniciar Partitura</button>
+        <button id="delete-measure-btn" class="btn-danger">Eliminar Compás</button>
     </div>
 
-    <div class="control-group" id="chart-bar-controls-panel">
-        <button id="add-start-repeat-btn">Inicio Repetición</button>
-        <button id="add-end-repeat-btn">Fin Repetición</button>
-        <button id="delete-measure-btn" class="btn-danger">Eliminar Compás</button>
+    <!-- Controles de Edición de Estructura -->
+    <div class="control-group">
+        <button id="add-row-btn" class="btn-structure-edit">Agregar Fila</button>
+        <button id="add-section-btn" class="btn-structure-edit">Agregar Sección</button>
+        <button id="delete-row-btn" class="btn-danger">Eliminar Fila</button>
+        <button id="delete-section-btn" class="btn-danger">Eliminar Sección</button>
+    </div>
+
+    <!-- Acciones de Documento/Globales -->
+    <div class="control-group">
+        <button id="add-comment-btn" class="btn-comment">Insertar Comentario</button>
+        <button id="export-pdf-btn" class="btn-export">Exportar como PDF</button>
+        <button id="reset-chart-btn" class="btn-danger">Reiniciar Partitura</button>
     </div>
 </div>
 

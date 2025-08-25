@@ -215,6 +215,48 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSheetMusic(); // Save on zoom change
     });
 
+    // --- CONTROLES DE FUENTE Y ALTURA DE COMPÁS ---
+    const measureFontSizeSlider = document.getElementById('measure-font-size-slider');
+    const measureHeightSlider = document.getElementById('measure-height-slider');
+
+    function applyMeasureStyles(fontSize, minHeight) {
+        document.documentElement.style.setProperty('--measure-font-size', `${fontSize}em`);
+        document.documentElement.style.setProperty('--measure-min-height', `${minHeight}px`);
+    }
+
+    function saveMeasureSettings() {
+        localStorage.setItem('measureFontSize', measureFontSizeSlider.value);
+        localStorage.setItem('measureMinHeight', measureHeightSlider.value);
+    }
+
+    function loadMeasureSettings() {
+        const savedFontSize = localStorage.getItem('measureFontSize');
+        const savedMinHeight = localStorage.getItem('measureMinHeight');
+
+        if (savedFontSize) {
+            measureFontSizeSlider.value = savedFontSize;
+        }
+        if (savedMinHeight) {
+            measureHeightSlider.value = savedMinHeight;
+        }
+        // Apply settings on load
+        applyMeasureStyles(measureFontSizeSlider.value, measureHeightSlider.value);
+    }
+
+    // Event Listeners for sliders
+    measureFontSizeSlider.addEventListener('input', () => {
+        applyMeasureStyles(measureFontSizeSlider.value, measureHeightSlider.value);
+        saveMeasureSettings();
+    });
+
+    measureHeightSlider.addEventListener('input', () => {
+        applyMeasureStyles(measureFontSizeSlider.value, measureHeightSlider.value);
+        saveMeasureSettings();
+    });
+
+    // Load settings on initial page load
+    loadMeasureSettings();
+
     // Función para agregar una fila de compases
     function addRow(grid) {
         for (let i = 0; i < 4; i++) {

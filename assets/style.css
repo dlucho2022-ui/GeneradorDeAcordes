@@ -13,6 +13,11 @@ body {
     overflow-x: hidden; /* Añadido de Index2.html */
 }
 
+:root {
+    --measure-font-size: 1.8em; /* Default value */
+    --measure-min-height: 80px; /* Default value */
+}
+
 .wrapper {
     width: 100%;
     max-width: 1300px;
@@ -1064,9 +1069,9 @@ body:not(.body-sheet-music) .button.playing svg {
 
 .measure {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 1.5em; /* Relativo al zoom */
+    font-size: var(--measure-font-size); /* Relativo al zoom */
     font-weight: bold;
-    min-height: 60px;
+    min-height: var(--measure-min-height);
     padding: 10px;
     border: 2px solid #121212; /* Aplica borde a todos los lados */
     box-sizing: border-box;

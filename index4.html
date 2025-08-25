@@ -65,6 +65,18 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1001;
         }
         #floating-play-stop-button-circle.playing { background-color: #dc3545; }
+        .completed-progression-chord {
+            opacity: 0.7;
+            background-color: #3a3a3a; /* Un color de fondo diferente */
+            border: 1px solid #555;
+            cursor: default; /* Para indicar que no se pueden clickear */
+        }
+        .progression-separator {
+            margin: 10px 0;
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -187,19 +199,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateProgressionDisplay() {
-        console.log("Actualizando display de progresión."); // <--- AGREGAR ESTA LÍNEA
-        progressionBuilder.innerHTML = '';
+        console.log("Actualizando display de progresión.");
+        progressionBuilder.innerHTML = ''; // Limpiar la caja de progresión
+
+        // Mostrar acordes de progresiones completadas
+        allCompletedProgressions.forEach((prog, progIndex) => {
+            prog.forEach((chord, chordIndex) => {
+                const chordEl = document.createElement('div');
+                chordEl.className = 'progression-chord completed-progression-chord'; // Nueva clase para acordes completados
+                chordEl.innerHTML = `<div class="chord-name-display">${chord.display}</div>`;
+                chordEl.onclick = () => {
+                    // Eliminar acorde de una progresión completada
+                    // Si es el único acorde en la progresión, eliminar la progresión completa
+                    if (allCompletedProgressions[progIndex].length === 1) {
+                        allCompletedProgressions.splice(progIndex, 1);
+                    } else {
+                        allCompletedProgressions[progIndex].splice(chordIndex, 1);
+                    }
+                    updateProgressionDisplay();
+                    drawAllProgressionLines(); // Redibujar líneas al eliminar
+                };
+                progressionBuilder.appendChild(chordEl);
+            });
+            // Opcional: agregar un separador visual entre progresiones completadas
+            if (progIndex < allCompletedProgressions.length - 1) {
+                const separator = document.createElement('div');
+                separator.className = 'progression-separator';
+                separator.textContent = '---'; // O un icono, o una línea
+                progressionBuilder.appendChild(separator);
+            }
+        });
+
+        // Mostrar acordes de la progresión actual
         currentProgression.forEach((chord, index) => {
             const chordEl = document.createElement('div');
-            chordEl.className = 'progression-chord';
+            chordEl.className = 'progression-chord'; // Clase normal para acordes actuales
             chordEl.innerHTML = `<div class="chord-name-display">${chord.display}</div>`;
-            chordEl.onclick = () => { 
-                currentProgression.splice(index, 1); 
-                updateProgressionDisplay(); 
+            chordEl.onclick = () => {
+                // Permitir eliminar solo acordes de la progresión actual
+                currentProgression.splice(index, 1);
+                updateProgressionDisplay();
+                drawAllProgressionLines(); // Redibujar líneas al eliminar
             };
             progressionBuilder.appendChild(chordEl);
         });
-        drawAllProgressionLines();
+
+        // drawAllProgressionLines(); // Esta llamada ya se hace en addChordToProgression y clearProgressionBtn
     }
 
     // Función auxiliar para dibujar un solo path de progresión
@@ -245,12 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
         allCompletedProgressions.forEach((prog, index) => {
             const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
             newPath.setAttribute('class', 'progression-path-completed'); // Puedes darle una clase diferente si quieres otro estilo
-            newPath.setAttribute('stroke', '#198754'); // CAMBIADO: Color verde
+            newPath.setAttribute('stroke', '#198620'); // CAMBIADO: Color verde
             newPath.setAttribute('stroke-width', '3px');
             newPath.setAttribute('fill', 'none');
             newPath.setAttribute('stroke-linecap', 'round');
             newPath.setAttribute('stroke-linejoin', 'round');
-            newPath.setAttribute('opacity', '0.5');
+            newPath.setAttribute('opacity', '0.8');
             progressionSVG.appendChild(newPath);
             _drawSingleProgressionPath(prog, newPath);
         });

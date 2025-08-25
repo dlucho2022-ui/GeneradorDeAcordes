@@ -149,11 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     commentBox.style.top = commentData.top;
                     commentBox.style.left = commentData.left;
 
-                    document.body.appendChild(commentBox);
+                    chartContainer.appendChild(commentBox);
                     makeDraggable(commentBox);
 
-                    // Add input listener directly to comment content
-                    contentArea.addEventListener('input', saveSheetMusic);
+                    // Add blur listener directly to comment content
+                    contentArea.addEventListener('blur', saveSheetMusic);
                 });
                 console.log('Comentarios reconstruidos.');
             }
@@ -387,12 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
         commentBox.style.top = `${window.innerHeight / 2 - 50}px`;
         commentBox.style.left = `${window.innerWidth / 2 - 75}px`;
 
-        document.body.appendChild(commentBox);
+        chartContainer.appendChild(commentBox);
         makeDraggable(commentBox);
         saveSheetMusic(); // Save after adding comment
 
-        // Add input listener directly to comment content
-        contentArea.addEventListener('input', saveSheetMusic);
+        // Add blur listener directly to comment content
+        contentArea.addEventListener('blur', saveSheetMusic);
     });
 
     document.getElementById('export-pdf-btn').addEventListener('click', async () => {
@@ -400,48 +400,85 @@ document.addEventListener('DOMContentLoaded', () => {
         const songTitle = document.getElementById('song-title').textContent.trim();
         const filename = songTitle ? `${songTitle}.pdf` : 'cifrado.pdf';
 
-        // Temporarily hide floating controls, comments, and placeholders for clean capture
-        const floatingControls = document.querySelector('.floating-controls-container');
-        const comments = document.querySelectorAll('.comment-box');
+        // Temporarily hide elements for a clean capture
+        const elementsToHide = [
+            document.querySelector('.floating-controls-container'),
+            // Comments are now included by being children of chartContainer
+        ];
         const placeholders = document.querySelectorAll('.measure-placeholder');
 
-        if (floatingControls) floatingControls.style.visibility = 'hidden';
-        comments.forEach(comment => comment.style.visibility = 'hidden');
-        placeholders.forEach(placeholder => placeholder.style.display = 'none');
+        elementsToHide.forEach(el => { if (el) el.style.visibility = 'hidden'; });
+        placeholders.forEach(p => p.style.display = 'none');
 
-        // Use html2canvas to capture the chartContainer
+        // Generate canvas from the chart container with explicit dimensions
         const canvas = await html2canvas(chartContainer, {
-            scale: 2, // Volver a escala 2 para mejor calidad de renderizado
+            width: chartContainer.scrollWidth, // Explicitly set width
+            height: chartContainer.scrollHeight, // Explicitly set height
+            scale: 2,
             useCORS: true,
             logging: false,
             backgroundColor: '#FFFFFF'
         });
 
-        // Restore visibility
-        if (floatingControls) floatingControls.style.visibility = 'visible';
-        comments.forEach(comment => comment.style.visibility = 'visible');
-        placeholders.forEach(placeholder => placeholder.style.display = '');
+        // Restore visibility of hidden elements
+        elementsToHide.forEach(el => { if (el) el.style.visibility = 'visible'; });
+        placeholders.forEach(p => p.style.display = '');
 
-        const imgData = canvas.toDataURL('image/jpeg', 0.7); // Usar JPEG con calidad 0.7
-        const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+        // Get image data from canvas
+        const imgData = canvas.toDataURL('image/jpeg', 0.8);
 
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        let heightLeft = imgHeight;
-        let position = 0;
+        // Setup PDF document
+        const pdf = new window.jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight); // Especificar 'JPEG'
-        heightLeft -= pageHeight;
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const marginTop = 10;
+        const marginBottom = 10; // Revert to 10 for now for simplicity
+        const marginHorizontal = 10;
+        
+        const usableWidth = pdfWidth - (marginHorizontal * 2);
+        const usableHeight = pdfHeight - marginTop - marginBottom;
 
-        while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight); // Especificar 'JPEG'
-            heightLeft -= pageHeight;
+        // Calculate image dimensions to fit in PDF, maintaining aspect ratio
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgAspectRatio = imgProps.height / imgProps.width;
+        const pdfImageWidth = usableWidth - 0.5; // Adjusted for right margin issue
+        const pdfImageHeight = pdfImageWidth * imgAspectRatio;
+
+        // --- HYBRID LOGIC ---
+        if (pdfImageHeight <= usableHeight) {
+            // --- SINGLE PAGE LOGIC ---
+            // Content fits on one page, create a custom-height PDF
+            const customPageHeight = pdfImageHeight + marginTop + marginBottom;
+            const singlePagePdf = new window.jspdf.jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: [pdfWidth, customPageHeight]
+            });
+            singlePagePdf.addImage(imgData, 'JPEG', marginHorizontal, marginTop, pdfImageWidth, pdfImageHeight);
+            singlePagePdf.save(filename);
+
+        } else {
+            // --- MULTI-PAGE LOGIC ---
+            // Content is too long, use standard A4 pages
+            let heightLeft = pdfImageHeight;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'JPEG', marginHorizontal, marginTop, pdfImageWidth, pdfImageHeight);
+            heightLeft -= usableHeight;
+
+            while (heightLeft > 0) {
+                position -= usableHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', marginHorizontal, position + marginTop, pdfImageWidth, pdfImageHeight);
+                heightLeft -= usableHeight;
+            }
+            pdf.save(filename);
         }
-
-        pdf.save(filename);
     });
     
     // Cargar datos al iniciar

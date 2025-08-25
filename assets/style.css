@@ -15,7 +15,7 @@ body {
 
 .wrapper {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1300px;
     margin: 0 auto;
     padding: 0 15px;
     box-sizing: border-box;
@@ -1026,4 +1026,203 @@ body:not(.body-sheet-music) .button.playing svg {
     margin-top: -5px;
     margin-bottom: 5px;
     color: var(--text-color);
+}
+
+
+/* Estilos para el Generador de Cifrados (index5.html) */
+
+#chart-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fdfdfd;
+    color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-size: 100%; /* Base para el zoom */
+    transition: font-size 0.2s ease-in-out;
+}
+
+.song-section {
+    margin-bottom: 30px;
+}
+
+.song-section h2 {
+    font-family: 'Times New Roman', Times, serif;
+    color: #333;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    font-size: 1.8em; /* Relativo al zoom */
+}
+
+.measures-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.measure {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5em; /* Relativo al zoom */
+    font-weight: bold;
+    min-height: 60px;
+    padding: 10px;
+    border: 2px solid #121212; /* Aplica borde a todos los lados */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.measure:focus {
+    outline: 2px solid #bb86fc;
+    background-color: #f0f0f0;
+}
+
+/* Panel de Controles Flotante para Cifrados */
+.floating-controls-container {
+    position: fixed;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    background-color: #2c2c2c;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #444;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.floating-controls-container button,
+.floating-controls-container select {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.floating-controls-container button:hover,
+.floating-controls-container select:hover {
+    background-color: #6a0dad;
+}
+
+.floating-controls-container .btn-danger {
+    background-color: #dc3545;
+}
+
+.floating-controls-container .btn-danger:hover {
+    background-color: #a72836;
+}
+
+.floating-controls-container label {
+    color: #f0f0f0;
+    font-size: 0.9em;
+    text-align: center;
+    margin-bottom: -5px;
+}
+
+
+/* --- Estilos para Barras de Repetición --- */
+
+.measure.repeat-start {
+    border-left: 4px solid #121212;
+}
+
+.measure.repeat-start::before {
+    content: ':';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 0;
+    font-weight: bold;
+    font-size: 1.2em; /* Relativo al zoom */
+}
+
+.measure.repeat-end {
+    border-right: 4px solid #121212;
+}
+
+.measures-grid .measure.repeat-end {
+    border-right-color: #121212;
+}
+
+.measure.repeat-end::after {
+    content: ':';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 0;
+    font-weight: bold;
+    font-size: 1.2em; /* Relativo al zoom */
+}
+
+.measure.double-bar {
+    border-right: 1px solid #121212;
+}
+
+.measure.double-bar::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: #121212;
+}
+
+/* Estilos para Comentarios Arrastrables */
+.comment-box {
+    position: absolute;
+    z-index: 1100;
+    background-color: transparent;
+    border: 1px dashed #333;
+    padding: 5px;
+    padding-top: 20px; /* Espacio para la manija de arrastre */
+    border-radius: 3px;
+    max-width: 300px;
+}
+
+.comment-drag-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 18px;
+    cursor: move;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px dashed #333;
+}
+
+.comment-content {
+    color: #000000; /* Texto negro para legibilidad */
+    white-space: pre-wrap; /* Respeta saltos de línea y espacios */
+    outline: none; /* Sin borde al hacer foco */
+    min-height: 20px; /* Altura mínima */
+}
+
+.measure-placeholder {
+    background-color: #fdfdfd; /* Mismo fondo que un compás normal */
+    min-height: 60px;
+    box-sizing: border-box;
+    visibility: hidden; /* Oculta el contenido pero mantiene el espacio */
+    border: 2px solid #121212; /* El placeholder también necesita bordes */
 }

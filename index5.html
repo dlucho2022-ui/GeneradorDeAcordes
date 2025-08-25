@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Cifrados</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrapper">
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Generador de progresiones</a></li>
+                <li><a href="Index2.html">Generador de partituras</a></li>
+                <li><a href="Index3.html">Creador de Escalas</a></li>
+                <li><a href="index4.html">circulo de quintas</a></li>
+                <li><a href="#" class="active-nav-link">Generador de cifrados</a></li>
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<!-- Controles Flotantes para Cifrados -->
+<div class="floating-controls-container">
+    <div class="control-group" id="chart-zoom-panel">
+        <label for="font-size-selector">Zoom</label>
+        <select id="font-size-selector">
+            <option value="50%">50%</option>
+            <option value="60%">60%</option>
+            <option value="70%">70%</option>
+            <option value="80%">80%</option>
+            <option value="90%">90%</option>
+            <option value="100%" selected>100%</option>
+            <option value="110%">110%</option>
+            <option value="120%">120%</option>
+            <option value="130%">130%</option>
+            <option value="140%">140%</option>
+            <option value="150%">150%</option>
+            <option value="160%">160%</option>
+            <option value="170%">170%</option>
+            <option value="180%">180%</option>
+            <option value="190%">190%</option>
+            <option value="200%">200%</option>
+        </select>
+    </div>
+
+    
+
+    <div class="control-group" id="chart-structure-controls-panel">
+        <button id="add-row-btn">Agregar Fila</button>
+        <button id="add-section-btn">Agregar Sección</button>
+        
+        <button id="clear-measure-btn" class="btn-danger">Limpiar Compás</button>
+        <button id="delete-row-btn" class="btn-danger">Eliminar Fila</button>
+        <button id="delete-section-btn" class="btn-danger">Eliminar Sección</button>
+        <button id="add-comment-btn">Insertar Comentario</button>
+    </div>
+
+    <div class="control-group" id="chart-bar-controls-panel">
+        <button id="add-start-repeat-btn">Inicio Repetición</button>
+        <button id="add-end-repeat-btn">Fin Repetición</button>
+        <button id="delete-measure-btn" class="btn-danger">Eliminar Compás</button>
+    </div>
+</div>
+
+
+
+<main id="chart-container">
+    <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
+    <div class="song-section">
+        <h2 contenteditable="true">Intro</h2>
+        <div class="measures-grid">
+            <div class="measure" contenteditable="true"></div>
+            <div class="measure" contenteditable="true"></div>
+            <div class="measure" contenteditable="true"></div>
+            <div class="measure" contenteditable="true"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const chartContainer = document.getElementById('chart-container');
+        const fontSizeSelector = document.getElementById('font-size-selector');
+        let focusedMeasure = null;
+        let focusedSectionTitle = null; // New global variable
+
+        // --- LÓGICA PARA ARRASTRAR ELEMENTOS ---
+        function makeDraggable(element) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const dragHandle = element.querySelector('.comment-drag-handle');
+            
+            if (dragHandle) {
+                dragHandle.onmousedown = dragMouseDown;
+            } else {
+                element.onmousedown = dragMouseDown;
+            }
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                element.style.top = (element.offsetTop - pos2) + "px";
+                element.style.left = (element.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // --- MANEJO DE FOCO ---
+        chartContainer.addEventListener('focusin', (event) => {
+            if (event.target.classList.contains('measure')) {
+                focusedMeasure = event.target;
+                focusedSectionTitle = null; // Clear section title focus
+            } else if (event.target.tagName === 'H2' && event.target.closest('.song-section')) {
+                focusedSectionTitle = event.target;
+                focusedMeasure = null; // Clear measure focus
+            } else {
+                focusedMeasure = null;
+                focusedSectionTitle = null;
+            }
+        });
+
+        // --- MANEJO DE CONTROLES ---
+
+        // Selector de tamaño de fuente (Zoom)
+        fontSizeSelector.addEventListener('change', (e) => {
+            chartContainer.style.fontSize = e.target.value;
+        });
+
+        // Función para agregar una fila de compases
+        function addRow(grid) {
+            for (let i = 0; i < 4; i++) {
+                const measure = document.createElement('div');
+                measure.className = 'measure';
+                measure.contentEditable = 'true';
+                grid.appendChild(measure);
+            }
+        }
+
+        // Controles de compás
+        document.getElementById('add-start-repeat-btn').addEventListener('click', () => {
+            if (focusedMeasure && focusedMeasure.classList.contains('measure')) focusedMeasure.classList.toggle('repeat-start');
+            else alert('Hacé clic en un compás primero.');
+        });
+
+        document.getElementById('add-end-repeat-btn').addEventListener('click', () => {
+            if (focusedMeasure && focusedMeasure.classList.contains('measure')) focusedMeasure.classList.toggle('repeat-end');
+            else alert('Hacé clic en un compás primero.');
+        });
+
+        document.getElementById('delete-measure-btn').addEventListener('click', () => {
+            if (!focusedMeasure) {
+                alert('Hacé clic en el compás que querés eliminar.');
+                return;
+            }
+            if (confirm('¿Estás seguro de que querés eliminar este compás? Esto dejará un espacio vacío en la grilla.')) {
+                // Reemplaza el compás con un placeholder para mantener la estructura de la grilla
+                const placeholder = document.createElement('div');
+                placeholder.className = 'measure measure-placeholder'; // Agrega una nueva clase para el estilo
+                focusedMeasure.parentNode.replaceChild(placeholder, focusedMeasure);
+                focusedMeasure = null; // Limpia el compás enfocado
+            }
+        });
+
+
+        document.getElementById('clear-measure-btn').addEventListener('click', () => {
+            if (focusedMeasure && focusedMeasure.classList.contains('measure')) {
+                focusedMeasure.textContent = '';
+                focusedMeasure.classList.remove('repeat-start', 'repeat-end', 'double-bar');
+            } else {
+                alert('Hacé clic en un compás primero.');
+            }
+        });
+
+        // Controles de estructura
+        document.getElementById('add-row-btn').addEventListener('click', () => {
+            if (focusedMeasure) {
+                const grid = focusedMeasure.closest('.measures-grid');
+                if (!grid) {
+                    alert('El compás seleccionado no está dentro de una grilla de medidas.');
+                    return;
+                }
+
+                const measures = Array.from(grid.children); // Obtener todos los hijos (compases y placeholders)
+                const focusedIndex = measures.indexOf(focusedMeasure);
+                const insertionStartIndex = Math.floor(focusedIndex / 4) * 4 + 4;
+
+                let referenceElement = null;
+                if (insertionStartIndex < measures.length) {
+                    referenceElement = measures[insertionStartIndex];
+                }
+
+                for (let i = 0; i < 4; i++) {
+                    const newMeasure = document.createElement('div');
+                    newMeasure.className = 'measure';
+                    newMeasure.contentEditable = 'true';
+                    newMeasure.textContent = '';
+
+                    if (referenceElement) {
+                        grid.insertBefore(newMeasure, referenceElement);
+                    } else {
+                        grid.appendChild(newMeasure);
+                    }
+                }
+            } else if (focusedSectionTitle) { // New logic for section title focus
+                const grid = focusedSectionTitle.nextElementSibling; // The measures-grid is the next sibling of h2
+                if (grid && grid.classList.contains('measures-grid')) {
+                    // Insert at the beginning of the grid
+                    for (let i = 0; i < 4; i++) {
+                        const newMeasure = document.createElement('div');
+                        newMeasure.className = 'measure';
+                        newMeasure.contentEditable = 'true';
+                        newMeasure.textContent = '';
+                        grid.insertBefore(newMeasure, grid.firstChild); // Insert before the first child
+                    }
+                } else {
+                    alert('No se encontró la grilla de compases para esta sección.');
+                }
+            } else {
+                alert('Hacé clic en un compás o en el título de una sección para indicar dónde querés agregar la fila.');
+            }
+        });
+
+        document.getElementById('add-section-btn').addEventListener('click', () => {
+            const sectionCount = chartContainer.getElementsByClassName('song-section').length + 1;
+            const newSection = document.createElement('div');
+            newSection.className = 'song-section';
+
+            const newTitle = document.createElement('h2');
+            newTitle.contentEditable = 'true';
+            newTitle.textContent = `Sección ${sectionCount}`;
+            
+            const newGrid = document.createElement('div');
+            newGrid.className = 'measures-grid';
+
+            newSection.appendChild(newTitle);
+            newSection.appendChild(newGrid);
+            chartContainer.appendChild(newSection);
+            addRow(newGrid);
+        });
+
+        document.getElementById('delete-row-btn').addEventListener('click', () => {
+            if (!focusedMeasure) {
+                alert('Hacé clic en un compás de la sección cuya última fila querés eliminar.');
+                return;
+            }
+            const grid = focusedMeasure.closest('.measures-grid');
+            if (grid) {
+                const measures = grid.querySelectorAll('.measure');
+                if (measures.length > 4) {
+                    if (confirm('¿Estás seguro de que querés eliminar la última fila de esta sección?')) {
+                        for (let i = 0; i < 4; i++) {
+                            grid.removeChild(grid.lastElementChild);
+                        }
+                    }
+                } else {
+                    alert('No se puede eliminar la única fila de una sección.');
+                }
+            }
+        });
+
+        document.getElementById('delete-section-btn').addEventListener('click', () => {
+            if (!focusedMeasure) {
+                alert('Hacé clic en un compás de la sección que querés eliminar.');
+                return;
+            }
+            const section = focusedMeasure.closest('.song-section');
+            if (section) {
+                if (chartContainer.getElementsByClassName('song-section').length > 1) {
+                    if (confirm('¿Estás seguro de que querés eliminar esta sección completa?')) {
+                        section.remove();
+                        focusedMeasure = null; // Reset focus
+                    }
+                } else {
+                    alert('No se puede eliminar la única sección.');
+                }
+            }
+        });
+
+        document.getElementById('add-comment-btn').addEventListener('click', () => {
+            const commentBox = document.createElement('div');
+            commentBox.className = 'comment-box';
+
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'comment-drag-handle';
+
+            const contentArea = document.createElement('div');
+            contentArea.className = 'comment-content';
+            contentArea.contentEditable = 'true';
+            contentArea.textContent = 'Escribí acá...';
+
+            commentBox.appendChild(dragHandle);
+            commentBox.appendChild(contentArea);
+            
+            // Posición inicial (centro de la vista)
+            commentBox.style.top = `${window.innerHeight / 2 - 50}px`;
+            commentBox.style.left = `${window.innerWidth / 2 - 75}px`;
+
+            document.body.appendChild(commentBox);
+            makeDraggable(commentBox);
+        });
+    });
+</script>

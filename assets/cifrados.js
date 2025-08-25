@@ -40,14 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
         function closeDragElement() {
             document.onmouseup = null;
             document.onmousemove = null;
+            saveSheetMusic(); // Save after drag ends
         }
     }
 
     // --- PERSISTENCIA DE DATOS ---
     function saveSheetMusic() {
+        console.log('saveSheetMusic() called.');
         const data = {
             songTitle: document.getElementById('song-title').textContent,
-            sections: []
+            sections: [],
+            comments: [] // Add comments array
         };
 
         document.querySelectorAll('.song-section').forEach(sectionDiv => {
@@ -64,11 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
             data.sections.push(section);
         });
 
+        // Save comments
+        document.querySelectorAll('.comment-box').forEach(commentBox => {
+            data.comments.push({
+                content: commentBox.querySelector('.comment-content').textContent,
+                top: commentBox.style.top,
+                left: commentBox.style.left
+            });
+        });
+
         localStorage.setItem('sheetMusicData', JSON.stringify(data));
         console.log('Partitura guardada automáticamente:', data);
     }
 
     function loadSheetMusic() {
+        console.log('loadSheetMusic() called.');
         console.log('Intentando cargar partitura...');
         const savedData = localStorage.getItem('sheetMusicData');
         if (savedData) {
@@ -76,9 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = JSON.parse(savedData);
             console.log('Datos parseados:', data);
 
-            // Clear ALL existing content in chartContainer
+            // Clear ALL existing content in chartContainer and remove all comments
             chartContainer.innerHTML = '';
-            console.log('Contenido de chartContainer limpiado.');
+            document.querySelectorAll('.comment-box').forEach(comment => comment.remove()); // Remove existing comments
+            console.log('Contenido de chartContainer y comentarios limpiados.');
 
             // Rebuild song title
             const songTitleElement = document.createElement('h1');
@@ -114,6 +128,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 console.log(`Medidas para "${sectionData.title}" reconstruidas.`);
             });
+
+            // Rebuild comments
+            if (data.comments) {
+                data.comments.forEach(commentData => {
+                    const commentBox = document.createElement('div');
+                    commentBox.className = 'comment-box';
+
+                    const dragHandle = document.createElement('div');
+                    dragHandle.className = 'comment-drag-handle';
+
+                    const contentArea = document.createElement('div');
+                    contentArea.className = 'comment-content';
+                    contentArea.contentEditable = 'true';
+                    contentArea.textContent = commentData.content;
+
+                    commentBox.appendChild(dragHandle);
+                    commentBox.appendChild(contentArea);
+                    
+                    commentBox.style.top = commentData.top;
+                    commentBox.style.left = commentData.left;
+
+                    document.body.appendChild(commentBox);
+                    makeDraggable(commentBox);
+
+                    // Add input listener directly to comment content
+                    contentArea.addEventListener('input', saveSheetMusic);
+                });
+                console.log('Comentarios reconstruidos.');
+            }
+
             console.log('Partitura cargada automáticamente.');
         } else {
             console.log('No se encontraron datos guardados. Usando estructura por defecto.');
@@ -150,6 +194,17 @@ document.addEventListener('DOMContentLoaded', () => {
             focusedSectionTitle = null;
         }
         console.log('Foco cambiado. focusedMeasure:', focusedMeasure, 'focusedSectionTitle:', focusedSectionTitle);
+    });
+
+    // --- GUARDADO AUTOMÁTICO AL ESCRIBIR ---
+    chartContainer.addEventListener('input', (event) => {
+        console.log('Input event detected on:', event.target);
+        if (event.target.classList.contains('measure') || 
+            event.target.id === 'song-title' || 
+            (event.target.tagName === 'H2' && event.target.closest('.song-section'))) {
+            console.log('Input event on comment-content detected.');
+            saveSheetMusic();
+        }
     });
 
     // --- MANEJO DE CONTROLES ---
@@ -335,6 +390,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(commentBox);
         makeDraggable(commentBox);
         saveSheetMusic(); // Save after adding comment
+
+        // Add input listener directly to comment content
+        contentArea.addEventListener('input', saveSheetMusic);
     });
 
     document.getElementById('export-pdf-btn').addEventListener('click', async () => {
@@ -388,4 +446,35 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Cargar datos al iniciar
     loadSheetMusic();
+
+    // --- FUNCIÓN PARA REINICIAR LA PARTITURA ---
+    function resetChart() {
+        if (confirm('¿Estás seguro de que quieres reiniciar la partitura? Se borrará todo el contenido.')) {
+            // Limpiar el localStorage
+            localStorage.removeItem('sheetMusicData');
+            console.log('Datos de partitura borrados del localStorage.');
+
+            // Reestablecer la estructura por defecto
+            chartContainer.innerHTML = `
+                <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
+                <div class="song-section">
+                    <h2 contenteditable="true">Intro</h2>
+                    <div class="measures-grid">
+                        <div class="measure" contenteditable="true"></div>
+                        <div class="measure" contenteditable="true"></div>
+                        <div class="measure" contenteditable="true"></div>
+                        <div class="measure" contenteditable="true"></div>
+                    </div>
+                </div>
+            `;
+            // Eliminar todos los comentarios existentes del DOM
+            document.querySelectorAll('.comment-box').forEach(comment => comment.remove());
+            console.log('Estructura de partitura reestablecida a la configuración por defecto.');
+            // No es necesario llamar a saveSheetMusic() aquí, ya que loadSheetMusic() se encarga de la persistencia
+            // al inicio si no hay datos guardados, y el estado inicial ya está establecido.
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    document.getElementById('reset-chart-btn').addEventListener('click', resetChart);
 });

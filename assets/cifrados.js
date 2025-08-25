@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pdfHeight = pdf.internal.pageSize.getHeight();
         const marginTop = 10;
         const marginBottom = 10; // Revert to 10 for now for simplicity
-        const marginHorizontal = 10;
+        const marginHorizontal = 0;
         
         const usableWidth = pdfWidth - (marginHorizontal * 2);
         const usableHeight = pdfHeight - marginTop - marginBottom;

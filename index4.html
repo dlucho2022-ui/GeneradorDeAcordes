@@ -59,12 +59,42 @@
             transition: d 0.5s ease-in-out;
         }
         #floating-play-stop-button-circle {
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
-            background-color: #198754; color: white; border-radius: 50%; border: none;
+            position: fixed;
+            top: 15px;   /* Ajustado a 15px */
+            left: 15px;  /* Ajustado a 15px */
+            width: 60px; height: 60px;
+            background-color: #198754; /* Color verde para stopped */
+            color: white;
+            border-radius: 50%;
+            border: none;
             display: flex; justify-content: center; align-items: center; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 1001; /* Asegura que esté por encima de otros elementos */
+            transition: all 0.3s ease; /* Transición para hover y active */
         }
-        #floating-play-stop-button-circle.playing { background-color: #dc3545; }
+        #floating-play-stop-button-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        #floating-play-stop-button-circle.playing {
+            background-color: #dc3545; /* Color rojo para playing */
+            animation: pulse 1.5s infinite; /* Animación de pulso */
+        }
+        /* Definir la animación pulse si no está ya definida en index4.html */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+        }
         .completed-progression-chord {
             opacity: 0.7;
             background-color: #3a3a3a; /* Un color de fondo diferente */
@@ -415,17 +445,50 @@ document.addEventListener('DOMContentLoaded', () => {
             playStopBtn.innerHTML = playIconSVG;
             playStopBtn.classList.remove('playing');
         } else {
-            if (currentProgression.length === 0) return;
+            // Crear una lista plana de todos los acordes a reproducir
+            const allChordsToPlay = [];
+            allCompletedProgressions.forEach(prog => allChordsToPlay.push(...prog));
+            allChordsToPlay.push(...currentProgression);
+
+            if (allChordsToPlay.length === 0) return; // Si no hay acordes, no hacer nada
+
             Tone.Transport.bpm.value = 120;
             let chordIndex = 0;
             transportLoop = new Tone.Loop(time => {
-                const chord = currentProgression[chordIndex % currentProgression.length];
+                const chord = allChordsToPlay[chordIndex % allChordsToPlay.length];
                 sampler.triggerAttackRelease(chord.notes, '1n', time);
-                const chordElements = progressionBuilder.childNodes;
-                chordElements.forEach(el => el.classList.remove('playing-chord'));
-                if(chordElements[chordIndex % currentProgression.length]){
-                    chordElements[chordIndex % currentProgression.length].classList.add('playing-chord');
+
+                // Lógica para resaltar el acorde actual en la progresión visual
+                const allChordElements = progressionBuilder.querySelectorAll('.progression-chord');
+                allChordElements.forEach(el => el.classList.remove('playing-chord'));
+
+                // Calcular el índice global del acorde que se está reproduciendo
+                let globalChordIndex = chordIndex % allChordsToPlay.length;
+                let currentVisualIndex = 0;
+
+                // Encontrar el índice visual correcto para resaltar
+                for (let i = 0; i < allCompletedProgressions.length; i++) {
+                    if (globalChordIndex < allCompletedProgressions[i].length) {
+                        if (allChordElements[currentVisualIndex + globalChordIndex]) {
+                            allChordElements[currentVisualIndex + globalChordIndex].classList.add('playing-chord');
+                        }
+                        break;
+                    }
+                    currentVisualIndex += allCompletedProgressions[i].length;
+                    // Sumar 1 por cada separador si los hay
+                    if (i < allCompletedProgressions.length - 1) {
+                        currentVisualIndex += 1; // Asumiendo un separador por cada progresión completada
+                    }
+                    globalChordIndex -= allCompletedProgressions[i].length;
                 }
+
+                if (globalChordIndex >= 0 && globalChordIndex < currentProgression.length) {
+                    if (allChordElements[currentVisualIndex + globalChordIndex]) {
+                        allChordElements[currentVisualIndex + globalChordIndex].classList.add('playing-chord');
+                    }
+                }
+
+
                 chordIndex++;
             }, "1n").start(0);
             Tone.Transport.start();

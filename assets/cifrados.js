@@ -257,15 +257,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load settings on initial page load
     loadMeasureSettings();
 
-    // Función para agregar una fila de compases
-    function addRow(grid) {
+    // Helper function to insert 4 measures
+    function insertMeasures(grid, referenceElement = null) {
         for (let i = 0; i < 4; i++) {
             const measure = document.createElement('div');
             measure.className = 'measure';
             measure.contentEditable = 'true';
-            grid.appendChild(measure);
+            measure.textContent = ''; // Ensure new measures are empty
+
+            if (referenceElement) {
+                grid.insertBefore(measure, referenceElement);
+            } else {
+                grid.appendChild(measure);
+            }
         }
-        saveSheetMusic(); // Save after adding row
     }
 
     // Controles de compás
@@ -319,36 +324,55 @@ document.addEventListener('DOMContentLoaded', () => {
             if (insertionStartIndex < measures.length) {
                 referenceElement = measures[insertionStartIndex];
             }
-
-            for (let i = 0; i < 4; i++) {
-                const newMeasure = document.createElement('div');
-                newMeasure.className = 'measure';
-                newMeasure.contentEditable = 'true';
-                newMeasure.textContent = '';
-
-                if (referenceElement) {
-                    grid.insertBefore(newMeasure, referenceElement);
-                } else {
-                    grid.appendChild(newMeasure);
-                }
-            }
+            insertMeasures(grid, referenceElement); // Use helper
         } else if (focusedSectionTitle) {
             const grid = focusedSectionTitle.nextElementSibling;
             if (grid && grid.classList.contains('measures-grid')) {
-                for (let i = 0; i < 4; i++) {
-                    const newMeasure = document.createElement('div');
-                    newMeasure.className = 'measure';
-                    newMeasure.contentEditable = 'true';
-                    newMeasure.textContent = '';
-                    grid.insertBefore(newMeasure, grid.firstChild);
-                }
+                insertMeasures(grid, grid.firstChild); // Insert at beginning
             } else {
                 alert('No se encontró la grilla de compases para esta sección.');
             }
         } else {
             alert('Hacé clic en un compás o en el título de una sección para indicar dónde querés agregar la fila.');
         }
-        saveSheetMusic(); // Save after adding row
+        saveSheetMusic();
+    });
+
+    chartContainer.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default Enter behavior (new line)
+
+            const activeElement = document.activeElement;
+
+            if (activeElement && activeElement.classList.contains('measure')) {
+                const grid = activeElement.closest('.measures-grid');
+                if (grid) {
+                    const measures = Array.from(grid.children);
+                    const focusedIndex = measures.indexOf(activeElement);
+                    const insertionStartIndex = Math.floor(focusedIndex / 4) * 4 + 4; // After current row
+
+                    let referenceElement = null;
+                    if (insertionStartIndex < measures.length) {
+                        referenceElement = measures[insertionStartIndex];
+                    }
+                    insertMeasures(grid, referenceElement);
+                    saveSheetMusic();
+                    // Optional: move focus to the first new measure
+                    if (referenceElement) {
+                        referenceElement.previousElementSibling.focus();
+                    } else {
+                        grid.lastElementChild.focus();
+                    }
+                }
+            } else if (activeElement && activeElement.tagName === 'H2' && activeElement.closest('.song-section')) {
+                const grid = activeElement.nextElementSibling;
+                if (grid && grid.classList.contains('measures-grid')) {
+                    insertMeasures(grid); // Append to end of section
+                    saveSheetMusic();
+                    grid.lastElementChild.focus(); // Move focus to first new measure
+                }
+            }
+        }
     });
 
     document.getElementById('add-section-btn').addEventListener('click', () => {

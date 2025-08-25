@@ -20,6 +20,7 @@
             border: 2px solid #444;
             transition: transform 0.7s cubic-bezier(0.645, 0.045, 0.355, 1), 
                         border-color 0.3s, box-shadow 0.3s;
+            z-index: 10; /* Asegura que los botones estén sobre las líneas */
         }
         .key-base:hover {
             border-color: #bb86fc;
@@ -37,11 +38,25 @@
         .key-minor.active { background-color: #9370db; color: #f0f0f0; }
         .key-diminished.active { background-color: #ff6347; color: #f0f0f0; }
 
-        .center-controls { z-index: 10; text-align: center; }
+        .center-controls { z-index: 20; text-align: center; position: relative; }
         .center-controls label { font-size: 1.2em; margin-bottom: 10px; display: block; color: #e0e0e0; }
         .center-controls select {
             font-size: 1.2em; padding: 5px; border-radius: 5px; background-color: #212121;
             color: #f0f0f0; border: 1px solid #444;
+        }
+        #progression-svg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Permite hacer clic a través del SVG */
+            z-index: 15;
+        }
+        #progression-path {
+            stroke: #ff6347; /* Color tomate, bien visible */
+            stroke-width: 4px;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.7;
+            transition: d 0.5s ease-in-out;
         }
         #floating-play-stop-button-circle {
             position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
@@ -65,7 +80,9 @@
         </nav>
     </header>
     <main>
-        <div class="circle-container" id="circle-of-fifths"></div>
+        <div class="circle-container" id="circle-of-fifths">
+            <svg id="progression-svg"><path id="progression-path"></path></svg>
+        </div>
         <div id="progression-container" class="progression-section">
             <h2>Progresión de Acordes</h2>
             <div id="progression-builder" class="progression-builder"></div>
@@ -81,6 +98,7 @@
 <footer><p> </p></footer>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Script de index4.html cargado y DOM listo."); // <--- AGREGAR ESTA LÍNEA
     document.body.addEventListener('click', () => { if (Tone.context.state !== 'running') Tone.start(); }, { once: true });
 
     const sampler = new Tone.Sampler({
@@ -92,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressionBuilder = document.getElementById('progression-builder');
     const clearProgressionBtn = document.getElementById('clear-progression-btn');
     const playStopBtn = document.getElementById('floating-play-stop-button-circle');
+    const progressionPath = document.getElementById('progression-path');
     const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>`;
     const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
 
@@ -127,36 +146,126 @@ document.addEventListener('DOMContentLoaded', () => {
     const sharpKeys = ['G', 'D', 'A', 'E', 'B', 'F#'];
     const radii = { major: 310, minor: 230, diminished: 150 };
     const keyElements = [];
+    const keyElementMap = new Map();
     let currentProgression = [];
+    let allCompletedProgressions = []; // NUEVA VARIABLE
     let transportLoop;
 
     function getChordNotes(rootNote, type) {
-        const pureRootNote = rootNote.replace('m', ''); // Limpiar la 'm' para el cálculo
+        const pureRootNote = rootNote.replace('m', '');
         const rootPitch = Tone.Frequency(pureRootNote + "4").toMidi();
-        let intervals;
-        if (type === 'major') intervals = [0, 4, 7];
-        else if (type === 'minor') intervals = [0, 3, 7];
-        else intervals = [0, 3, 6]; // diminished
+        let intervals = (type === 'major') ? [0, 4, 7] : (type === 'minor') ? [0, 3, 7] : [0, 3, 6];
         return intervals.map(i => Tone.Frequency(rootPitch + i, "midi").toNote());
     }
 
     function addChordToProgression(rootNote, type) {
         let display = rootNote.replace('b', '♭').replace('#', '♯');
         if (type === 'diminished') display += '°';
-        // No longer need to add 'm' as it's part of the rootNote (e.g., 'Am')
-        currentProgression.push({ root: rootNote, type: type, notes: getChordNotes(rootNote, type), display: display });
+
+        const newChord = { root: rootNote, type: type, notes: getChordNotes(rootNote, type), display: display };
+
+        // Siempre añadir el nuevo acorde a la progresión actual primero
+        currentProgression.push(newChord);
+
+        // Verificar si el nuevo acorde cierra el ciclo de la progresión actual
+        // Solo si hay al menos dos acordes (el primero y el que acaba de cerrar el ciclo)
+        if (currentProgression.length > 1) {
+            const firstChordOfCurrent = currentProgression[0];
+            if (firstChordOfCurrent.root === newChord.root && firstChordOfCurrent.type === newChord.type) {
+                // Ciclo cerrado para la currentProgression
+                // Guardar una copia de la progresión actual (que ahora incluye el acorde que cierra el ciclo)
+                allCompletedProgressions.push([...currentProgression]);
+                console.log("Ciclo de progresión completado. Guardado:", allCompletedProgressions[allCompletedProgressions.length - 1]);
+                // Reiniciar currentProgression para la siguiente progresión
+                currentProgression = [];
+                console.log("Nueva progresión iniciada.");
+            }
+        }
+
         updateProgressionDisplay();
+        drawAllProgressionLines(); // Llamar a la nueva función de dibujo
     }
 
     function updateProgressionDisplay() {
+        console.log("Actualizando display de progresión."); // <--- AGREGAR ESTA LÍNEA
         progressionBuilder.innerHTML = '';
         currentProgression.forEach((chord, index) => {
             const chordEl = document.createElement('div');
             chordEl.className = 'progression-chord';
             chordEl.innerHTML = `<div class="chord-name-display">${chord.display}</div>`;
-            chordEl.onclick = () => { currentProgression.splice(index, 1); updateProgressionDisplay(); };
+            chordEl.onclick = () => { 
+                currentProgression.splice(index, 1); 
+                updateProgressionDisplay(); 
+            };
             progressionBuilder.appendChild(chordEl);
         });
+        drawAllProgressionLines();
+    }
+
+    // Función auxiliar para dibujar un solo path de progresión
+    function _drawSingleProgressionPath(progression, pathElement) {
+        if (progression.length < 2) {
+            pathElement.setAttribute('d', '');
+            return;
+        }
+        const containerRect = circleContainer.getBoundingClientRect();
+        const containerCenter = { x: containerRect.width / 2, y: containerRect.height / 2 };
+
+        const points = progression.map(chord => {
+            const mapKey = chord.root + chord.type;
+            const element = keyElementMap.get(mapKey);
+            if (!element) {
+                console.warn(`Elemento no encontrado en keyElementMap para la clave: ${mapKey} en _drawSingleProgressionPath`);
+                return null;
+            }
+
+            const style = window.getComputedStyle(element);
+            const matrix = new DOMMatrix(style.transform);
+            return { x: matrix.e + containerCenter.x, y: matrix.f + containerCenter.y };
+        }).filter(p => p);
+
+        if (points.length < 2) {
+            pathElement.setAttribute('d', '');
+            return;
+        }
+
+        const pathData = points.map((p, i) => (i === 0 ? 'M' : 'L') + `${p.x} ${p.y}`).join(' ');
+        pathElement.setAttribute('d', pathData);
+    }
+
+    // Nueva función para dibujar todas las progresiones
+    function drawAllProgressionLines() {
+        const progressionSVG = document.getElementById('progression-svg');
+        // Limpiar todos los paths existentes excepto el que usaremos para la currentProgression
+        // (si es que lo vamos a reutilizar, sino, limpiar todo y crear uno nuevo para currentProgression)
+        // Por simplicidad, vamos a limpiar todos los paths y recrearlos.
+        progressionSVG.innerHTML = ''; // Limpiar todos los paths anteriores
+
+        // Dibujar cada progresión completada
+        allCompletedProgressions.forEach((prog, index) => {
+            const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            newPath.setAttribute('class', 'progression-path-completed'); // Puedes darle una clase diferente si quieres otro estilo
+            newPath.setAttribute('stroke', '#198754'); // CAMBIADO: Color verde
+            newPath.setAttribute('stroke-width', '3px');
+            newPath.setAttribute('fill', 'none');
+            newPath.setAttribute('stroke-linecap', 'round');
+            newPath.setAttribute('stroke-linejoin', 'round');
+            newPath.setAttribute('opacity', '0.5');
+            progressionSVG.appendChild(newPath);
+            _drawSingleProgressionPath(prog, newPath);
+        });
+
+        // Dibujar la progresión actual
+        const currentPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        currentPath.setAttribute('id', 'progression-path'); // Reutilizamos el ID para el path actual
+        currentPath.setAttribute('stroke', '#ff6347'); // Color para la progresión actual
+        currentPath.setAttribute('stroke-width', '4px');
+        currentPath.setAttribute('fill', 'none');
+        currentPath.setAttribute('stroke-linecap', 'round');
+        currentPath.setAttribute('stroke-linejoin', 'round');
+        currentPath.setAttribute('opacity', '0.7');
+        progressionSVG.appendChild(currentPath);
+        _drawSingleProgressionPath(currentProgression, currentPath);
     }
 
     function createKeyElement(keyInfo, type, radius, index) {
@@ -172,12 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
         keyElement.addEventListener('click', (e) => {
             e.stopPropagation();
             sampler.releaseAll();
-            const keyName = keyElement.dataset.key;
-            const notes = getChordNotes(keyName, type);
+            const clickedKeyName = keyElement.dataset.key;
+            const clickedKeyType = keyElement.dataset.type;
+            const notes = getChordNotes(clickedKeyName, clickedKeyType);
             sampler.triggerAttackRelease(notes, '2n');
             keyElement.classList.add('active');
             setTimeout(() => keyElement.classList.remove('active'), 300);
-            addChordToProgression(keyName, type);
+            addChordToProgression(clickedKeyName, clickedKeyType);
         });
         circleContainer.appendChild(keyElement);
         keyElements.push({ element: keyElement, radius: radius, index: index });
@@ -200,14 +310,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const keyDataForPitch = keysData.find(k => k.pitch === pitch);
             if (!keyDataForPitch) return;
 
-            // 1. Relabel
             const keyName = isSharpContext ? keyDataForPitch.sharp[type] : keyDataForPitch.flat[type];
             keyElement.dataset.key = keyName;
             let text = keyName.replace('b', '♭').replace('#', '♯');
             if (type === 'diminished') text += '°';
             keyElement.querySelector('.key-text').textContent = text;
+            keyElementMap.set(keyName + type, keyElement); // Update map with current key name
 
-            // 2. Highlight and Position
             let isDiatonic = false;
             if (diatonicRoots) {
                 if (type === 'major' && diatonicRoots.majors.includes(keyName)) isDiatonic = true;
@@ -229,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 keyElement.style.transform = posTransform;
             }
         });
+        drawAllProgressionLines(); // Redraw lines after rotation
     }
 
     function initCircle() {
@@ -282,7 +392,9 @@ document.addEventListener('DOMContentLoaded', () => {
     clearProgressionBtn.addEventListener('click', () => {
         if (Tone.Transport.state === 'started') togglePlayback();
         currentProgression = [];
+        allCompletedProgressions = []; // Limpiar también las progresiones completadas
         updateProgressionDisplay();
+        drawAllProgressionLines(); // Volver a dibujar para limpiar las líneas
     });
     playStopBtn.addEventListener('click', togglePlayback);
 

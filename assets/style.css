@@ -1194,11 +1194,11 @@ body:not(.body-sheet-music) .button.playing svg {
     position: absolute;
     z-index: 1100;
     background-color: transparent;
-    border: 1px dashed #333;
-    padding: 5px;
-    padding-top: 20px; /* Espacio para la manija de arrastre */
+    border: none; /* No border */
+    padding: 0; /* No padding on the box itself */
     border-radius: 3px;
     max-width: 300px;
+    padding-top: 18px; /* Space for the drag handle */
 }
 
 .comment-drag-handle {
@@ -1206,10 +1206,10 @@ body:not(.body-sheet-music) .button.playing svg {
     top: 0;
     left: 0;
     width: 100%;
-    height: 18px;
+    height: 18px; /* Small top bar */
     cursor: move;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-bottom: 1px dashed #333;
+    background-color: transparent; /* Invisible */
+    border: none; /* No border */
 }
 
 .comment-content {
@@ -1217,12 +1217,16 @@ body:not(.body-sheet-music) .button.playing svg {
     white-space: pre-wrap; /* Respeta saltos de línea y espacios */
     outline: none; /* Sin borde al hacer foco */
     min-height: 20px; /* Altura mínima */
+    padding: 5px; /* Padding for content */
+    border: none; /* No border on content area */
+    cursor: text; /* Indicate it's editable */
 }
 
 .measure-placeholder {
-    background-color: #fdfdfd; /* Mismo fondo que un compás normal */
-    min-height: 60px;
+    border-right: 2px solid #121212;
+    border-bottom: 2px solid #121212;
     box-sizing: border-box;
+    min-height: 60px; /* Misma altura que un compás normal */
+    background-color: transparent;
     visibility: hidden; /* Oculta el contenido pero mantiene el espacio */
-    border: 2px solid #121212; /* El placeholder también necesita bordes */
 }

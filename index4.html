@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circulo de Quintas</title>
+    <link rel="shortcut icon" href="assets/images/iconapp.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/cards.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        .circle-container {
+            position: relative; width: 750px; height: 750px; margin: 50px auto;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .key-base {
+            position: absolute; border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; cursor: pointer; user-select: none; background-color: #2c2c2c;
+            border: 2px solid #444;
+            transition: all 0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .key-base:hover {
+            border-color: #bb86fc;
+            transform: var(--transform-pos) scale(1.1) !important;
+        }
+        .key-base.diatonic {
+            border: 3px solid #bb86fc;
+            box-shadow: 0 0 20px 3px rgba(187, 134, 252, 0.5);
+            transform: var(--transform-pos) scale(1.05);
+        }
+        .key-major { width: 130px; height: 130px; font-size: 2em; color: #f0f0f0; }
+        .key-minor { width: 100px; height: 100px; font-size: 1.6em; color: #e0e0e0; }
+        .key-diminished { width: 75px; height: 75px; font-size: 1.2em; color: #b0b0b0; }
+
+        .key-major.active { background-color: #6a0dad; color: #f0f0f0; }
+        .key-minor.active { background-color: #9370db; color: #f0f0f0; }
+        .key-diminished.active { background-color: #ff6347; color: #f0f0f0; }
+
+        .function-label {
+            position: absolute; top: 5px; right: 10px; font-size: 0.8em; color: #f0f0f0;
+            background-color: rgba(0,0,0,0.6); padding: 2px 5px; border-radius: 4px;
+            display: none; /* Oculto por defecto */
+        }
+        .key-base.diatonic .function-label { display: block; }
+
+        .center-controls { z-index: 10; text-align: center; }
+        .center-controls label { font-size: 1.2em; margin-bottom: 10px; display: block; color: #e0e0e0; }
+        .center-controls select {
+            font-size: 1.2em; padding: 5px; border-radius: 5px; background-color: #212121;
+            color: #f0f0f0; border: 1px solid #444;
+        }
+        #floating-play-stop-button-circle {
+            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+            background-color: #198754; color: white; border-radius: 50%; border: none;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1001;
+        }
+        #floating-play-stop-button-circle.playing { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Generador de progresiones</a></li>
+                <li><a href="Index2.html">Generador de partituras</a></li>
+                <li><a href="Index3.html">Generador de ondas</a></li>
+                <li><a href="index4.html" class="active-nav-link">circulo de quintas</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="circle-container" id="circle-of-fifths"></div>
+        <div id="progression-container" class="progression-section">
+            <h2>Progresión de Acordes</h2>
+            <div id="progression-builder" class="progression-builder"></div>
+            <div class="progression-controls">
+                <button id="clear-progression-btn" class="control-button">Limpiar</button>
+            </div>
+        </div>
+    </main>
+</div>
+<button id="floating-play-stop-button-circle" class="button">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>
+</button>
+<footer><p> </p></footer>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('click', () => { if (Tone.context.state !== 'running') Tone.start(); }, { once: true });
+
+    const sampler = new Tone.Sampler({
+        urls: { 'C4':'C4.mp3','D#4':'Ds4.mp3','F#4':'Fs4.mp3','A4':'A4.mp3' },
+        release: 0.5, baseUrl: "https://tonejs.github.io/audio/salamander/",
+    }).toDestination();
+
+    const circleContainer = document.getElementById('circle-of-fifths');
+    const progressionBuilder = document.getElementById('progression-builder');
+    const clearProgressionBtn = document.getElementById('clear-progression-btn');
+    const playStopBtn = document.getElementById('floating-play-stop-button-circle');
+    const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>`;
+    const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
+
+    const keysData = [
+        { pitch: 0, sharp: { major: 'C', minor: 'Am', diminished: 'B' }, flat: { major: 'C', minor: 'Am', diminished: 'B' } },
+        { pitch: 7, sharp: { major: 'G', minor: 'Em', diminished: 'F#' }, flat: { major: 'G', minor: 'Em', diminished: 'F#' } },
+        { pitch: 2, sharp: { major: 'D', minor: 'Bm', diminished: 'C#' }, flat: { major: 'D', minor: 'Bm', diminished: 'C#' } },
+        { pitch: 9, sharp: { major: 'A', minor: 'F#m', diminished: 'G#' }, flat: { major: 'A', minor: 'F#m', diminished: 'G#' } },
+        { pitch: 4, sharp: { major: 'E', minor: 'C#m', diminished: 'D#' }, flat: { major: 'E', minor: 'C#m', diminished: 'D#' } },
+        { pitch: 11, sharp: { major: 'B', minor: 'G#m', diminished: 'A#' }, flat: { major: 'Cb', minor: 'Abm', diminished: 'Bb' } },
+        { pitch: 6, sharp: { major: 'F#', minor: 'D#m', diminished: 'E#' }, flat: { major: 'Gb', minor: 'Ebm', diminished: 'F' } },
+        { pitch: 1, sharp: { major: 'C#', minor: 'A#m', diminished: 'B#' }, flat: { major: 'Db', minor: 'Bbm', diminished: 'C' } },
+        { pitch: 8, sharp: { major: 'G#', minor: 'Fm', diminished: 'G' }, flat: { major: 'Ab', minor: 'Fm', diminished: 'G' } },
+        { pitch: 3, sharp: { major: 'D#', minor: 'Cm', diminished: 'D' }, flat: { major: 'Eb', minor: 'Cm', diminished: 'D' } },
+        { pitch: 10, sharp: { major: 'A#', minor: 'Gm', diminished: 'A' }, flat: { major: 'Bb', minor: 'Gm', diminished: 'A' } },
+        { pitch: 5, sharp: { major: 'F', minor: 'Dm', diminished: 'E' }, flat: { major: 'F', minor: 'Dm', diminished: 'E' } }
+    ];
+    const diatonicFunctionMap = {
+        'C': [{r:'C',f:'Imaj7',t:'maj7'},{r:'D',f:'IIm7',t:'m7'},{r:'E',f:'IIIm7',t:'m7'},{r:'F',f:'IVmaj7',t:'maj7'},{r:'G',f:'V7',t:'dom7'},{r:'A',f:'VIm7',t:'m7'},{r:'B',f:'VIIm7b5',t:'m7b5'}],
+        'G': [{r:'G',f:'Imaj7',t:'maj7'},{r:'A',f:'IIm7',t:'m7'},{r:'B',f:'IIIm7',t:'m7'},{r:'C',f:'IVmaj7',t:'maj7'},{r:'D',f:'V7',t:'dom7'},{r:'E',f:'VIm7',t:'m7'},{r:'F#',f:'VIIm7b5',t:'m7b5'}],
+        'D': [{r:'D',f:'Imaj7',t:'maj7'},{r:'E',f:'IIm7',t:'m7'},{r:'F#',f:'IIIm7',t:'m7'},{r:'G',f:'IVmaj7',t:'maj7'},{r:'A',f:'V7',t:'dom7'},{r:'B',f:'VIm7',t:'m7'},{r:'C#',f:'VIIm7b5',t:'m7b5'}],
+        'A': [{r:'A',f:'Imaj7',t:'maj7'},{r:'B',f:'IIm7',t:'m7'},{r:'C#',f:'IIIm7',t:'m7'},{r:'D',f:'IVmaj7',t:'maj7'},{r:'E',f:'V7',t:'dom7'},{r:'F#',f:'VIm7',t:'m7'},{r:'G#',f:'VIIm7b5',t:'m7b5'}],
+        'E': [{r:'E',f:'Imaj7',t:'maj7'},{r:'F#',f:'IIm7',t:'m7'},{r:'G#',f:'IIIm7',t:'m7'},{r:'A',f:'IVmaj7',t:'maj7'},{r:'B',f:'V7',t:'dom7'},{r:'C#',f:'VIm7',t:'m7'},{r:'D#',f:'VIIm7b5',t:'m7b5'}],
+        'B': [{r:'B',f:'Imaj7',t:'maj7'},{r:'C#',f:'IIm7',t:'m7'},{r:'D#',f:'IIIm7',t:'m7'},{r:'E',f:'IVmaj7',t:'maj7'},{r:'F#',f:'V7',t:'dom7'},{r:'G#',f:'VIm7',t:'m7'},{r:'A#',f:'VIIm7b5',t:'m7b5'}],
+        'F#': [{r:'F#',f:'Imaj7',t:'maj7'},{r:'G#',f:'IIm7',t:'m7'},{r:'A#',f:'IIIm7',t:'m7'},{r:'B',f:'IVmaj7',t:'maj7'},{r:'C#',f:'V7',t:'dom7'},{r:'D#',f:'VIm7',t:'m7'},{r:'E#',f:'VIIm7b5',t:'m7b5'}],
+        'Gb': [{r:'Gb',f:'Imaj7',t:'maj7'},{r:'Ab',f:'IIm7',t:'m7'},{r:'Bb',f:'IIIm7',t:'m7'},{r:'Cb',f:'IVmaj7',t:'maj7'},{r:'Db',f:'V7',t:'dom7'},{r:'Eb',f:'VIm7',t:'m7'},{r:'F',f:'VIIm7b5',t:'m7b5'}],
+        'Db': [{r:'Db',f:'Imaj7',t:'maj7'},{r:'Eb',f:'IIm7',t:'m7'},{r:'F',f:'IIIm7',t:'m7'},{r:'Gb',f:'IVmaj7',t:'maj7'},{r:'Ab',f:'V7',t:'dom7'},{r:'Bb',f:'VIm7',t:'m7'},{r:'C',f:'VIIm7b5',t:'m7b5'}],
+        'Ab': [{r:'Ab',f:'Imaj7',t:'maj7'},{r:'Bb',f:'IIm7',t:'m7'},{r:'C',f:'IIIm7',t:'m7'},{r:'Db',f:'IVmaj7',t:'maj7'},{r:'Eb',f:'V7',t:'dom7'},{r:'F',f:'VIm7',t:'m7'},{r:'G',f:'VIIm7b5',t:'m7b5'}],
+        'Eb': [{r:'Eb',f:'Imaj7',t:'maj7'},{r:'F',f:'IIm7',t:'m7'},{r:'G',f:'IIIm7',t:'m7'},{r:'Ab',f:'IVmaj7',t:'maj7'},{r:'Bb',f:'V7',t:'dom7'},{r:'C',f:'VIm7',t:'m7'},{r:'D',f:'VIIm7b5',t:'m7b5'}],
+        'Bb': [{r:'Bb',f:'Imaj7',t:'maj7'},{r:'C',f:'IIm7',t:'m7'},{r:'D',f:'IIIm7',t:'m7'},{r:'Eb',f:'IVmaj7',t:'maj7'},{r:'F',f:'V7',t:'dom7'},{r:'G',f:'VIm7',t:'m7'},{r:'A',f:'VIIm7b5',t:'m7b5'}],
+        'F': [{r:'F',f:'Imaj7',t:'maj7'},{r:'G',f:'IIm7',t:'m7'},{r:'A',f:'IIIm7',t:'m7'},{r:'Bb',f:'IVmaj7',t:'maj7'},{r:'C',f:'V7',t:'dom7'},{r:'D',f:'VIm7',t:'m7'},{r:'E',f:'VIIm7b5',t:'m7b5'}]
+    };
+    const sharpKeys = ['G', 'D', 'A', 'E', 'B', 'F#'];
+    const radii = { major: 310, minor: 230, diminished: 150 };
+    const noteToPitchIndex = {
+        'C':0, 'B#':0, 'Dbb':0, 'C#':1, 'Db':1, 'D':2, 'C##':2, 'Ebb':2, 'D#':3, 'Eb':3, 'Fbb':3,
+        'E':4, 'Fb':4, 'D##':4, 'F':5, 'E#':5, 'Gbb':5, 'F#':6, 'Gb':6, 'E##':6, 'G':7, 'F##':7, 'Abb':7,
+        'G#':8, 'Ab':8, 'A':9, 'G##':9, 'Bbb':9, 'A#':10, 'Bb':10, 'Cbb':10, 'B':11, 'Cb':11, 'A##':11
+    };
+    const allNotesByPitch = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const keyElements = [];
+    let currentProgression = [];
+    let transportLoop;
+
+    function getPitchIndex(noteName) { return noteToPitchIndex[noteName.replace(/m|°|dim/g, '')]; }
+
+    function getChordNotes(rootNote, type) {
+        const rootIndex = getPitchIndex(rootNote);
+        let intervals;
+        if (type === 'maj7') intervals = [0, 4, 7, 11];
+        else if (type === 'm7') intervals = [0, 3, 7, 10];
+        else if (type === 'dom7') intervals = [0, 4, 7, 10];
+        else if (type === 'm7b5') intervals = [0, 3, 6, 10];
+        else intervals = [0, 3, 6, 9]; // dim7 as fallback
+        return intervals.map(interval => `${allNotesByPitch[(rootIndex + interval) % 12]}4`);
+    }
+
+    function addChordToProgression(rootNote, type, func) {
+        let display = rootNote.replace('b', '♭').replace('#', '♯');
+        if (type === 'm7b5') display += 'm7(b5)';
+        else if (type === 'dom7') display += '7';
+        else if (type) display += type.replace('diminished', '°');
+
+        currentProgression.push({ root: rootNote, type: type, notes: getChordNotes(rootNote, type), display: display, func: func });
+        updateProgressionDisplay();
+    }
+
+    function updateProgressionDisplay() {
+        progressionBuilder.innerHTML = '';
+        currentProgression.forEach((chord, index) => {
+            const chordEl = document.createElement('div');
+            chordEl.className = 'progression-chord';
+            chordEl.innerHTML = `<div class="chord-name-display">${chord.display}</div><div class="function-label">${chord.func || ''}</div>`;
+            chordEl.onclick = () => { currentProgression.splice(index, 1); updateProgressionDisplay(); };
+            progressionBuilder.appendChild(chordEl);
+        });
+    }
+
+    function createKeyElement(keyInfo, type, radius, index) {
+        const keyElement = document.createElement('div');
+        keyElement.className = `key-base key-${type}`;
+        keyElement.dataset.pitch = keysData[index].pitch;
+        keyElement.dataset.type = type;
+        
+        const textElement = document.createElement('div');
+        textElement.className = 'key-text';
+        keyElement.appendChild(textElement);
+
+        const functionLabel = document.createElement('div');
+        functionLabel.className = 'function-label';
+        keyElement.appendChild(functionLabel);
+
+        keyElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sampler.releaseAll();
+            const chordType = keyElement.dataset.chordType || type; // Use diatonic type if available
+            const keyName = keyElement.dataset.key;
+            const func = functionLabel.textContent;
+            const notes = getChordNotes(keyName, chordType);
+            sampler.triggerAttackRelease(notes, '2n');
+            keyElement.classList.add('active');
+            setTimeout(() => keyElement.classList.remove('active'), 300);
+            addChordToProgression(keyName, chordType, func);
+        });
+        circleContainer.appendChild(keyElement);
+        keyElements.push({ element: keyElement, radius: radius, index: index });
+    }
+
+    function relabelAndHighlight(selectedKey) {
+        const isSharpContext = sharpKeys.includes(selectedKey);
+        const diatonic = diatonicFunctionMap[selectedKey];
+        const diatonicLookup = diatonic ? Object.fromEntries(diatonic.map(d => [getPitchIndex(d.r), d])) : {};
+
+        keyElements.forEach(item => {
+            const pitch = parseInt(item.element.dataset.pitch);
+            const type = item.element.dataset.type;
+            const keyDataForPitch = keysData.find(k => k.pitch === pitch);
+            if (!keyDataForPitch) return;
+
+            const keyName = isSharpContext ? keyDataForPitch.sharp[type] : keyDataForPitch.flat[type];
+            item.element.dataset.key = keyName;
+            item.element.querySelector('.key-text').textContent = keyName.replace('b', '♭').replace('#', '♯') + (type === 'diminished' ? '°' : '');
+
+            const functionLabel = item.element.querySelector('.function-label');
+            const diatonicInfo = diatonicLookup[pitch];
+
+            if (diatonicInfo && ( (type === 'major' && (diatonicInfo.t === 'maj7' || diatonicInfo.t === 'dom7')) || (type === 'minor' && diatonicInfo.t === 'm7') || (type === 'diminished' && diatonicInfo.t === 'm7b5') )) {
+                item.element.classList.add('diatonic');
+                functionLabel.textContent = diatonicInfo.f;
+                item.element.dataset.chordType = diatonicInfo.t;
+            } else {
+                item.element.classList.remove('diatonic');
+                functionLabel.textContent = '';
+                item.element.dataset.chordType = type; // Revert to default type
+            }
+        });
+    }
+
+    function initCircle() {
+        // Create center controls inside the circle container
+        const centerControls = document.createElement('div');
+        centerControls.className = 'center-controls';
+        centerControls.innerHTML = `<label for="key-selector">Tonalidad</label><select id="key-selector"></select>`;
+        circleContainer.appendChild(centerControls);
+        const keySelector = document.getElementById('key-selector'); // Re-select after creation
+
+        keysData.forEach((data, i) => {
+            createKeyElement(data, 'major', radii.major, i);
+            createKeyElement(data, 'minor', radii.minor, i);
+            createKeyElement(data, 'diminished', radii.diminished, i);
+        });
+        const selectorKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+        selectorKeys.forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = key.replace('b', '♭').replace('#', '♯');
+            keySelector.appendChild(option);
+        });
+        keySelector.addEventListener('change', (e) => rotateCircle(e.target.value));
+    }
+
+    function rotateCircle(selectedKey = 'C') {
+        const selectedIndex = keysData.findIndex(k => k.sharp.major === selectedKey || k.flat.major === selectedKey);
+        keyElements.forEach(item => {
+            const angle = ((item.index - selectedIndex) / keysData.length) * 2 * Math.PI - (Math.PI / 2);
+            const x = item.radius * Math.cos(angle);
+            const y = item.radius * Math.sin(angle);
+            const posTransform = `translate(${x}px, ${y}px)`;
+            item.element.style.setProperty('--transform-pos', posTransform);
+            item.element.style.transform = posTransform;
+        });
+        relabelAndHighlight(selectedKey);
+    }
+
+    function togglePlayback() {
+        if (Tone.Transport.state === 'started') {
+            Tone.Transport.stop();
+            if (transportLoop) transportLoop.dispose();
+            playStopBtn.innerHTML = playIconSVG;
+            playStopBtn.classList.remove('playing');
+        } else {
+            if (currentProgression.length === 0) return;
+            Tone.Transport.bpm.value = 120;
+            let chordIndex = 0;
+            transportLoop = new Tone.Loop(time => {
+                const chord = currentProgression[chordIndex % currentProgression.length];
+                sampler.triggerAttackRelease(chord.notes, '1n', time);
+                const chordElements = progressionBuilder.childNodes;
+                chordElements.forEach(el => el.classList.remove('playing-chord'));
+                if(chordElements[chordIndex % currentProgression.length]){
+                    chordElements[chordIndex % currentProgression.length].classList.add('playing-chord');
+                }
+                chordIndex++;
+            }, "1n").start(0);
+            Tone.Transport.start();
+            playStopBtn.innerHTML = stopIconSVG;
+            playStopBtn.classList.add('playing');
+        }
+    }
+
+    clearProgressionBtn.addEventListener('click', () => {
+        if (Tone.Transport.state === 'started') togglePlayback();
+        currentProgression = [];
+        updateProgressionDisplay();
+    });
+    playStopBtn.addEventListener('click', togglePlayback);
+
+    initCircle();
+    rotateCircle('C');
+});
+</script>
+</body>
+</html>

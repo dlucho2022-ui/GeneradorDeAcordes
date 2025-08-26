@@ -127,7 +127,8 @@ async function loadMetronomeSound() {
 
         metronomeGainNode = audioContext.createGain();
         const metronomeVolume = document.getElementById('metronome-volume');
-        metronomeGainNode.gain.value = metronomeVolume.value;
+        // Convert initial dB value from slider to linear gain
+        metronomeGainNode.gain.value = Math.pow(10, metronomeVolume.value / 20);
         metronomeGainNode.connect(audioContext.destination);
 
     } catch (e) {
@@ -1289,7 +1290,8 @@ window.onload = () => {
 
     metronomeVolume.addEventListener('input', (event) => {
         if (metronomeGainNode) {
-            metronomeGainNode.gain.value = event.target.value;
+            // Convert dB to linear gain
+            metronomeGainNode.gain.value = Math.pow(10, event.target.value / 20);
         }
     });
     // Ensure metronome stops if page is closed or refreshed

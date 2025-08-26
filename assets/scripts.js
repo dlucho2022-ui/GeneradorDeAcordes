@@ -1,7 +1,3 @@
-let selectedTonalidad = "Do";
-let selectedEscala = "";
-let selectedAcorde = "";
-
 const semitonos_display = ["Do", "Do#", "Reb", "Re", "Re#", "Mib", "Mi", "Fa", "Fa#", "Solb", "Sol", "Sol#", "Lab", "La", "La#", "Sib", "Si"];
 const semitonos_calculo = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
 
@@ -79,9 +75,9 @@ let audioContext;
 let isPlaying = false;
 let currentAudio = null;
 let currentTimeout = null;
-let progressionInterval = null;
 let currentProgressionIndex = 0;
 let currentProgression = [];
+let chordVolumeLinear = Math.pow(10, -6 / 20); // Default value from slider
 
 let currentToneNote = null;
 let currentSynth = new Tone.Synth({
@@ -89,18 +85,23 @@ let currentSynth = new Tone.Synth({
 }).toDestination();
 currentSynth.volume.value = -10;
 
+let kick, snare, hihat;
+let drumSequence, chordLoop;
+let drumVolume;
+
+
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
-    "dim7": "dim7", "m△7": "m-maj7",
-    "△7#5": "aug-maj7", "△7": "maj7", "7#5": "7aug5", "7b5": "7b5",
+    "dim7": "dim7", "m△7": "m-maj7"
+  , "△7#5": "aug-maj7", "△7": "maj7", "7#5": "7aug5", "7b5": "7b5",
     "7#9": "7", "7b9": "7"
 };
 const notaAudioMap = {
     "Do": "c", "Do#": "c-sharp", "Reb": "c-sharp", "Re": "d", "Re#": "d-sharp", "Mib": "d-sharp", "Mi": "e",
     "Fa": "f", "Fa#": "f-sharp", "Solb": "f-sharp", "Sol": "g", "Sol#": "g-sharp", "Lab": "g-sharp",
     "La": "a", "La#": "a-sharp", "Sib": "a-sharp", "Si": "b", "Si#": "c", "Mi#": "f", "Fab": "e",
-    "Fax": "g", "Dox": "d", "Solx": "a", "Lax": "b", "Six": "c-sharp",
-    "Sibb": "a", "Mibb": "d", "Labb": "g"
+    "Fax": "g", "Dox": "d", "Solx": "a", "Lax": "b", "Six": "c-sharp", "Mix": "f-sharp", "Rex": "e",
+    "Sibb": "a", "Mibb": "d", "Labb": "g", "Rebb": "c", "Solbb": "f", "Dobb": "a-sharp", "Fabb": "d-sharp", "Sibbb": "g-sharp"
 };
 
 const toneNoteMap = {
@@ -111,12 +112,12 @@ const toneNoteMap = {
 
 
 
-// --- NUEVAS VARIABLES Y FUNCIONES PARA EL METRÓNOMO ---
+// --- LÓGICA DEL METRÓNOMO INTEGRADO ---
 let metronomeInterval = null;
-let metronomeBpm = 60;
 let isMetronomePlaying = false;
 let metronomeSound;
 let metronomeGainNode;
+let tapTimes = [];
 
 async function loadMetronomeSound() {
     try {
@@ -124,7 +125,6 @@ async function loadMetronomeSound() {
         const arrayBuffer = await response.arrayBuffer();
         metronomeSound = await audioContext.decodeAudioData(arrayBuffer);
 
-        // Crear nodo de ganancia para el metrónomo y conectarlo
         metronomeGainNode = audioContext.createGain();
         const metronomeVolume = document.getElementById('metronome-volume');
         metronomeGainNode.gain.value = metronomeVolume.value;
@@ -139,47 +139,45 @@ function playMetronomeClick() {
     if (metronomeSound) {
         const source = audioContext.createBufferSource();
         source.buffer = metronomeSound;
-        source.connect(metronomeGainNode); // Conectar al nodo de ganancia del metrónomo
+        source.connect(metronomeGainNode);
         source.start(0);
     }
 }
 
-function toggleMetronome() {
-    const toggleBtn = document.getElementById('toggle-metronome-btn');
-    if (isMetronomePlaying) {
-        clearInterval(metronomeInterval);
-        isMetronomePlaying = false;
-        toggleBtn.classList.remove('playing');
-        toggleBtn.classList.add('stopped');
-    } else {
-        if (audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
-        const intervalMs = 60000 / metronomeBpm;
-        metronomeInterval = setInterval(playMetronomeClick, intervalMs);
-        isMetronomePlaying = true;
-        toggleBtn.classList.add('playing');
-        toggleBtn.classList.remove('stopped');
+function startMetronome() {
+    const bpm = parseInt(document.getElementById('bpm-input').value);
+    if (isNaN(bpm) || bpm <= 0) {
+        alert('Por favor, ingresa un BPM válido.');
+        return;
     }
+    const intervalMs = 60000 / bpm;
+
+    metronomeInterval = setInterval(playMetronomeClick, intervalMs);
+    document.getElementById('metronome-start-stop').innerHTML = '<i class="fas fa-stop"></i> Stop';
+    isMetronomePlaying = true;
+}
+
+function stopMetronome() {
+    clearInterval(metronomeInterval);
+    document.getElementById('metronome-start-stop').innerHTML = '<i class="fas fa-play"></i> Start';
+    isMetronomePlaying = false;
 }
 
 function updateMetronomeBPM(bpm) {
-    metronomeBpm = bpm;
-    document.getElementById('bpm-value').textContent = bpm;
+    document.getElementById('bpm-input').value = bpm;
+    document.getElementById('bpm-slider').value = bpm;
+    document.getElementById('bpm-value-display').textContent = bpm;
     if (isMetronomePlaying) {
-        // Reinicia el metrónomo con el nuevo BPM
         clearInterval(metronomeInterval);
-        const intervalMs = 60000 / metronomeBpm;
+        const intervalMs = 60000 / bpm;
         metronomeInterval = setInterval(playMetronomeClick, intervalMs);
     }
-    
-    if(isPlaying){
-        clearInterval(progressionInterval);
-        const progressionIntervalMs = (60000 / metronomeBpm) * 4;
-        progressionInterval = setInterval(playNextChordInProgression, progressionIntervalMs);
+    if(isPlaying){ // If progression is playing, update its tempo too
+        Tone.Transport.bpm.value = bpm;
     }
 }
-// --- FIN DE LAS NUEVAS FUNCIONES PARA EL METRÓNOMO ---
+
+// --- FIN DE LA LÓGICA DEL METRÓNOMO INTEGRADO ---
 
 function mapNotaToSemitone(nota) {
     const semitonoMap = {
@@ -187,9 +185,8 @@ function mapNotaToSemitone(nota) {
         "Fa": 5, "Fa#": 6, "Solb": 6, "Sol": 7, "Sol#": 8, "Lab": 8,
         "La": 9, "La#": 10, "Sib": 10, "Si": 11,
         "Mi#": 5, "Si#": 0, "Fab": 4, "Dob": 11,
-        "Dox": 2, "Fax": 7, "Solx": 9, "Lax": 11, "Six": 1,
-        // Correcciones y adiciones para notas con doble bemol
-        "Rebb": 0, "Mibb": 2, "Fabb": 3, "Labb": 7, "Sibb": 9, "Dobb": 10
+        "Dox": 2, "Fax": 7, "Solx": 9, "Lax": 11, "Six": 1, "Rex": 4, "Mix": 6,
+        "Rebb": 0, "Mibb": 2, "Fabb": 3, "Solbb": 5, "Labb": 7, "Sibb": 9, "Dobb": 10, "Sibbb": 8
     };
     return semitonoMap[nota] !== undefined ? semitonoMap[nota] : -1;
 }
@@ -217,39 +214,35 @@ function getTipoAcorde(intervalos) {
     };
 
     const intervalosStr = intervalos.join(',');
-    if (intervalos.length === 3) return acordesTriada[intervalosStr] || " (?)";
-    if (intervalos.length === 4) return acordesSeptima[intervalosStr] || " (?)";
-    return " (?)";
+    if (intervalos.length === 3) return acordesTriada[intervalosStr] || " (?) ";
+    if (intervalos.length === 4) return acordesSeptima[intervalosStr] || " (?) ";
+    return " (?) ";
 }
 
 async function loadAudioFiles() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
-    // drumGainNode and drumBuffer are no longer needed for static loops
-    // drumGainNode = audioContext.createGain();
-    // const drumVolume = document.getElementById('drum-volume');
-    // drumGainNode.gain.value = drumVolume.value;
-    // drumGainNode.connect(audioContext.destination);
+    
+    drumVolume = new Tone.Volume(0).toDestination();
+    kick = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/Kick-V01-Yamaha-16x16.wav").connect(drumVolume);
+    snare = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/SNARE-V01-CustomWorks-6x13.wav").connect(drumVolume);
+    hihat = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/HHats-CL-V01-SABIAN-AAX.wav").connect(drumVolume);
 
     const notas_audio = ["c", "c-sharp", "d", "d-sharp", "e", "f", "f-sharp", "g", "g-sharp", "a", "a-sharp", "b"];
-    const tipos_acorde = ["dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
+    const tipos_acorde = ["7", "m7", "dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
     for (const nota of notas_audio) {
         for (const tipo of tipos_acorde) {
             const audioKey = `${nota}-${tipo}`;
             audios_acordes[audioKey] = new Audio(`assets/audios/${nota}-${tipo}.mp3`);
         }
     }
-    // loadDrumLoop(drumLoopSelect.value) is no longer needed here
+    
     await loadMetronomeSound();
 }
 
 
 
-function handleDrumLoopChange(event) {
-    // This function is no longer needed as static drum loops are removed.
-    // Drum patterns are now controlled by predefinedProgressions.
-}
 
 function playChord(nota, tipo, duracion = null) {
     stopAudio();
@@ -268,6 +261,7 @@ function playChord(nota, tipo, duracion = null) {
 
     const audio = audios_acordes[key];
     if (audio) {
+        audio.volume = chordVolumeLinear;
         audio.currentTime = 0;
         audio.loop = false;
         audio.play().catch(e => console.error("Error al reproducir el audio:", e));
@@ -327,8 +321,58 @@ function stopAudio() {
     }
 }
 
+function simplifyNoteForDisplay(note) {
+    // This function translates theoretically correct but hard-to-read note names
+    // into their simpler, more common enharmonic equivalents for display purposes.
+    switch (note) {
+        // User-specified enharmonics that were requested
+        case "Mi#": return "Fa";
+        case "Si#": return "Do";
+        case "Fab": return "Mi";
+        case "Dob": return "Si";
+
+        // Double sharps (x)
+        case "Dox": return "Re";
+        case "Rex": return "Mi";
+        case "Mix": return "Fa#";
+        case "Fax": return "Sol";
+        case "Solx": return "La";
+        case "Lax": return "Si";
+        case "Six": return "Do#";
+
+        // Double flats (bb)
+        case "Rebb": return "Do";
+        case "Mibb": return "Re";
+        case "Solbb": return "Fa";
+        case "Labb": return "Sol";
+        case "Sibb": return "La";
+        case "Dobb": return "Sib";
+        case "Fabb": return "Mib";
+        
+        // Triple sharps (xxx) - for completeness
+        case "Doxxx": return "Re#";
+        case "Rexxx": return "Fa";
+        case "Mixxx": return "Sol";
+        case "Faxxx": return "Sol#";
+        case "Solxxx": return "La#";
+        case "Laxxx": return "Do";
+
+        // Triple flats (bbb) - for completeness
+        case "Rebbb": return "Si";
+        case "Mibbb": return "Do#";
+        case "Solbbb": return "Mi";
+        case "Labbb": return "Fa#";
+        case "Sibbb": return "Sol#";
+        case "Dobbb": return "La";
+        case "Fabbb": return "Re";
+
+        // Default case for notes that don't need simplification
+        default: return note;
+    }
+}
+
 function getProperNoteNameForScale(rootNote, intervalIndex, semitoneInterval) {
-    const rootBaseNote = rootNote.replace(/[#b]/g, '');
+    const rootBaseNote = rootNote.replace(/[#bx]/g, ''); 
     const rootBaseIndex = notasBase.indexOf(rootBaseNote);
     const targetBaseNote = notasBase[(rootBaseIndex + intervalIndex) % 7];
     const rootSemitone = mapNotaToSemitone(rootNote);
@@ -393,6 +437,10 @@ function getDiatonicIndexFromGrade(grado) {
     return gradoMap[baseGrado] || 0;
 }
 
+let selectedTonalidad = "Do";
+let selectedEscala = "";
+let selectedAcorde = "";
+
 function renderSelectors() {
     const tonalidadOptionsContainer = document.getElementById('tonalidad-options');
     tonalidadOptionsContainer.innerHTML = '';
@@ -409,6 +457,14 @@ function renderSelectors() {
             document.querySelectorAll('#tonalidad-options .card-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
             calcularEscala();
+
+            // Actualizar preview y patrón de batería si hay una progresión seleccionada
+            const select = document.getElementById('predefined-progressions-select');
+            if (select.value !== '') {
+                const progression = predefinedProgressions[parseInt(select.value)];
+                const event = new Event('change');
+                select.dispatchEvent(event);
+            }
         });
         tonalidadOptionsContainer.appendChild(option);
     });
@@ -509,12 +565,13 @@ function calcularEscala() {
     const resultadoBox = document.getElementById('resultado-box');
     const contextoBox = document.getElementById('contexto-box');
     const selectedSemitono = selectedTonalidad;
+    
 
     if (isPlaying) {
         togglePlay();
     }
     if(isMetronomePlaying){
-        toggleMetronome();
+        stopMetronome();
     }
 
     if (!selectedSemitono || (!selectedEscala && !selectedAcorde)) {
@@ -623,7 +680,7 @@ function generarAcordesDiatonicos(escala, acordesPredefinidos) {
         const nota = escala[i];
         const tercera = escala[(i + 2) % numNotas];
         const quinta = escala[(i + 4) % numNotas];
-        let tipoAcorde = " (?)";
+        let tipoAcorde = " (?) ";
         let tipoAudio = "";
 
         if (tercera && quinta) {
@@ -645,7 +702,7 @@ function openTab(tabName, event) {
         togglePlay();
     }
     if(isMetronomePlaying){
-        toggleMetronome();
+        stopMetronome();
     }
 
     const tabContents = document.getElementsByClassName('tab-content');
@@ -661,7 +718,11 @@ function openTab(tabName, event) {
 }
 
 function getChordNotes(rootNote, chordType) {
-    const matchingChord = Object.values(acordes).find(c => c.notacion === chordType);
+    let internalChordType = chordType;
+    if (internalChordType === '△7') {
+        internalChordType = 'maj7';
+    }
+    const matchingChord = Object.values(acordes).find(c => c.notacion === internalChordType);
     if (!matchingChord) return [];
 
     let notes = [];
@@ -690,7 +751,7 @@ function updateProgressionDisplay() {
         if (chord.notes && chord.notes.length > 0) {
             const chordNotesEl = document.createElement('div');
             chordNotesEl.className = 'chord-notes-display';
-            chordNotesEl.innerHTML = chord.notes.map(getFormattedNoteForDisplay).join(' - ');
+            chordNotesEl.innerHTML = chord.notes.map(note => getFormattedNoteForDisplay(simplifyNoteForDisplay(note))).join(' - ');
             chordEl.appendChild(chordNotesEl);
         }
 
@@ -705,7 +766,7 @@ function addChordToProgression(nota, tipo, display) {
         togglePlay();
     }
     if(isMetronomePlaying){
-        toggleMetronome();
+        stopMetronome();
     }
 
     const notes = getChordNotes(nota, tipo);
@@ -726,7 +787,7 @@ function removeChordFromProgression(index) {
         togglePlay();
     }
     if(isMetronomePlaying){
-        toggleMetronome();
+        stopMetronome();
     }
     currentProgression.splice(index, 1);
     updateProgressionDisplay();
@@ -737,7 +798,7 @@ function clearProgression() {
         togglePlay();
     }
     if(isMetronomePlaying){
-        toggleMetronome();
+        stopMetronome();
     }
     currentProgression = [];
     updateProgressionDisplay();
@@ -748,7 +809,7 @@ function generateRandomProgression() {
         togglePlay();
     }
     if(isMetronomePlaying){
-        toggleMetronome();
+        stopMetronome();
     }
 
     currentProgression = [];
@@ -778,86 +839,317 @@ function generateRandomProgression() {
     updateProgressionDisplay();
 }
 
+// Progresiones predefinidas con grados romanos
+const predefinedProgressions = [
+    {
+        name: "Pop Clásico",
+        roman: "I-VI-IV-V",
+        description: "La progresión más popular en la música pop",
+        chordTypes: ["maj7", "m7", "maj7", "7"],
+    },
+    {
+        name: "Jazz Básico",
+        roman: "II-V-I",
+        description: "Progresión jazzística fundamental",
+        chordTypes: ["m7", "7", "maj7"],
+    },
+    {
+        name: "Rock Clásico",
+        roman: "I-IV-V",
+        description: "Progresión rock tradicional",
+        chordTypes: ["maj7", "maj7", "7"],
+    },
+    {
+        name: "Pop Moderno",
+        roman: "VI-IV-I-V",
+        description: "Progresión pop contemporánea",
+        chordTypes: ["m7", "maj7", "maj7", "7"],
+    },
+    {
+        name: "Balada Emocional",
+        roman: "I-VII-VI-III",
+        description: "Progresión emotiva para baladas",
+        chordTypes: ["maj7", "dim7", "m7", "m7"],
+    },
+    {
+        name: "Alternativo",
+        roman: "I-III-VII-VI",
+        description: "Progresión alternativa moderna",
+        chordTypes: ["maj7", "m7", "dim7", "m7"],
+    },
+    {
+        name: "Blues",
+        roman: "I-IV-V",
+        description: "Progresión blues tradicional",
+        chordTypes: ["7", "7", "7"],
+    },
+    {
+        name: "Funk",
+        roman: "I-VII-VI",
+        description: "Progresión funky con séptima",
+        chordTypes: ["7", "dim7", "m7"],
+    },
+    {
+        name: "Reggae",
+        roman: "I-VII-IV",
+        description: "Progresión reggae característica",
+        chordTypes: ["maj7", "7", "maj7"],
+    },
+    {
+        name: "Disco",
+        roman: "I-III-IV-V",
+        description: "Progresión disco de los 70s",
+        chordTypes: ["maj7", "m7", "maj7", "7"],
+    },
+    {
+        name: "Punk",
+        roman: "I-V-IV",
+        description: "Progresión punk rock simple",
+        chordTypes: ["maj7", "7", "maj7"],
+    },
+    {
+        name: "Bossa Nova",
+        roman: "I-VI-II-V",
+        description: "Progresión bossa nova brasileña",
+        chordTypes: ["m7", "7", "m7", "7"],
+    },
+    {
+        name: "Country",
+        roman: "I-IV-I-V",
+        description: "Progresión country tradicional",
+        chordTypes: ["maj7", "maj7", "maj7", "7"],
+    },
+    {
+        name: "R&B",
+        roman: "I-VI-IV-VII",
+        description: "Progresión R&B moderna",
+        chordTypes: ["7", "m7", "maj7", "dim7"],
+    },
+    {
+        name: "Indie",
+        roman: "VI-IV-I-III",
+        description: "Progresión indie rock",
+        chordTypes: ["m7", "maj7", "maj7", "m7"],
+    },
+    {
+        name: "Gospel",
+        roman: "I-IV-V-IV",
+        description: "Progresión gospel tradicional",
+        chordTypes: ["maj7", "maj7", "7", "maj7"],
+    }
+];
+
+
+
+
+// Función para determinar la notación preferida basada en la tonalidad
+function getPreferredNotation(rootNote) {
+    // Si la tonalidad tiene bemoles, usar notación con bemoles
+    if (rootNote.includes('b')) {
+        return semitonos_display; // Incluye notación con bemoles
+    }
+    // Si no, usar notación con sostenidos
+    return semitonos_calculo;
+}
+
+// Función para convertir grados romanos a acordes reales basados en la tonalidad
+function getChordFromRomanNumeral(romanNumeral, chordType, rootNote) {
+    const romanToInterval = {
+        "I": 0, "II": 2, "III": 4, "IV": 5, "V": 7, "VI": 9, "VII": 11,
+        "bII": 1, "bIII": 3, "bV": 6, "bVI": 8, "bVII": 10,
+        "#IV": 6, "#V": 8, "#VI": 10
+    };
+
+    const baseInterval = romanToInterval[romanNumeral.replace(/[#b]/g, '')];
+    if (baseInterval === undefined) return null;
+
+    const rootSemitone = mapNotaToSemitone(rootNote);
+    const chordSemitone = (rootSemitone + baseInterval) % 12;
+
+    // Usar la notación preferida basada en la tonalidad
+    const preferredNotation = getPreferredNotation(rootNote);
+
+    // Encontrar la nota que coincida con el semitono y tenga la notación preferida
+    let noteName = null;
+
+    // Primero intentar encontrar una nota con la misma notación que la raíz
+    for (let i = 0; i < preferredNotation.length; i++) {
+        if (mapNotaToSemitone(preferredNotation[i]) === chordSemitone) {
+            // Si la raíz usa bemoles, preferir notación con bemoles
+            if (rootNote.includes('b') && preferredNotation[i].includes('b')) {
+                noteName = preferredNotation[i];
+                break;
+            }
+            // Si la raíz usa sostenidos, preferir notación con sostenidos
+            if (!rootNote.includes('b') && preferredNotation[i].includes('#')) {
+                noteName = preferredNotation[i];
+                break;
+            }
+            // Si no hay preferencia específica, usar la primera coincidencia
+            if (!noteName) {
+                noteName = preferredNotation[i];
+            }
+        }
+    }
+
+    // Si no se encontró, usar la notación de cálculo como fallback
+    if (!noteName) {
+        noteName = semitonos_calculo[chordSemitone];
+    }
+
+    return {
+        nota: noteName,
+        tipo: chordType
+    };
+}
+
+// Función para generar acordes dinámicos de una progresión
+function generateDynamicProgression(progressionIndex) {
+    const progression = predefinedProgressions[progressionIndex];
+    const romanNumerals = progression.roman.split('-');
+    const chords = [];
+
+    romanNumerals.forEach((roman, index) => {
+        const chord = getChordFromRomanNumeral(roman, progression.chordTypes[index], selectedTonalidad);
+        if (chord) {
+            chords.push(chord);
+        }
+    });
+
+    return chords;
+}
+
+function renderPredefinedProgressionsSelector() {
+    const select = document.getElementById('predefined-progressions-select');
+    select.innerHTML = '<option value="">Progresiones</option>';
+
+    predefinedProgressions.forEach((progression, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${progression.name} (${progression.roman})`;
+        option.title = progression.description; // Tooltip con descripción
+        select.appendChild(option);
+    });
+}
+
+function loadPredefinedProgression(index) {
+    console.log('loadPredefinedProgression called with index:', index);
+    if (isPlaying) {
+        togglePlay();
+    }
+    if(isMetronomePlaying){
+        stopMetronome();
+    }
+
+    const progression = predefinedProgressions[index];
+    if (!progression) return;
+
+    // Generar acordes dinámicamente basados en la tonalidad actual
+    const dynamicChords = generateDynamicProgression(index);
+
+    currentProgression = [];
+
+    dynamicChords.forEach(chord => {
+        const display = formatChordDisplay(chord.tipo);
+        const notes = getChordNotes(chord.nota, chord.tipo);
+
+        const chordObj = {
+            nota: chord.nota,
+            tipo: chord.tipo,
+            display: `${getFormattedNoteForDisplay(chord.nota)}${display}`,
+            notes: notes
+        };
+        currentProgression.push(chordObj);
+    });
+
+    updateProgressionDisplay();
+}
+
+
+// Iconos SVG para el botón flotante
+const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>`;
+const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
 
 function togglePlay() {
     stopAllNotes();
 
     const toggleBtn = document.getElementById('toggle-progression-btn');
-    
-    if (isPlaying) {
-        clearInterval(progressionInterval);
-        progressionInterval = null;
-        stopAudio();
-        
-        // Stop programmatic drum pattern
-        stopDrumPattern();
+    const floatingBtn = document.getElementById('floating-play-stop-button');
 
-        if (isMetronomePlaying) {
-            toggleMetronome();
+    if (isPlaying) {
+        if (chordLoop) {
+            chordLoop.stop(0).dispose();
         }
-        
+        if (drumSequence) {
+            drumSequence.stop(0).dispose();
+        }
+        Tone.Transport.stop();
+        stopAudio(); // Stop any lingering chord audio
+
         isPlaying = false;
         toggleBtn.classList.remove('playing');
         toggleBtn.classList.add('stopped');
+
+        // Actualizar botón flotante
+        floatingBtn.innerHTML = playIconSVG;
+        floatingBtn.classList.remove('playing');
+        floatingBtn.classList.add('stopped');
+
         document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
 
     } else {
         if (currentProgression.length > 0) {
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
+            
+            if (Tone.context.state === 'suspended') {
+                Tone.context.resume();
             }
 
-            if (!isMetronomePlaying) {
-                toggleMetronome();
-            }
-            
             isPlaying = true;
             currentProgressionIndex = 0;
-            
-            const bpm = document.getElementById('bpm-slider').value;
-            const progressionIntervalMs = (60000 / bpm) * 4;
 
-            playNextChordInProgression();
-            progressionInterval = setInterval(() => {
-                playNextChordInProgression();
-            }, progressionIntervalMs);
+            const bpm = document.getElementById('bpm-input').value;
+            Tone.Transport.bpm.value = bpm;
 
-            // Start programmatic drum pattern based on selected progression
-            const select = document.getElementById('predefined-progressions-select');
-            if (select.value !== '') {
-                const progression = predefinedProgressions[parseInt(select.value)];
-                if (progression.drumPattern && drumSampler) {
-                    playDrumPattern(progression.drumPattern);
-                }
-            }
+            chordLoop = new Tone.Loop(time => {
+                const chord = currentProgression[currentProgressionIndex];
+                playChord(chord.nota, chord.tipo);
+                Tone.Draw.schedule(() => {
+                    document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
+                    const currentChordEl = document.querySelectorAll('.progression-chord')[currentProgressionIndex];
+                    if (currentChordEl) {
+                        currentChordEl.classList.add('playing-chord');
+                    }
+                }, time);
+                currentProgressionIndex = (currentProgressionIndex + 1) % currentProgression.length;
+            }, '1m').start(0);
+
+            drumSequence = new Tone.Sequence((time, note) => {
+                if (note.kick) kick.start(time);
+                if (note.snare) snare.start(time);
+                if (note.hihat) hihat.start(time);
+            }, [
+                { kick: true, snare: false, hihat: true },
+                { kick: false, snare: false, hihat: true },
+                { kick: false, snare: true, hihat: true },
+                { kick: false, snare: false, hihat: true },
+            ], '4n').start(0);
+
+            Tone.Transport.start();
 
             toggleBtn.classList.add('playing');
             toggleBtn.classList.remove('stopped');
+
+            // Actualizar botón flotante
+            floatingBtn.innerHTML = stopIconSVG;
+            floatingBtn.classList.add('playing');
+            floatingBtn.classList.remove('stopped');
         }
     }
 }
 
-function playNextChordInProgression() {
-    if (currentProgression.length === 0) {
-        togglePlay();
-        return;
-    }
-
-    document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
-
-    const chord = currentProgression[currentProgressionIndex];
-    playChord(chord.nota, chord.tipo);
-
-    const currentChordEl = document.querySelectorAll('.progression-chord')[currentProgressionIndex];
-    if (currentChordEl) {
-        currentChordEl.classList.add('playing-chord');
-        console.log(`Resaltando acorde en el índice: ${currentProgressionIndex}`);
-    }
-
-    currentProgressionIndex = (currentProgressionIndex + 1) % currentProgression.length;
-}
 
 window.onload = () => {
+
     document.addEventListener('click', () => {
         if (Tone.Transport.state !== 'started') {
             Tone.start();
@@ -865,18 +1157,66 @@ window.onload = () => {
     }, { once: true });
 
     renderSelectors();
+    renderPredefinedProgressionsSelector();
     loadAudioFiles();
+    
 
     calcularEscala();
 
     document.getElementById('toggle-progression-btn').addEventListener('click', togglePlay);
+    document.getElementById('floating-play-stop-button').addEventListener('click', togglePlay);
+    document.getElementById('floating-generate-random-btn').addEventListener('click', generateRandomProgression);
     document.getElementById('clear-progression-btn').addEventListener('click', clearProgression);
     document.getElementById('generate-random-btn').addEventListener('click', generateRandomProgression);
-    document.getElementById('floating-metronome-button').addEventListener('click', toggleMetronome);
+    // Event listener para el selector de progresiones
+    document.getElementById('predefined-progressions-select').addEventListener('change', (e) => {
+        const preview = document.getElementById('progression-preview');
+        const description = document.getElementById('preview-description');
+        const chords = document.getElementById('preview-chords');
 
-    
+        if (e.target.value === '') {
+            preview.style.display = 'none';
+        } else {
+            const progression = predefinedProgressions[parseInt(e.target.value)];
 
-    
+            const loopName = 'Sin loop';
+            description.textContent = `${progression.description} (Tonalidad: ${selectedTonalidad}) • ${loopName}`;
+
+            // Generar acordes dinámicos para la preview
+            const dynamicChords = generateDynamicProgression(parseInt(e.target.value));
+            chords.innerHTML = dynamicChords.map(chord => {
+                const display = formatChordDisplay(chord.tipo);
+                return `<span class="chord-tag">${getFormattedNoteForDisplay(chord.nota)}${display}</span>`;
+            }).join(' → ');
+
+            preview.style.display = 'block';
+
+            // Cargar automáticamente la progresión seleccionada
+            loadPredefinedProgression(parseInt(e.target.value));
+        }
+    });
+
+    // Inicializar estado del botón flotante
+    const floatingBtn = document.getElementById('floating-play-stop-button');
+    floatingBtn.innerHTML = playIconSVG;
+    floatingBtn.classList.add('stopped');
+
+    const drumVolumeControl = document.getElementById('drum-volume');
+    drumVolumeControl.addEventListener('input', (event) => {
+        if (drumVolume) {
+            drumVolume.volume.value = event.target.value;
+        }
+    });
+
+    const chordVolumeControl = document.getElementById('chord-volume');
+    chordVolumeControl.addEventListener('input', (event) => {
+        // Convert dB to linear volume (amplitude)
+        chordVolumeLinear = Math.pow(10, event.target.value / 20);
+        // Update volume of currently playing audio if it exists
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.volume = chordVolumeLinear;
+        }
+    });
 
     const noteButtons = document.querySelectorAll('.note-btn');
     noteButtons.forEach(button => {
@@ -893,18 +1233,190 @@ window.onload = () => {
         });
     }
 
-    // --- NUEVOS EVENTOS PARA EL METRÓNOMO ---
-    document.getElementById('toggle-metronome-btn').addEventListener('click', toggleMetronome);
+    // --- EVENTOS PARA EL METRÓNOMO INTEGRADO ---
+    const metronomeFab = document.getElementById('floating-metronome-button');
+    const metronomeOptionsPopup = document.getElementById('metronome-options-popup');
+    const bpmInput = document.getElementById('bpm-input');
     const bpmSlider = document.getElementById('bpm-slider');
+    const metronomeStartStopBtn = document.getElementById('metronome-start-stop');
+    const metronomeTapBtn = document.getElementById('metronome-tap');
+    const metronomeVolume = document.getElementById('metronome-volume');
+
+    metronomeFab.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent click from closing popup immediately
+        metronomeOptionsPopup.classList.toggle('visible');
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!metronomeOptionsPopup.contains(event.target) && !metronomeFab.contains(event.target)) {
+            metronomeOptionsPopup.classList.remove('visible');
+        }
+    });
+
+    bpmInput.addEventListener('input', (event) => {
+        updateMetronomeBPM(event.target.value);
+    });
     bpmSlider.addEventListener('input', (event) => {
         updateMetronomeBPM(event.target.value);
     });
 
-    // Nuevo evento para el slider de volumen del metrónomo
-    document.getElementById('metronome-volume').addEventListener('input', (event) => {
+    metronomeStartStopBtn.addEventListener('click', function() {
+        if (isMetronomePlaying) {
+            stopMetronome();
+        } else {
+            startMetronome();
+        }
+    });
+
+    metronomeTapBtn.addEventListener('click', function() {
+        const now = new Date().getTime();
+        tapTimes.push(now);
+
+        if (tapTimes.length > 4) {
+            tapTimes.shift();
+        }
+
+        if (tapTimes.length > 1) {
+            let sumDiff = 0;
+            for (let i = 1; i < tapTimes.length; i++) {
+                sumDiff += (tapTimes[i] - tapTimes[i-1]);
+            }
+            const avgDiff = sumDiff / (tapTimes.length - 1);
+            const calculatedBPM = Math.round(60000 / avgDiff);
+            updateMetronomeBPM(calculatedBPM);
+        }
+    });
+
+    metronomeVolume.addEventListener('input', (event) => {
         if (metronomeGainNode) {
             metronomeGainNode.gain.value = event.target.value;
         }
     });
-    // --- FIN DE LOS NUEVOS EVENTOS ---
+    // Ensure metronome stops if page is closed or refreshed
+    window.addEventListener('beforeunload', stopMetronome);
+    // --- FIN DE LOS EVENTOS DEL METRÓNOMO INTEGRADO ---
+
+    
+
+    document.getElementById('floating-text-input').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Evita el salto de línea en el textarea
+            addChordFromInput();
+        }
+    });
 };
+
+function addChordFromInput() {
+    const inputElement = document.getElementById('floating-text-input');
+    const inputText = inputElement.value.trim();
+
+    if (inputText === '') {
+        return;
+    }
+
+    let rootNoteInput = '';
+    let chordTypeInput = '';
+
+    const noteAliasMap = {
+        "c": "Do", "c#": "Do#", "db": "Reb", "d": "Re", "d#": "Re#", "eb": "Mib", "e": "Mi",
+        "f": "Fa", "f#": "Fa#", "gb": "Solb", "g": "Sol", "g#": "Sol#", "ab": "Lab",
+        "a": "La", "a#": "La#", "bb": "Sib", "b": "Si",
+        "cb": "Si", "fb": "Mi", "b#": "Do", "e#": "Fa",
+        "do": "Do", "do#": "Do#", "reb": "Reb", "re": "Re", "re#": "Re#", "mib": "Mib", "mi": "Mi",
+        "fa": "Fa", "fa#": "Fa#", "solb": "Solb", "sol": "Sol", "sol#": "Sol#", "lab": "Lab",
+        "la": "La", "la#": "La#", "sib": "Sib", "si": "Si"
+    };
+
+    // Crear una lista de todas las posibles notas (en español e inglés, con y sin alteraciones)
+    // y ordenarlas por longitud descendente para asegurar que "Do#" se encuentre antes que "Do"
+    const allPossibleNotes = Array.from(new Set([
+        ...semitonos_display,
+        ...Object.keys(noteAliasMap).map(key => noteAliasMap[key]), // Valores del alias map
+        ...Object.keys(noteAliasMap) // Claves del alias map (ej. "c", "c#")
+    ])).sort((a, b) => b.length - a.length);
+
+    // Intentar extraer la nota raíz y el tipo de acorde
+    let foundNote = false;
+    for (const possibleNote of allPossibleNotes) {
+        const lowerCaseInputText = inputText.toLowerCase();
+        const lowerCasePossibleNote = possibleNote.toLowerCase();
+
+        if (lowerCaseInputText.startsWith(lowerCasePossibleNote)) {
+            rootNoteInput = inputText.substring(0, possibleNote.length);
+            chordTypeInput = inputText.substring(possibleNote.length).trim();
+            foundNote = true;
+            break;
+        }
+    }
+
+    if (!foundNote) {
+        console.warn(`No se pudo identificar la nota raíz en: ${inputText}`);
+        inputElement.value = '';
+        return;
+    }
+
+    // Normalizar la nota raíz
+    let normalizedRootNote = null;
+    const lowerCaseRootNoteInput = rootNoteInput.toLowerCase();
+    if (noteAliasMap[lowerCaseRootNoteInput]) {
+        normalizedRootNote = noteAliasMap[lowerCaseRootNoteInput];
+    } else if (semitonos_display.includes(rootNoteInput)) {
+        normalizedRootNote = rootNoteInput;
+    } else {
+        const capitalizedRootNote = rootNoteInput.charAt(0).toUpperCase() + rootNoteInput.slice(1).toLowerCase();
+        if (semitonos_display.includes(capitalizedRootNote)) {
+            normalizedRootNote = capitalizedRootNote;
+        } else {
+            const semitone = mapNotaToSemitone(rootNoteInput);
+            if (semitone !== -1) {
+                normalizedRootNote = semitonos_display.find(n => mapNotaToSemitone(n) === semitone);
+            }
+        }
+    }
+
+    // Normalizar el tipo de acorde
+    let normalizedChordType = null;
+    let chordDisplay = null;
+
+    const chordAliasMap = {
+        "maj7": "Mayor Séptima (maj7)", "major7": "Mayor Séptima (maj7)", "M7": "Mayor Séptima (maj7)", "△7": "Mayor Séptima (maj7)",
+        "m7": "Menor Séptima (m7)", "minor7": "Menor Séptima (m7)",
+        "7": "Séptima de Dominante (7)", "dom7": "Séptima de Dominante (7)",
+        "m7b5": "Menor Séptima con Quinta Disminuida (m7b5)", "halfdim": "Menor Séptima con Quinta Disminuida (m7b5)", "ø7": "Menor Séptima con Quinta Disminuida (m7b5)",
+        "dim7": "Disminuido Séptima (dim7)", "dim": "Disminuido Séptima (dim7)", "°7": "Disminuido Séptima (dim7)",
+        "m-maj7": "Menor Séptima Mayor (m△7)", "mmaj7": "Menor Séptima Mayor (m△7)", "m△7": "Menor Séptima Mayor (m△7)",
+        "aug-maj7": "Aumentado Séptima Mayor (△7#5)", "augmaj7": "Aumentado Séptima Mayor (△7#5)", "△7#5": "Aumentado Séptima Mayor (△7#5)",
+        "7#5": "Séptima con Quinta Aumentada (7#5)", "7aug5": "Séptima con Quinta Aumentada (7#5)",
+        "7b5": "Séptima con Quinta Disminuida (7b5)"
+    };
+
+    const lowerCaseChordTypeInput = chordTypeInput.toLowerCase();
+    for (const key in acordes) {
+        if (acordes[key].notacion.toLowerCase() === lowerCaseChordTypeInput) {
+            normalizedChordType = acordes[key].notacion;
+            chordDisplay = formatChordDisplay(normalizedChordType);
+            break;
+        }
+    }
+
+    if (!normalizedChordType) {
+        // Intentar con el chordAliasMap
+        if (chordAliasMap[lowerCaseChordTypeInput]) {
+            const internalKey = chordAliasMap[lowerCaseChordTypeInput];
+            const matchingChord = Object.values(acordes).find(c => c.notacion === internalKey.match(/\(([^)]+)\)/)[1]);
+            if (matchingChord) {
+                normalizedChordType = matchingChord.notacion;
+                chordDisplay = formatChordDisplay(normalizedChordType);
+            }
+        }
+    }
+
+    if (!normalizedRootNote || !normalizedChordType) {
+        console.warn(`No se pudo parsear el acorde: ${inputText}`);
+        inputElement.value = '';
+        return;
+    }
+
+    addChordToProgression(normalizedRootNote, normalizedChordType, chordDisplay);
+    inputElement.value = ''; // Limpiar el input después de añadir
+}

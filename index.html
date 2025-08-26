@@ -83,10 +83,12 @@
                     <button id="generate-random-btn" class="control-button" style="display: none;">Generar Aleatorio</button>
                 </div>
                 <div class="player-controls-container">
+                    <label for="drum-pattern-select">Patrón de Batería:</label>
+                    <select id="drum-pattern-select" class="control-select"></select>
                     <label for="drum-volume">Volumen Batería:</label>
-                    <input type="range" id="drum-volume" min="-100" max="32" step="1" value="0" class="volume-slider">
+                    <input type="range" id="drum-volume" min="-45" max="20" step="1" value="0" class="volume-slider">
                     <label for="chord-volume">Volumen Acordes:</label>
-                    <input type="range" id="chord-volume" min="-100" max="32" step="1" value="-6" class="volume-slider">
+                    <input type="range" id="chord-volume" min="-45" max="20" step="1" value="-6" class="volume-slider">
                 </div>
             </div>
         </div>
@@ -96,7 +98,7 @@
                
                 <div class="piano-controls">
                     <label for="note-volume">Volumen:</label>
-                    <input type="range" id="note-volume" min="-100" max="32" step="1" value="-10" class="volume-slider">
+                    <input type="range" id="note-volume" min="-45" max="20" step="1" value="-10" class="volume-slider">
                 </div>
                 <div class="piano-keyboard">
                     <div class="note-btn white" data-note="Do">C</div>
@@ -141,7 +143,7 @@
                 </div>
                 <div class="selector-container">
                     <label for="metronome-volume">Volumen:</label>
-                    <input type="range" id="metronome-volume" min="-100" max="32" value="-20" step="1">
+                    <input type="range" id="metronome-volume" min="-45" max="20" value="-20" step="1">
                 </div>
                 <div class="selector-container">
                     <button class="button-option" id="metronome-start-stop">

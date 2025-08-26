@@ -76,9 +76,6 @@ const todasLasOpciones = { ...escalas_modos, ...acordes };
 
 const audios_acordes = {};
 let audioContext;
-let drumBuffer;
-let drumSourceNode = null;
-let drumGainNode = null;
 let isPlaying = false;
 let currentAudio = null;
 let currentTimeout = null;
@@ -112,10 +109,7 @@ const toneNoteMap = {
     "Lab": "Ab", "La": "A", "La#": "A#", "Sib": "Bb", "Si": "B"
 };
 
-const drumLoops = {
-    "drumloop.wav": "assets/audios/drumloop.wav",
-    "drumloop2.wav": "assets/audios/drumloop2.wav"
-};
+
 
 // --- NUEVAS VARIABLES Y FUNCIONES PARA EL METRÓNOMO ---
 let metronomeInterval = null;
@@ -232,10 +226,11 @@ async function loadAudioFiles() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
-    drumGainNode = audioContext.createGain();
-    const drumVolume = document.getElementById('drum-volume');
-    drumGainNode.gain.value = drumVolume.value;
-    drumGainNode.connect(audioContext.destination);
+    // drumGainNode and drumBuffer are no longer needed for static loops
+    // drumGainNode = audioContext.createGain();
+    // const drumVolume = document.getElementById('drum-volume');
+    // drumGainNode.gain.value = drumVolume.value;
+    // drumGainNode.connect(audioContext.destination);
 
     const notas_audio = ["c", "c-sharp", "d", "d-sharp", "e", "f", "f-sharp", "g", "g-sharp", "a", "a-sharp", "b"];
     const tipos_acorde = ["dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
@@ -245,31 +240,15 @@ async function loadAudioFiles() {
             audios_acordes[audioKey] = new Audio(`assets/audios/${nota}-${tipo}.mp3`);
         }
     }
-    const drumLoopSelect = document.getElementById('drum-loop-select');
-    await loadDrumLoop(drumLoopSelect.value);
+    // loadDrumLoop(drumLoopSelect.value) is no longer needed here
     await loadMetronomeSound();
 }
 
-async function loadDrumLoop(filename) {
-    try {
-        const url = drumLoops[filename];
-        if (!url) {
-            console.error(`No se encontró la URL para el loop: ${filename}`);
-            return;
-        }
-        const response = await fetch(url);
-        const arrayBuffer = await response.arrayBuffer();
-        drumBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    } catch (e) {
-        console.error("Error al cargar o decodificar el loop de batería:", e);
-    }
-}
+
 
 function handleDrumLoopChange(event) {
-    if (isPlaying) {
-        togglePlay();
-    }
-    loadDrumLoop(event.target.value);
+    // This function is no longer needed as static drum loops are removed.
+    // Drum patterns are now controlled by predefinedProgressions.
 }
 
 function playChord(nota, tipo, duracion = null) {
@@ -810,10 +789,8 @@ function togglePlay() {
         progressionInterval = null;
         stopAudio();
         
-        if (drumSourceNode) {
-            drumSourceNode.stop();
-            drumSourceNode = null;
-        }
+        // Stop programmatic drum pattern
+        stopDrumPattern();
 
         if (isMetronomePlaying) {
             toggleMetronome();
@@ -826,11 +803,6 @@ function togglePlay() {
 
     } else {
         if (currentProgression.length > 0) {
-            if (!drumBuffer) {
-                console.error('El loop de batería aún no se ha cargado.');
-                return;
-            }
-
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
@@ -850,11 +822,14 @@ function togglePlay() {
                 playNextChordInProgression();
             }, progressionIntervalMs);
 
-            drumSourceNode = audioContext.createBufferSource();
-            drumSourceNode.buffer = drumBuffer;
-            drumSourceNode.loop = true;
-            drumSourceNode.connect(drumGainNode);
-            drumSourceNode.start(0);
+            // Start programmatic drum pattern based on selected progression
+            const select = document.getElementById('predefined-progressions-select');
+            if (select.value !== '') {
+                const progression = predefinedProgressions[parseInt(select.value)];
+                if (progression.drumPattern && drumSampler) {
+                    playDrumPattern(progression.drumPattern);
+                }
+            }
 
             toggleBtn.classList.add('playing');
             toggleBtn.classList.remove('stopped');
@@ -899,13 +874,9 @@ window.onload = () => {
     document.getElementById('generate-random-btn').addEventListener('click', generateRandomProgression);
     document.getElementById('floating-metronome-button').addEventListener('click', toggleMetronome);
 
-    document.getElementById('drum-volume').addEventListener('input', (event) => {
-        if (drumGainNode) {
-            drumGainNode.gain.value = event.target.value;
-        }
-    });
+    
 
-    document.getElementById('drum-loop-select').addEventListener('change', handleDrumLoopChange);
+    
 
     const noteButtons = document.querySelectorAll('.note-btn');
     noteButtons.forEach(button => {

@@ -54,8 +54,78 @@ header p {
 main {
     flex-grow: 1;
     width: 90%;
-    max-width: 900px;
+    max-width: 100%; /* Increased width to 100% */
     padding: 20px;
+}
+
+.main-layout-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 20px; /* Space between columns */
+    justify-content: center; /* Center items when they wrap */
+    width: 100%; /* Take full width of main */
+}
+
+.main-layout-container > div {
+    flex: 1; /* Allow items to grow and shrink */
+    min-width: 48%; /* Adjusted minimum width for each column */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Adjustments for cards-container within scales-chords-tab */
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.card {
+    flex: 1;
+    min-width: 200px; /* Adjust as needed */
+    max-width: 30%; /* Adjust as needed */
+}
+
+/* Adjustments for progression-builder within progression-container */
+.progression-builder {
+    min-height: 100px; /* Ensure it has enough height */
+}
+
+/* New wrapper for main content sections */
+#main-content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Space between the two main sections */
+    width: 90%; /* Match main's width */
+    max-width: 900px; /* Match main's max-width */
+    margin: 20px auto; /* Center it and add some top margin */
+}
+
+#scales-chords-tab,
+#progression-container {
+    flex: 1; /* Allow them to grow and shrink */
+    min-width: 300px; /* Minimum width before wrapping */
+    margin: 0; /* Reset margins */
+}
+
+/* Adjustments for cards-container within scales-chords-tab */
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.card {
+    flex: 1;
+    min-width: 200px; /* Adjust as needed */
+    max-width: 30%; /* Adjust as needed */
+}
+
+/* Adjustments for progression-builder within progression-container */
+.progression-builder {
+    min-height: 100px; /* Ensure it has enough height */
 }
 
 footer {
@@ -331,11 +401,7 @@ nav ul li a.active-nav-link {
 .control-button.playing { background-color: #ff6347; }
 .control-button.playing:hover { background-color: #e5533c; }
 
-.drum-control {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+
 
 .volume-slider {
     width: 80px;

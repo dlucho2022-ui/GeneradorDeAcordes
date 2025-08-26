@@ -26,41 +26,6 @@
         </nav>
     </header>
 </div>
-    <main>
-        </div>
-
-        
-
-        <div id="progression-container" class="progression-section">
-            <h2>Progresión de Acordes</h2>
-            <div id="progression-builder" class="progression-builder">
-                </div>
-            <div class="progression-controls">
-                <button id="toggle-progression-btn" class="control-button stopped" style="display: none;">
-                    <span class="play-icon">▶</span>
-                    <span class="stop-icon">■</span>
-                </button>
-                <button id="clear-progression-btn" class="control-button">Limpiar</button>
-                <button id="generate-random-btn" class="control-button" style="display: none;">Generar Aleatorio</button>
-            </div>
-            <div class="player-controls-container">
-                
-
-                <div class="control-box">
-                    <h2><i class="fas fa-drum"></i></h2>
-                    <div class="volume-control">
-                        <label for="drum-volume">Volumen:</label>
-                        <input type="range" id="drum-volume" min="0" max="1" step="0.1" value="0.5" class="volume-slider">
-                    </div>
-                    <select id="drum-loop-select">
-                        <option value="drumloop.wav">Loop 1</option>
-                        <option value="drumloop2.wav">Loop 2</option>
-                        <option value="drumloop3.wav">Loop 3</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
         <div id="scales-chords-tab" class="tab-content active">
             <div class="cards-container">
                 <div class="card">
@@ -102,10 +67,37 @@
             </div>
 
             </div>
+        <div id="progression-container" class="progression-section">
+            <h2>Progresión de Acordes</h2>
+            <div id="progression-builder" class="progression-builder">
+                </div>
+            <div class="progression-controls">
+                <button id="toggle-progression-btn" class="control-button stopped" style="display: none;">
+                    <span class="play-icon">▶</span>
+                    <span class="stop-icon">■</span>
+                </button>
+                <button id="clear-progression-btn" class="control-button">Limpiar</button>
+                <button id="generate-random-btn" class="control-button" style="display: none;">Generar Aleatorio</button>
+            </div>
+            <div class="player-controls-container">
+                
 
-        
-
-    <div id="piano-tab" class="tab-content" style="display: none;">
+                <div class="control-box">
+                    <h2><i class="fas fa-drum"></i></h2>
+                    <div class="volume-control">
+                        <label for="drum-volume">Volumen:</label>
+                        <input type="range" id="drum-volume" min="0" max="1" step="0.1" value="0.5" class="volume-slider">
+                    </div>
+                    <select id="drum-loop-select">
+                        <option value="drumloop.wav">Loop 1</option>
+                        <option value="drumloop2.wav">Loop 2</option>
+                        <option value="drumloop3.wav">Loop 3</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    <main>
+        <div id="piano-tab" class="tab-content" style="display: none;">
             <div class="piano-box">
                
                 <div class="piano-controls">
@@ -128,7 +120,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <footer>
@@ -1869,7 +1860,7 @@
     </button>
     <div id="floating-button-container">
         <button id="floating-metronome-button" class="button">
-            <i class="fas fa-metronome"></i>
+            <img src="assets/images/metronomo.png" alt="Metrónomo" style="width: 50px; height: 50px;">
         </button>
         <div id="metronome-options-popup" class="metronome-popup">
             <div class="metronome-controls">
@@ -1901,7 +1892,7 @@
             </svg>
         </button>
         
-        <textarea id="floating-text-input" class="button"></textarea>
+        <textarea id="floating-text-input" class="button" placeholder="Introduce acordes aquí..."></textarea>
     </div>
     
     </body>

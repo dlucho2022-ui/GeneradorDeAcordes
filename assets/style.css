@@ -936,9 +936,9 @@ body:not(.body-sheet-music) .button.playing svg {
 #floating-random-pdf-button:hover { background-color: #17a2b8; } /* A slightly different hover color */
 
 #floating-text-input {
-    width: 70px;
-    height: 70px; /* Cambiado a 70px */
-    border-radius: 50%; /* Cambiado a redondo */
+    width: 150px;
+    height: 90px; /* Cambiado a 100px */
+    border-radius: 8px; /* Cambiado a rectangular */
     border: none;
     background: #333; /* Mismo fondo que los botones */
     color: #e0e0e0;

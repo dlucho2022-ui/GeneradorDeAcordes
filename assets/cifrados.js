@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Calculate image dimensions to fit in PDF, maintaining aspect ratio
         const imgProps = pdf.getImageProperties(imgData);
         const imgAspectRatio = imgProps.height / imgProps.width;
-        const pdfImageWidth = usableWidth - 0.5; // Adjusted for right margin issue
+        const pdfImageWidth = usableWidth; // Adjusted for right margin issue
         const pdfImageHeight = pdfImageWidth * imgAspectRatio;
 
         // --- HYBRID LOGIC ---

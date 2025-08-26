@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Armonizar</title>
     <link rel="shortcut icon" href="assets/images/iconapp.png" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet">
     <script src="https://unpkg.com/tone@14.7.58/build/Tone.js"></script>
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/cards.css">
@@ -205,8 +205,117 @@
         }).toDestination();
         currentSynth.volume.value = -10;
 
+        let progressionDrumPattern = 'simple';
         // Sistema de batería programática
-        
+        let drumSampler = null;
+        let currentDrumPattern = null;
+        let drumSequence = null;
+
+        // Configuración de samples de batería
+        const drumSamples = {
+            'kick': 'https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/Kick-V01-Yamaha-16x16.wav',
+            'snare': 'https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/SNARE-V01-CustomWorks-6x13.wav',
+            'hihat': 'https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/HHats-CL-V01-SABIAN-AAX.wav',
+            'crash': 'https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/14-Crash-V01-SABIAN-14.wav'
+        };
+
+        // Patrones de batería por estilo
+        const drumPatterns = {
+            'simple': [
+                { time: '0:0:0', note: 'kick' },
+                { time: '0:1:0', note: 'snare' },
+                { time: '0:2:0', note: 'kick' },
+                { time: '0:3:0', note: 'snare' }
+            ],
+            'rock': [
+                { time: '0:0:0', note: 'kick' },
+                { time: '0:0:2', note: 'hihat' },
+                { time: '0:1:0', note: 'snare' },
+                { time: '0:1:2', note: 'hihat' },
+                { time: '0:2:0', note: 'kick' },
+                { time: '0:2:2', note: 'hihat' },
+                { time: '0:3:0', note: 'snare' },
+                { time: '0:3:2', note: 'hihat' }
+            ],
+            'funk': [
+                { time: '0:0:0', note: 'kick' },
+                { time: '0:0:3', note: 'hihat' },
+                { time: '0:1:1', note: 'snare' },
+                { time: '0:1:3', note: 'hihat' },
+                { time: '0:2:2', note: 'kick' },
+                { time: '0:2:3', note: 'hihat' },
+                { time: '0:3:1', note: 'snare' },
+                { time: '0:3:3', note: 'hihat' }
+            ],
+            'bossa nova': [
+                { time: '0:0:0', note: 'kick' },
+                { time: '0:0:3', note: 'kick' },
+                { time: '0:1:2', note: 'snare' },
+                { time: '0:2:0', note: 'kick' },
+                { time: '0:2:3', note: 'kick' },
+                { time: '0:3:2', note: 'snare' }
+            ]
+        };
+
+        // Inicializar sampler de batería
+        async function initDrumSampler() {
+            try {
+                drumSampler = new Tone.Players({
+                    urls: drumSamples,
+                    onload: () => {
+                        console.log('Drum samples loaded successfully');
+                        console.log('Drum Sampler is ready:', drumSampler);
+                    }
+                }).toDestination();
+                drumSampler.volume.value = 0; // Volumen ajustado para batería
+            } catch (error) {
+                console.error('Error loading drum samples:', error);
+            }
+        }
+
+        // Función para tocar patrón de batería
+        function playDrumPattern(patternName) {
+            if (!drumSampler) {
+                console.warn('Drum sampler not initialized');
+                return;
+            }
+
+            // Detener patrón anterior si existe
+            if (drumSequence) {
+                drumSequence.stop();
+                drumSequence.dispose();
+            }
+
+            const pattern = drumPatterns[patternName];
+            if (!pattern) {
+                console.warn('Drum pattern not found:', patternName);
+                return;
+            }
+
+            currentDrumPattern = patternName;
+
+            // Crear secuencia de batería
+            drumSequence = new Tone.Part((time, event) => {
+                console.log('Playing drum sample:', event.note, 'at time:', time);
+                console.log('Triggering:', event.note);
+                drumSampler.get(event.note).start(time);
+            }, pattern);
+
+            drumSequence.loop = true;
+            drumSequence.loopEnd = '1m'; // 1 compás
+            drumSequence.start(0);
+            console.log('Drum sequence started.');
+        }
+
+        // Función para detener batería
+        function stopDrumPattern() {
+            if (drumSequence) {
+                drumSequence.stop();
+                drumSequence.dispose();
+                drumSequence = null;
+            }
+            currentDrumPattern = null;
+        }
 
         const acorde_audio_map = {
             "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
@@ -294,6 +403,9 @@
                 clearInterval(progressionInterval);
                 const progressionIntervalMs = (60000 / bpm) * 4;
                 progressionInterval = setInterval(playNextChordInProgression, progressionIntervalMs);
+                if (currentDrumPattern) { // Restart drum pattern with new BPM
+                    playDrumPattern(currentDrumPattern);
+                }
             }
         }
 
@@ -334,9 +446,9 @@
             };
 
             const intervalosStr = intervalos.join(',');
-            if (intervalos.length === 3) return acordesTriada[intervalosStr] || " (?)";
-            if (intervalos.length === 4) return acordesSeptima[intervalosStr] || " (?)";
-            return " (?)";
+            if (intervalos.length === 3) return acordesTriada[intervalosStr] || " (?) ";
+            if (intervalos.length === 4) return acordesSeptima[intervalosStr] || " (?) ";
+            return " (?) ";
         }
 
         async function loadAudioFiles() {
@@ -800,7 +912,7 @@
                 const nota = escala[i];
                 const tercera = escala[(i + 2) % numNotas];
                 const quinta = escala[(i + 4) % numNotas];
-                let tipoAcorde = " (?)";
+                let tipoAcorde = " (?) ";
                 let tipoAudio = "";
 
                 if (tercera && quinta) {
@@ -921,6 +1033,7 @@
                 toggleMetronome();
             }
             currentProgression = [];
+            progressionDrumPattern = 'simple';
             updateProgressionDisplay();
         }
 
@@ -933,6 +1046,7 @@
             }
 
             currentProgression = [];
+            progressionDrumPattern = 'simple';
             const notasPosibles = semitonos_display;
             const tiposDeAcordePosibles = Object.keys(acordes).filter(key => key.includes("Séptima"));
 
@@ -966,14 +1080,14 @@
                 roman: "I-VI-IV-V",
                 description: "La progresión más popular en la música pop",
                 chordTypes: ["maj7", "m7", "maj7", "7"],
-                drumPattern: "pop"
+                drumPattern: "simple"
             },
             {
                 name: "Jazz Básico",
                 roman: "II-V-I",
                 description: "Progresión jazzística fundamental",
                 chordTypes: ["m7", "7", "maj7"],
-                drumPattern: "jazz"
+                drumPattern: "simple"
             },
             {
                 name: "Rock Clásico",
@@ -987,28 +1101,28 @@
                 roman: "VI-IV-I-V",
                 description: "Progresión pop contemporánea",
                 chordTypes: ["m7", "maj7", "maj7", "7"],
-                drumPattern: "pop"
+                drumPattern: "simple"
             },
             {
                 name: "Balada Emocional",
                 roman: "I-VII-VI-III",
                 description: "Progresión emotiva para baladas",
                 chordTypes: ["maj7", "dim7", "m7", "m7"],
-                drumPattern: "ballad"
+                drumPattern: "simple"
             },
             {
                 name: "Alternativo",
                 roman: "I-III-VII-VI",
                 description: "Progresión alternativa moderna",
                 chordTypes: ["maj7", "m7", "dim7", "m7"],
-                drumPattern: "alternative"
+                drumPattern: "rock"
             },
             {
                 name: "Blues",
                 roman: "I-IV-V",
                 description: "Progresión blues tradicional",
                 chordTypes: ["7", "7", "7"],
-                drumPattern: "blues"
+                drumPattern: "simple"
             },
             {
                 name: "Funk",
@@ -1022,55 +1136,56 @@
                 roman: "I-VII-IV",
                 description: "Progresión reggae característica",
                 chordTypes: ["maj7", "7", "maj7"],
-                drumPattern: "reggae"
+                drumPattern: "simple"
             },
             {
                 name: "Disco",
                 roman: "I-III-IV-V",
                 description: "Progresión disco de los 70s",
                 chordTypes: ["maj7", "m7", "maj7", "7"],
-                drumPattern: "disco"
+                drumPattern: "funk"
             },
             {
                 name: "Punk",
                 roman: "I-V-IV",
                 description: "Progresión punk rock simple",
                 chordTypes: ["maj7", "7", "maj7"],
-                drumPattern: "punk"
+                drumPattern: "rock"
             },
             {
                 name: "Bossa Nova",
                 roman: "I-VI-II-V",
                 description: "Progresión bossa nova brasileña",
                 chordTypes: ["m7", "7", "m7", "7"],
-                drumPattern: "bossa"
+                drumPattern: "bossa nova"
             },
             {
                 name: "Country",
                 roman: "I-IV-I-V",
                 description: "Progresión country tradicional",
                 chordTypes: ["maj7", "maj7", "maj7", "7"],
-                drumPattern: "country"
+                drumPattern: "simple"
             },
             {
                 name: "R&B",
                 roman: "I-VI-IV-VII",
                 description: "Progresión R&B moderna",
                 chordTypes: ["7", "m7", "maj7", "dim7"],
-                drumPattern: "rnb"
+                drumPattern: "funk"
             },
             {
                 name: "Indie",
                 roman: "VI-IV-I-III",
                 description: "Progresión indie rock",
                 chordTypes: ["m7", "maj7", "maj7", "m7"],
-                drumPattern: "indie"
+                drumPattern: "rock"
             },
             {
                 name: "Gospel",
                 roman: "I-IV-V-IV",
                 description: "Progresión gospel tradicional",
-                chordTypes: ["maj7", "maj7", "7", "maj7"]
+                chordTypes: ["maj7", "maj7", "7", "maj7"],
+                drumPattern: "simple"
             }
         ];
 
@@ -1169,6 +1284,7 @@
         }
 
         function loadPredefinedProgression(index) {
+            console.log('loadPredefinedProgression called with index:', index);
             if (isPlaying) {
                 togglePlay();
             }
@@ -1179,7 +1295,13 @@
             const progression = predefinedProgressions[index];
             if (!progression) return;
 
-            
+            progressionDrumPattern = progression.drumPattern;
+
+            // Iniciar patrón de batería si la progresión lo tiene
+            console.log('Checking for drum pattern in progression:', progression.drumPattern);
+            if (progression.drumPattern) {
+                playDrumPattern(progression.drumPattern);
+            }
 
             // Generar acordes dinámicamente basados en la tonalidad actual
             const dynamicChords = generateDynamicProgression(index);
@@ -1217,12 +1339,7 @@
                 clearInterval(progressionInterval);
                 progressionInterval = null;
                 stopAudio();
-
-                
-
-                
-
-                
+                stopDrumPattern();
 
                 isPlaying = false;
                 toggleBtn.classList.remove('playing');
@@ -1238,12 +1355,9 @@
             } else {
                 if (currentProgression.length > 0) {
                     
-
                     if (audioContext.state === 'suspended') {
                         audioContext.resume();
                     }
-
-                    
 
                     isPlaying = true;
                     currentProgressionIndex = 0;
@@ -1256,9 +1370,7 @@
                         playNextChordInProgression();
                     }, progressionIntervalMs);
 
-                    
-
-                    
+                    playDrumPattern(progressionDrumPattern);
 
                     toggleBtn.classList.add('playing');
                     toggleBtn.classList.remove('stopped');
@@ -1301,6 +1413,7 @@
             renderSelectors();
             renderPredefinedProgressionsSelector();
             loadAudioFiles();
+            initDrumSampler();
             
 
             calcularEscala();
@@ -1596,4 +1709,4 @@
     </div>
     
     </body>
-</html>>l>
+</html>

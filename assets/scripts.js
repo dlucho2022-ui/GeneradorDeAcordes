@@ -1,3 +1,9 @@
+console.log("scripts.js loaded and executing."); // Add this line at the very beginning
+
+console.log("scripts.js loaded and executing."); // Add this line at the very beginning
+
+console.log("scripts.js loaded and executing."); // Add this line at the very beginning
+
 const semitonos_display = ["Do", "Do#", "Reb", "Re", "Re#", "Mib", "Mi", "Fa", "Fa#", "Solb", "Sol", "Sol#", "Lab", "La", "La#", "Sib", "Si"];
 const semitonos_calculo = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
 
@@ -68,89 +74,6 @@ const acordes = {
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
 };
 
-const drumPatterns = {
-    "Loop 1 (Basic 4-on-the-floor - 8n)": [
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 2 (Rock Beat - 8n)": [
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 3 (Funk Groove - 8n)": [
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: true, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: true, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: true, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: true, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 4 (Jazz Ride - 8n)": [
-        { kick: true, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: true, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: true, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 5 (Tom Fill - 8n)": [
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: true, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 6 (Cymbal Heavy - 8n)": [
-        { kick: true, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: true, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: true, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: true, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 7 (Hip Hop - 8n)": [
-        { kick: true, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: true, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: true, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: false, snare: false, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: true, hihatClosed: false, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ],
-    "Loop 8 (Dance - 8n)": [
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 1
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 2
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: true, snare: true, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 3
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-        { kick: true, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // 4
-        { kick: false, snare: false, hihatClosed: true, hihatOpen: false, hihatBell: false, crash: false, splash: false, ride: false, rimshot: false, tom10: false, tom13: false }, // &
-    ]
-};
-
 const todasLasOpciones = { ...escalas_modos, ...acordes };
 
 const audios_acordes = {};
@@ -167,12 +90,6 @@ let currentSynth = new Tone.Synth({
     oscillator: { type: 'sine' }
 }).toDestination();
 currentSynth.volume.value = -10;
-
-let kick, snare, hihatClosed, hihatOpen, hihatBell, crash, splash, ride, rimshot, tom10, tom13;
-let drumSequence, chordLoop;
-let drumVolume;
-let drumPatternSelect; // Declare globally
-
 
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
@@ -193,7 +110,6 @@ const toneNoteMap = {
     "Mi": "E", "Fa": "F", "Fa#": "F#", "Solb": "Gb", "Sol": "G", "Sol#": "G#",
     "Lab": "Ab", "La": "A", "La#": "A#", "Sib": "Bb", "Si": "B"
 };
-
 
 
 // --- LÓGICA DEL METRÓNOMO INTEGRADO ---
@@ -308,19 +224,6 @@ async function loadAudioFiles() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
-    
-    drumVolume = new Tone.Volume(0).toDestination();
-    kick = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/Kick-V01-Yamaha-16x16.wav").connect(drumVolume);
-    snare = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/SNARE-V01-CustomWorks-6x13.wav").connect(drumVolume);
-    hihatClosed = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/HHats-CL-V01-SABIAN-AAX.wav").connect(drumVolume); // Renamed from hihat
-    hihatOpen = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/HHats-OP-V01-SABIAN-AAX.wav").connect(drumVolume);
-    hihatBell = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/BELL-HHats-CL-V01-SABIAN-AAX.wav").connect(drumVolume);
-    crash = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/14-Crash-V01-SABIAN-14.wav").connect(drumVolume);
-    splash = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/6-Splash-V01-SABIAN-HH-6.wav").connect(drumVolume);
-    ride = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/Ride-V01-ROBMOR-SABIAN-22.wav").connect(drumVolume);
-    rimshot = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/RIMSHOTS-V01-CW-6x13.wav").connect(drumVolume);
-    tom10 = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/TOM10-V02-StarClassic-10x10.wav").connect(drumVolume);
-    tom13 = new Tone.Player("https://raw.githubusercontent.com/gregharvey/drum-samples/master/GSCW%20Drums%20Kit%201%20Samples/TOM13-V06-StarClassic-13x13.wav").connect(drumVolume);
 
     const notas_audio = ["c", "c-sharp", "d", "d-sharp", "e", "f", "f-sharp", "g", "g-sharp", "a", "a-sharp", "b"];
     const tipos_acorde = ["7", "m7", "dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
@@ -333,9 +236,6 @@ async function loadAudioFiles() {
     
     await loadMetronomeSound();
 }
-
-
-
 
 function playChord(nota, tipo, duracion = null) {
     stopAudio();
@@ -551,7 +451,7 @@ function renderSelectors() {
             option.classList.add('selected');
             calcularEscala();
 
-            // Actualizar preview y patrón de batería si hay una progresión seleccionada
+            // Actualizar preview si hay una progresión seleccionada
             const select = document.getElementById('predefined-progressions-select');
             if (select.value !== '') {
                 const progression = predefinedProgressions[parseInt(select.value)];
@@ -1137,7 +1037,7 @@ function loadPredefinedProgression(index) {
     const progression = predefinedProgressions[index];
     if (!progression) return;
 
-    // Generar acordes dinámicamente basados en la tonalidad actual
+    // Generar acordes dinámicos basados en la tonalidad actual
     const dynamicChords = generateDynamicProgression(index);
 
     currentProgression = [];
@@ -1173,9 +1073,6 @@ function togglePlay() {
         if (chordLoop) {
             chordLoop.stop(0).dispose();
         }
-        if (drumSequence) {
-            drumSequence.stop(0).dispose();
-        }
         Tone.Transport.stop();
         stopAudio(); // Stop any lingering chord audio
 
@@ -1206,31 +1103,16 @@ function togglePlay() {
             chordLoop = new Tone.Loop(time => {
                 const chord = currentProgression[currentProgressionIndex];
                 playChord(chord.nota, chord.tipo);
+                const indexToHighlight = currentProgressionIndex;
                 Tone.Draw.schedule(() => {
                     document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
-                    const currentChordEl = document.querySelectorAll('.progression-chord')[currentProgressionIndex];
+                    const currentChordEl = document.querySelectorAll('.progression-chord')[indexToHighlight];
                     if (currentChordEl) {
                         currentChordEl.classList.add('playing-chord');
                     }
                 }, time);
                 currentProgressionIndex = (currentProgressionIndex + 1) % currentProgression.length;
             }, '1m').start(0);
-
-            const selectedPatternName = drumPatternSelect.value;
-            const selectedPattern = drumPatterns[selectedPatternName];
-            drumSequence = new Tone.Sequence((time, note) => {
-                if (note.kick) kick.start(time);
-                if (note.snare) snare.start(time);
-                if (note.hihatClosed) hihatClosed.start(time);
-                if (note.hihatOpen) hihatOpen.start(time);
-                if (note.hihatBell) hihatBell.start(time);
-                if (note.crash) crash.start(time);
-                if (note.splash) splash.start(time);
-                if (note.ride) ride.start(time);
-                if (note.rimshot) rimshot.start(time);
-                if (note.tom10) tom10.start(time);
-                if (note.tom13) tom13.start(time);
-            }, selectedPattern, '8n').start(0);
 
             Tone.Transport.start();
 
@@ -1258,17 +1140,6 @@ window.onload = () => {
     renderPredefinedProgressionsSelector();
     loadAudioFiles();
     
-    // Populate drum pattern select
-    drumPatternSelect = document.getElementById('drum-pattern-select'); // Remove const
-    for (const patternName in drumPatterns) {
-        const option = document.createElement('option');
-        option.value = patternName;
-        option.textContent = patternName;
-        drumPatternSelect.appendChild(option);
-    }
-    // Set default selection
-    drumPatternSelect.value = "Loop 1 (Basic 4-on-the-floor)";
-
     calcularEscala();
 
     document.getElementById('toggle-progression-btn').addEventListener('click', togglePlay);
@@ -1308,13 +1179,6 @@ window.onload = () => {
     const floatingBtn = document.getElementById('floating-play-stop-button');
     floatingBtn.innerHTML = playIconSVG;
     floatingBtn.classList.add('stopped');
-
-    const drumVolumeControl = document.getElementById('drum-volume');
-    drumVolumeControl.addEventListener('input', (event) => {
-        if (drumVolume) {
-            drumVolume.volume.value = event.target.value;
-        }
-    });
 
     const chordVolumeControl = document.getElementById('chord-volume');
     chordVolumeControl.addEventListener('input', (event) => {
@@ -1414,31 +1278,7 @@ window.onload = () => {
         }
     });
 
-    // Event listener for drum pattern select
-    drumPatternSelect.addEventListener('change', () => {
-        if (isPlaying) {
-            // Stop current sequence
-            if (drumSequence) {
-                drumSequence.stop(0).dispose();
-            }
-            // Restart with new pattern
-            const selectedPatternName = drumPatternSelect.value;
-            const selectedPattern = drumPatterns[selectedPatternName];
-            drumSequence = new Tone.Sequence((time, note) => {
-                if (note.kick) kick.start(time);
-                if (note.snare) snare.start(time);
-                if (note.hihatClosed) hihatClosed.start(time);
-                if (note.hihatOpen) hihatOpen.start(time);
-                if (note.hihatBell) hihatBell.start(time);
-                if (note.crash) crash.start(time);
-                if (note.splash) splash.start(time);
-                if (note.ride) ride.start(time);
-                if (note.rimshot) rimshot.start(time);
-                if (note.tom10) tom10.start(time);
-                if (note.tom13) tom13.start(time);
-            }, selectedPattern, '8n').start(0);
-        }
-    });
+    
 };
 
 function addChordFromInput() {

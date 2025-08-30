@@ -1,9 +1,5 @@
 console.log("scripts.js loaded and executing."); // Add this line at the very beginning
 
-console.log("scripts.js loaded and executing."); // Add this line at the very beginning
-
-console.log("scripts.js loaded and executing."); // Add this line at the very beginning
-
 const semitonos_display = ["Do", "Do#", "Reb", "Re", "Re#", "Mib", "Mi", "Fa", "Fa#", "Solb", "Sol", "Sol#", "Lab", "La", "La#", "Sib", "Si"];
 const semitonos_calculo = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
 
@@ -90,6 +86,9 @@ let currentSynth = new Tone.Synth({
     oscillator: { type: 'sine' }
 }).toDestination();
 currentSynth.volume.value = -10;
+
+let pianoSampler;
+let pianoVolume;
 
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
@@ -225,6 +224,14 @@ async function loadAudioFiles() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
+    // Initialize Salamander Piano Sampler
+    pianoVolume = new Tone.Volume(-6).toDestination();
+    pianoSampler = new Tone.Sampler({
+        urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
+        release: 0.5,
+        baseUrl: "https://tonejs.github.io/audio/salamander/",
+    }).connect(pianoVolume);
+
     const notas_audio = ["c", "c-sharp", "d", "d-sharp", "e", "f", "f-sharp", "g", "g-sharp", "a", "a-sharp", "b"];
     const tipos_acorde = ["7", "m7", "dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
     for (const nota of notas_audio) {
@@ -235,6 +242,31 @@ async function loadAudioFiles() {
     }
     
     await loadMetronomeSound();
+}
+
+function getPlayablePianoNotes(chordNoteNames) {
+    // 1. Map notes to objects with their pitch value (0-11)
+    const notesWithPitch = chordNoteNames.map(name => ({
+        name: name,
+        pitch: mapNotaToSemitone(name)
+    })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
+
+    // 2. Sort by pitch value
+    notesWithPitch.sort((a, b) => a.pitch - b.pitch);
+
+    // 3. Assign octaves to ensure ascending order
+    let lastPitch = -1;
+    let currentOctave = 4;
+    const playableNotes = notesWithPitch.map(note => {
+        if (note.pitch < lastPitch) {
+            currentOctave++;
+        }
+        lastPitch = note.pitch;
+        const mappedNote = toneNoteMap[note.name]; // Convert "Do" to "C"
+        return mappedNote ? mappedNote + currentOctave : null;
+    }).filter(n => n);
+
+    return playableNotes;
 }
 
 function playChord(nota, tipo, duracion = null) {
@@ -314,7 +346,7 @@ function stopAudio() {
     }
 }
 
-function simplifyNoteForDisplay(note) {
+function simplifyEnharmonic(note) {
     // This function translates theoretically correct but hard-to-read note names
     // into their simpler, more common enharmonic equivalents for display purposes.
     switch (note) {
@@ -451,7 +483,7 @@ function renderSelectors() {
             option.classList.add('selected');
             calcularEscala();
 
-            // Actualizar preview si hay una progresión seleccionada
+            // Actualizar preview y patrón de batería si hay una progresión seleccionada
             const select = document.getElementById('predefined-progressions-select');
             if (select.value !== '') {
                 const progression = predefinedProgressions[parseInt(select.value)];
@@ -590,7 +622,7 @@ function calcularEscala() {
             }
         }
 
-        const escalaNotasDisplay = escalaNotas.map(nota => getFormattedNoteForDisplay(nota));
+        const escalaNotasDisplay = escalaNotas.map(nota => getFormattedNoteForDisplay(simplifyEnharmonic(nota)));
         const acordesPredefinidos = opcionesSeleccionadas.acordes;
         let acordesHtml = "";
 
@@ -625,7 +657,7 @@ function calcularEscala() {
     else if (selectedAcorde) {
         const opcionesSeleccionadas = acordes[selectedAcorde];
         const notasAcorde = getChordNotes(selectedSemitono, opcionesSeleccionadas.notacion);
-        const notasAcordeDisplay = notasAcorde.map(nota => getFormattedNoteForDisplay(nota));
+        const notasAcordeDisplay = notasAcorde.map(nota => getFormattedNoteForDisplay(simplifyEnharmonic(nota)));
 
         const acordeNotacion = formatChordDisplay(opcionesSeleccionadas.notacion);
 
@@ -744,7 +776,7 @@ function updateProgressionDisplay() {
         if (chord.notes && chord.notes.length > 0) {
             const chordNotesEl = document.createElement('div');
             chordNotesEl.className = 'chord-notes-display';
-            chordNotesEl.innerHTML = chord.notes.map(note => getFormattedNoteForDisplay(simplifyNoteForDisplay(note))).join(' - ');
+            chordNotesEl.innerHTML = chord.notes.map(note => getFormattedNoteForDisplay(simplifyEnharmonic(note))).join(' - ');
             chordEl.appendChild(chordNotesEl);
         }
 
@@ -772,7 +804,18 @@ function addChordToProgression(nota, tipo, display) {
     };
     currentProgression.push(chord);
     updateProgressionDisplay();
+    
+    // Play original string sound for preview
     playChord(nota, tipo, 1000);
+
+    // Play piano sampler for preview
+    if (pianoSampler && notes && notes.length > 0) {
+        const simplifiedNotes = notes.map(n => simplifyEnharmonic(n));
+        const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
+        if (pianoNotes.length > 0) {
+            pianoSampler.triggerAttackRelease(pianoNotes, '1s'); // Play for 1 second
+        }
+    }
 }
 
 function removeChordFromProgression(index) {
@@ -1102,11 +1145,23 @@ function togglePlay() {
 
             chordLoop = new Tone.Loop(time => {
                 const chord = currentProgression[currentProgressionIndex];
+                const indexToHighlight = currentProgressionIndex; // Capturar el índice
+
+                // Play the original string sound
                 playChord(chord.nota, chord.tipo);
-                const indexToHighlight = currentProgressionIndex;
+
+                // Play the Salamander piano sound
+                if (pianoSampler && chord.notes && chord.notes.length > 0) {
+                    const simplifiedNotes = chord.notes.map(n => simplifyEnharmonic(n));
+                    const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
+                    if (pianoNotes.length > 0) {
+                        pianoSampler.triggerAttackRelease(pianoNotes, '1n', time);
+                    }
+                }
+                
                 Tone.Draw.schedule(() => {
                     document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
-                    const currentChordEl = document.querySelectorAll('.progression-chord')[indexToHighlight];
+                    const currentChordEl = document.querySelectorAll('.progression-chord')[indexToHighlight]; // Usar el índice capturado
                     if (currentChordEl) {
                         currentChordEl.classList.add('playing-chord');
                     }
@@ -1183,12 +1238,23 @@ window.onload = () => {
     const chordVolumeControl = document.getElementById('chord-volume');
     chordVolumeControl.addEventListener('input', (event) => {
         // Convert dB to linear volume (amplitude)
-        chordVolumeLinear = Math.pow(10, event.target.value / 20);
+        const linearVolume = Math.pow(10, event.target.value / 20);
+        // Clamp the value between 0.0 and 1.0 to prevent errors
+        chordVolumeLinear = Math.max(0, Math.min(1, linearVolume));
         // Update volume of currently playing audio if it exists
         if (currentAudio && !currentAudio.paused) {
             currentAudio.volume = chordVolumeLinear;
         }
     });
+
+    const pianoVolumeControl = document.getElementById('piano-volume');
+    if (pianoVolumeControl) {
+        pianoVolumeControl.addEventListener('input', (event) => {
+            if (pianoVolume) {
+                pianoVolume.volume.value = event.target.value;
+            }
+        });
+    }
 
     const noteButtons = document.querySelectorAll('.note-btn');
     noteButtons.forEach(button => {

@@ -1198,6 +1198,14 @@ function startChordLoop() {
                 chordSampler.triggerAttackRelease(pianoNotes, '1n', time); // Use chordSampler for full chord
             }
 
+            const rootNote = chord.notes[0]; // Get the root note
+            if (rootNote) {
+                const playableRootNote = getPlayablePianoNotes([simplifyEnharmonic(rootNote)]);
+                if (playableRootNote.length > 0) {
+                    arpeggioSampler.triggerAttackRelease(playableRootNote, '8n', Tone.Transport.now()); // Play root on beat 1
+                }
+            }
+
             const thirdNote = chord.notes[1];
             if (thirdNote) {
                 const playableThirdNote = getPlayablePianoNotes([simplifyEnharmonic(thirdNote)]);

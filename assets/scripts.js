@@ -87,8 +87,10 @@ let currentSynth = new Tone.Synth({
 }).toDestination();
 currentSynth.volume.value = -10;
 
-let pianoSampler;
+let chordSampler;
+let arpeggioSampler;
 let pianoVolume;
+let arpeggioVolume;
 
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
@@ -230,12 +232,26 @@ async function loadAudioFiles() {
     }
 
     // Initialize Salamander Piano Sampler
+    // Initialize volumes
     pianoVolume = new Tone.Volume(-6).toDestination();
-    pianoSampler = new Tone.Sampler({
-        urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
-        release: 0.5,
-        baseUrl: "https://tonejs.github.io/audio/salamander/",
-    }).connect(pianoVolume);
+    arpeggioVolume = new Tone.Volume(-12).toDestination(); // Default arpeggio volume
+
+    // Initialize Samplers
+    try {
+        chordSampler = new Tone.Sampler({
+            urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
+            release: 0.5,
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+        }).connect(pianoVolume);
+
+        arpeggioSampler = new Tone.Sampler({
+            urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
+            release: 0.5,
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+        }).connect(arpeggioVolume);
+    } catch (e) {
+        console.error("Error initializing Tone.Sampler:", e);
+    }
 
     const notas_audio = ["c", "c-sharp", "d", "d-sharp", "e", "f", "f-sharp", "g", "g-sharp", "a", "a-sharp", "b"];
     const tipos_acorde = ["7", "m7", "dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
@@ -247,6 +263,15 @@ async function loadAudioFiles() {
     }
     
     await loadMetronomeSound();
+
+    // Debugging: Check if samplers are loaded
+    Promise.all([chordSampler.loaded, arpeggioSampler.loaded])
+        .then(() => {
+            console.log("Samplers de piano cargados correctamente.");
+        })
+        .catch(e => {
+            console.error("Error al cargar los samplers de piano:", e);
+        });
 }
 
 function getPlayablePianoNotes(chordNoteNames) {
@@ -814,11 +839,11 @@ function addChordToProgression(nota, tipo, display) {
     playChord(nota, tipo, 1000);
 
     // Play piano sampler for preview
-    if (pianoSampler && notes && notes.length > 0) {
+    if (chordSampler && notes && notes.length > 0) {
         const simplifiedNotes = notes.map(n => simplifyEnharmonic(n));
         const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
         if (pianoNotes.length > 0) {
-            pianoSampler.triggerAttackRelease(pianoNotes, '1s'); // Play for 1 second
+            chordSampler.triggerAttackRelease(pianoNotes, '1s'); // Play for 1 second
         }
     }
 }
@@ -1123,8 +1148,11 @@ function togglePlay() {
         }
         Tone.Transport.stop();
         stopAudio(); // Stop any lingering chord audio
-        if (pianoSampler) {
-            pianoSampler.releaseAll();
+        if (chordSampler) {
+            chordSampler.releaseAll();
+        }
+        if (arpeggioSampler) {
+            arpeggioSampler.releaseAll();
         }
 
         isPlaying = false;
@@ -1163,18 +1191,18 @@ function startChordLoop() {
 
         playChord(chord.nota, chord.tipo);
 
-        if (pianoSampler && chord.notes && chord.notes.length > 0) {
+        if (chordSampler && arpeggioSampler && chord.notes && chord.notes.length > 0) {
             const simplifiedNotes = chord.notes.map(n => simplifyEnharmonic(n));
             const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
             if (pianoNotes.length > 0) {
-                pianoSampler.triggerAttackRelease(pianoNotes, '1n', time);
+                chordSampler.triggerAttackRelease(pianoNotes, '1n', time); // Use chordSampler for full chord
             }
 
             const thirdNote = chord.notes[1];
             if (thirdNote) {
                 const playableThirdNote = getPlayablePianoNotes([simplifyEnharmonic(thirdNote)]);
                 if (playableThirdNote.length > 0) {
-                    pianoSampler.triggerAttackRelease(playableThirdNote, '8n', Tone.Transport.now() + Tone.Time('0:1').toSeconds());
+                    arpeggioSampler.triggerAttackRelease(playableThirdNote, '8n', Tone.Transport.now() + Tone.Time('0:1').toSeconds()); // Use arpeggioSampler
                 }
             }
 
@@ -1182,7 +1210,7 @@ function startChordLoop() {
             if (fifthNote) {
                 const playableFifthNote = getPlayablePianoNotes([simplifyEnharmonic(fifthNote)]);
                 if (playableFifthNote.length > 0) {
-                    pianoSampler.triggerAttackRelease(playableFifthNote, '8n', Tone.Transport.now() + Tone.Time('0:2').toSeconds());
+                    arpeggioSampler.triggerAttackRelease(playableFifthNote, '8n', Tone.Transport.now() + Tone.Time('0:2').toSeconds()); // Use arpeggioSampler
                 }
             }
 
@@ -1190,7 +1218,7 @@ function startChordLoop() {
             if (seventhNote) {
                 const playableSeventhNote = getPlayablePianoNotes([simplifyEnharmonic(seventhNote)]);
                 if (playableSeventhNote.length > 0) {
-                    pianoSampler.triggerAttackRelease(playableSeventhNote, '8n', Tone.Transport.now() + Tone.Time('0:3').toSeconds());
+                    arpeggioSampler.triggerAttackRelease(playableSeventhNote, '8n', Tone.Transport.now() + Tone.Time('0:3').toSeconds()); // Use arpeggioSampler
                 }
             }
         }
@@ -1280,11 +1308,20 @@ window.onload = () => {
         }
     });
 
-    const pianoVolumeControl = document.getElementById('piano-volume');
+        const pianoVolumeControl = document.getElementById('piano-volume');
     if (pianoVolumeControl) {
         pianoVolumeControl.addEventListener('input', (event) => {
             if (pianoVolume) {
                 pianoVolume.volume.value = event.target.value;
+            }
+        });
+    }
+
+    const arpeggioVolumeControl = document.getElementById('arpeggio-volume');
+    if (arpeggioVolumeControl) {
+        arpeggioVolumeControl.addEventListener('input', (event) => {
+            if (arpeggioVolume) {
+                arpeggioVolume.volume.value = event.target.value;
             }
         });
     }

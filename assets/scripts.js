@@ -174,6 +174,11 @@ function updateMetronomeBPM(bpm) {
     }
     if(isPlaying){ // If progression is playing, update its tempo too
         Tone.Transport.bpm.value = bpm;
+        // Stop and restart the chordLoop to ensure timing is re-calculated
+        if (chordLoop) {
+            chordLoop.stop().dispose(); // Stop and dispose the old loop
+        }
+        startChordLoop(); // Re-create and start the loop with the new BPM
     }
 }
 
@@ -1118,6 +1123,9 @@ function togglePlay() {
         }
         Tone.Transport.stop();
         stopAudio(); // Stop any lingering chord audio
+        if (pianoSampler) {
+            pianoSampler.releaseAll();
+        }
 
         isPlaying = false;
         toggleBtn.classList.remove('playing');
@@ -1132,54 +1140,79 @@ function togglePlay() {
 
     } else {
         if (currentProgression.length > 0) {
-            
-            if (Tone.context.state === 'suspended') {
-                Tone.context.resume();
-            }
-
-            isPlaying = true;
-            currentProgressionIndex = 0;
-
-            const bpm = document.getElementById('bpm-input').value;
-            Tone.Transport.bpm.value = bpm;
-
-            chordLoop = new Tone.Loop(time => {
-                const chord = currentProgression[currentProgressionIndex];
-                const indexToHighlight = currentProgressionIndex; // Capturar el índice
-
-                // Play the original string sound
-                playChord(chord.nota, chord.tipo);
-
-                // Play the Salamander piano sound
-                if (pianoSampler && chord.notes && chord.notes.length > 0) {
-                    const simplifiedNotes = chord.notes.map(n => simplifyEnharmonic(n));
-                    const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
-                    if (pianoNotes.length > 0) {
-                        pianoSampler.triggerAttackRelease(pianoNotes, '1n', time);
-                    }
-                }
-                
-                Tone.Draw.schedule(() => {
-                    document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
-                    const currentChordEl = document.querySelectorAll('.progression-chord')[indexToHighlight]; // Usar el índice capturado
-                    if (currentChordEl) {
-                        currentChordEl.classList.add('playing-chord');
-                    }
-                }, time);
-                currentProgressionIndex = (currentProgressionIndex + 1) % currentProgression.length;
-            }, '1m').start(0);
-
-            Tone.Transport.start();
-
-            toggleBtn.classList.add('playing');
-            toggleBtn.classList.remove('stopped');
-
-            // Actualizar botón flotante
-            floatingBtn.innerHTML = stopIconSVG;
-            floatingBtn.classList.add('playing');
-            floatingBtn.classList.remove('stopped');
+            startChordLoop();
         }
     }
+}
+
+// New function to encapsulate chord loop starting logic
+function startChordLoop() {
+    if (Tone.context.state === 'suspended') {
+        Tone.context.resume();
+    }
+
+    isPlaying = true;
+    currentProgressionIndex = 0;
+
+    const bpm = document.getElementById('bpm-input').value;
+    Tone.Transport.bpm.value = bpm;
+
+    chordLoop = new Tone.Loop(time => {
+        const chord = currentProgression[currentProgressionIndex];
+        const indexToHighlight = currentProgressionIndex;
+
+        playChord(chord.nota, chord.tipo);
+
+        if (pianoSampler && chord.notes && chord.notes.length > 0) {
+            const simplifiedNotes = chord.notes.map(n => simplifyEnharmonic(n));
+            const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
+            if (pianoNotes.length > 0) {
+                pianoSampler.triggerAttackRelease(pianoNotes, '1n', time);
+            }
+
+            const thirdNote = chord.notes[1];
+            if (thirdNote) {
+                const playableThirdNote = getPlayablePianoNotes([simplifyEnharmonic(thirdNote)]);
+                if (playableThirdNote.length > 0) {
+                    pianoSampler.triggerAttackRelease(playableThirdNote, '8n', Tone.Transport.now() + Tone.Time('0:1').toSeconds());
+                }
+            }
+
+            const fifthNote = chord.notes[2];
+            if (fifthNote) {
+                const playableFifthNote = getPlayablePianoNotes([simplifyEnharmonic(fifthNote)]);
+                if (playableFifthNote.length > 0) {
+                    pianoSampler.triggerAttackRelease(playableFifthNote, '8n', Tone.Transport.now() + Tone.Time('0:2').toSeconds());
+                }
+            }
+
+            const seventhNote = chord.notes[3];
+            if (seventhNote) {
+                const playableSeventhNote = getPlayablePianoNotes([simplifyEnharmonic(seventhNote)]);
+                if (playableSeventhNote.length > 0) {
+                    pianoSampler.triggerAttackRelease(playableSeventhNote, '8n', Tone.Transport.now() + Tone.Time('0:3').toSeconds());
+                }
+            }
+        }
+
+        Tone.Draw.schedule(() => {
+            document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
+            const currentChordEl = document.querySelectorAll('.progression-chord')[indexToHighlight];
+            if (currentChordEl) {
+                currentChordEl.classList.add('playing-chord');
+            }
+        }, time);
+        currentProgressionIndex = (currentProgressionIndex + 1) % currentProgression.length;
+    }, '1m').start(0);
+
+    Tone.Transport.start();
+
+    document.getElementById('toggle-progression-btn').classList.add('playing');
+    document.getElementById('toggle-progression-btn').classList.remove('stopped');
+
+    document.getElementById('floating-play-stop-button').innerHTML = stopIconSVG;
+    document.getElementById('floating-play-stop-button').classList.add('playing');
+    document.getElementById('floating-play-stop-button').classList.remove('stopped');
 }
 
 

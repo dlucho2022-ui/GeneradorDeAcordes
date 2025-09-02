@@ -404,6 +404,7 @@ nav ul li a.active-nav-link {
 
 .volume-slider {
     -webkit-appearance: none; /* Remove default styling */
+    appearance: none; /* Standard property for compatibility */
     width: 250px; /* Increased width for more range */
     height: 10px; /* Slightly thicker track */
     background: linear-gradient(to right, #4CAF50, #8BC34A); /* Modern gradient */

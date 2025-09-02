@@ -102,10 +102,9 @@ main {
     margin: 20px auto; /* Center it and add some top margin */
 }
 
-#scales-chords-tab,
 #progression-container {
     flex: 1; /* Allow them to grow and shrink */
-    min-width: 300px; /* Minimum width before wrapping */
+    min-width: 400px; /* Increased minimum width to accommodate wider sliders */
     margin: 0; /* Reset margins */
 }
 
@@ -404,32 +403,55 @@ nav ul li a.active-nav-link {
 
 
 .volume-slider {
-    width: 80px;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 8px;
-    background: #444;
-    border-radius: 4px;
+    -webkit-appearance: none; /* Remove default styling */
+    width: 250px; /* Increased width for more range */
+    height: 10px; /* Slightly thicker track */
+    background: linear-gradient(to right, #4CAF50, #8BC34A); /* Modern gradient */
+    border-radius: 5px; /* Rounded ends */
     outline: none;
-    transition: opacity .2s;
+    opacity: 0.9; /* Slightly less transparent by default */
+    transition: opacity .2s ease-in-out; /* Smooth transition */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Subtle inner shadow */
+}
+
+.volume-slider:hover {
+    opacity: 1;
 }
 
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 15px;
-    height: 15px;
-    background: #9370db;
+    width: 22px; /* Slightly larger thumb */
+    height: 22px; /* Slightly larger thumb */
     border-radius: 50%;
-    cursor: pointer;
+    background: #007bff; /* Vibrant blue */
+    border: 2px solid #ffffff; /* White border */
+    cursor: grab; /* Modern cursor */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    transition: background .2s ease-in-out, box-shadow .2s ease-in-out; /* Smooth transitions */
+}
+
+.volume-slider::-webkit-slider-thumb:active {
+    cursor: grabbing; /* Grabbing cursor when active */
+    background: #0056b3; /* Darker blue when active */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
 
 .volume-slider::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    background: #9370db;
+    width: 22px; /* Slightly larger thumb */
+    height: 22px; /* Slightly larger thumb */
     border-radius: 50%;
-    cursor: pointer;
+    background: #007bff; /* Vibrant blue */
+    border: 2px solid #ffffff; /* White border */
+    cursor: grab; /* Modern cursor */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    transition: background .2s ease-in-out, box-shadow .2s ease-in-out; /* Smooth transitions */
+}
+
+.volume-slider::-moz-range-thumb:active {
+    cursor: grabbing; /* Grabbing cursor when active */
+    background: #0056b3; /* Darker blue when active */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Piano interactivo - de index.html */
@@ -518,7 +540,7 @@ nav ul li a.active-nav-link {
     flex-direction: row;
     justify-content: space-around;
     align-items: flex-start;
-    width: 100%;
+    width: 300px; /* Explicitly set width to accommodate wider sliders */
     margin-top: 20px;
 }
 
@@ -794,40 +816,7 @@ body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-pl
 }
 
 /* Estilos para el control de volumen de piano en Index3.html */
-#piano-volume {
-    width: 200px;
-    margin-top: 10px;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 8px;
-    background: #444;
-    border-radius: 4px;
-    outline: none;
-    transition: opacity .2s;
-}
 
-#piano-volume::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 15px;
-    background: #9370db;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-#piano-volume::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    background: #9370db;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-label[for="piano-volume"] {
-    color: #e0e0e0;
-    font-weight: bold;
-}
 
 /* Estilos para botones flotantes solo en index.html */
 body:not(.body-sheet-music) #floating-play-stop-button {

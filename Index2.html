@@ -432,6 +432,7 @@
                             blockNotes.push({ ...noteInfo, name: currentNoteName, isChromatic: isChromatic });
                         });
                         addBeaming(blockNotes);
+                        addTupletNotations(blockNotes);
                         currentGeneratedNotes.push(...blockNotes);
                         beatsInCurrentMeasure += blockInfo.beats;
                     }
@@ -459,6 +460,26 @@
                     notes.forEach(note => { if ((note.type === 'eighth' || note.type === '16th') && !note.isRest) { currentGroup.push(note); } else { if (currentGroup.length > 1) beamGroups.push(currentGroup); currentGroup = []; } });
                     if (currentGroup.length > 1) beamGroups.push(currentGroup);
                     beamGroups.forEach(group => { group.forEach((note, index) => { note.beams = []; const isFirstInGroup = index === 0; const isLastInGroup = index === group.length - 1; if (isFirstInGroup) note.beams.push({ number: 1, type: 'begin' }); else if (isLastInGroup) note.beams.push({ number: 1, type: 'end' }); else note.beams.push({ number: 1, type: 'continue' }); if (note.type === '16th') { const prevNote = group[index - 1]; const nextNote = group[index + 1]; const prevIs16th = prevNote && prevNote.type === '16th'; const nextIs16th = nextNote && nextNote.type === '16th'; if (!prevIs16th) note.beams.push({ number: 2, type: 'begin' }); else if (!nextIs16th) note.beams.push({ number: 2, type: 'end' }); else note.beams.push({ number: 2, type: 'continue' }); } }); });
+                }
+            }
+
+            function addTupletNotations(notes) {
+                for (let i = 0; i < notes.length; i++) {
+                    if (notes[i].isTuplet) {
+                        const tupletType = notes[i].isTuplet;
+                        let tupletGroup = [notes[i]];
+                        let j = i + 1;
+                        while (j < notes.length && notes[j].isTuplet === tupletType) {
+                            tupletGroup.push(notes[j]);
+                            j++;
+                        }
+
+                        if (tupletGroup.length > 1) {
+                            tupletGroup[0].tupletPosition = 'start';
+                            tupletGroup[tupletGroup.length - 1].tupletPosition = 'stop';
+                        }
+                        i = j - 1; // Skip past the processed tuplet notes
+                    }
                 }
             }
             function createMusicXML(notes, numMeasures, fifths, selectedKey, timeSignature, selectedClef) { const [beats, beatType] = timeSignature.split('/'); let measuresXML = '', noteIndex = 0; const measureCapacity = parseInt(beats, 10) * (beatType === '4' ? 12 : 6); for (let i = 0; i < numMeasures; i++) { measuresXML += `<measure number="${i + 1}">`; if (i === 0) { const clefSign = selectedClef === 'G' ? 'G' : 'F'; const clefLine = selectedClef === 'G' ? '2' : '4'; measuresXML += `<attributes><divisions>12</divisions><key><fifths>${fifths}</fifths></key><time><beats>${beats}</beats><beat-type>${beatType}</beat-type></time><clef><sign>${clefSign}</sign><line>${clefLine}</line></clef></attributes>`; } let currentMeasureDuration = 0; while (noteIndex < notes.length && currentMeasureDuration < measureCapacity) { const note = notes[noteIndex]; if (note.isRest) { measuresXML += `<note><rest/><duration>${note.xml}</duration><type>${note.type}</type></note>`; } else { const step = note.name.charAt(0); const octave = note.name.replace(/[^0-9]/g, ''); let alter = 0; if (note.name.includes('##') || note.name.includes('x')) { alter = 2; } else if (note.name.includes('#')) { alter = 1; } else if (note.name.includes('bb')) { alter = -2; } else if (note.name.includes('b')) { alter = -1; } let accidentalTag = ''; if (note.isChromatic) { if (alter > 0) { accidentalTag = `<accidental>${alter === 2 ? 'double-' : ''}sharp</accidental>`; } else if (alter < 0) { accidentalTag = `<accidental>${alter === -2 ? 'flat-' : ''}flat</accidental>`; } else { const diatonicNotesInKey = keyData[selectedKey].notes; if (diatonicNotesInKey.some(n => n.startsWith(step) && (n.includes('#') || n.includes('b')))) { accidentalTag = '<accidental>natural</accidental>'; } } } measuresXML += `<note><pitch><step>${step}</step><alter>${alter}</alter><octave>${octave}</octave></pitch><duration>${note.xml}</duration><type>${note.type}</type>`; let timeModificationTag = ''; if (note.isTuplet === 'triplet') { timeModificationTag = `<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>`; } else if (note.isTuplet === 'duplet') { timeModificationTag = `<time-modification><actual-notes>2</actual-notes><normal-notes>3</normal-notes></time-modification>`; }

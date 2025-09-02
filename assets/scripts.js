@@ -274,21 +274,21 @@ async function loadAudioFiles() {
         });
 }
 
-function getPlayablePianoNotes(chordNoteNames) {
+function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
     // 1. Map notes to objects with their pitch value (0-11)
+    //    Do NOT sort here. Assume chordNoteNames is already in musical order.
     const notesWithPitch = chordNoteNames.map(name => ({
         name: name,
         pitch: mapNotaToSemitone(name)
     })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
 
-    // 2. Sort by pitch value
-    notesWithPitch.sort((a, b) => a.pitch - b.pitch);
-
-    // 3. Assign octaves to ensure ascending order
-    let lastPitch = -1;
-    let currentOctave = 4;
+    // 3. Assign octaves to ensure ascending order based on original sequence
+    let lastPitch = -1; // Use -1 to ensure the first note doesn't trigger an octave jump
+    let currentOctave = startOctave;
     const playableNotes = notesWithPitch.map(note => {
-        if (note.pitch < lastPitch) {
+        // If the current note's pitch is lower than the previous one, it means we've crossed an octave boundary
+        // For example, B (11) to C (0)
+        if (lastPitch !== -1 && note.pitch < lastPitch) { // Only increment if it's not the very first note
             currentOctave++;
         }
         lastPitch = note.pitch;
@@ -361,6 +361,43 @@ function stopAllNotes() {
         currentSynth.triggerRelease(Tone.now());
         document.querySelector(`.note-btn[data-note="${currentToneNote}"]`)?.classList.remove('active');
         currentToneNote = null;
+    }
+}
+
+// New function to play a sequence of notes (scale or arpeggio)
+async function playScaleOrArpeggio(notes, octave = 4, duration = '8n') { // Keep octave parameter
+    if (!arpeggioSampler || !arpeggioSampler.loaded) {
+        console.warn("Sampler de arpegio no cargado. No se puede reproducir la escala/arpegio.");
+        return;
+    }
+
+    // Get the notes with correct octave assignments, starting from the specified octave
+    const basePlayableNotes = getPlayablePianoNotes(notes, octave); // Pass octave here
+
+    if (basePlayableNotes.length === 0) {
+        console.warn("No hay notas válidas para reproducir.");
+        return;
+    }
+
+    let fullAscendingSequence = [...basePlayableNotes];
+
+    // Add the root note an octave higher to complete the scale/arpeggio
+    const rootNoteTone = toneNoteMap[notes[0]]; // Get the Tone.js name for the original root note
+    if (rootNoteTone) {
+        // The octave of the root note in basePlayableNotes should be 'octave'
+        fullAscendingSequence.push(`${rootNoteTone}${octave + 1}`);
+    }
+
+    const allNotesToPlay = [...fullAscendingSequence, ...fullAscendingSequence.slice(0, -1).reverse()];
+
+    let time = Tone.now();
+    const noteDuration = Tone.Time(duration).toSeconds();
+    const delayBetweenNotes = noteDuration * 0.1;
+
+    for (let i = 0; i < allNotesToPlay.length; i++) {
+        const note = allNotesToPlay[i];
+        arpeggioSampler.triggerAttackRelease(note, duration, time);
+        time += noteDuration + delayBetweenNotes;
     }
 }
 
@@ -652,7 +689,9 @@ function calcularEscala() {
             }
         }
 
-        const escalaNotasDisplay = escalaNotas.map(nota => getFormattedNoteForDisplay(simplifyEnharmonic(nota)));
+        const escalaNotasDisplay = escalaNotas.map(nota => simplifyEnharmonic(nota)); // Get simplified notes for playback
+        const gradosDisplay = grados; // Use original grades for display
+
         const acordesPredefinidos = opcionesSeleccionadas.acordes;
         let acordesHtml = "";
 
@@ -677,25 +716,44 @@ function calcularEscala() {
 
         resultadoBox.innerHTML = `
             Escala de ${getFormattedNoteForDisplay(selectedSemitono)} ${selectedEscala}<br>
-            Notas: ${escalaNotasDisplay.join(' - ')}<br>
-            Grados: ${grados.join(' - ')}
+            Notas: <button class="result-button" id="playScaleNotes">${escalaNotasDisplay.map(nota => getFormattedNoteForDisplay(nota)).join(' - ')}</button><br>
+            Grados: <button class="result-button" id="playScaleGrades">${gradosDisplay.join(' - ')}</button>
             <br>
         `;
 
         contextoBox.style.display = 'block';
+
+        // Add event listeners after elements are in DOM
+        document.getElementById('playScaleNotes').addEventListener('click', () => {
+            playScaleOrArpeggio(escalaNotasDisplay); // Play the whole scale
+        });
+
+        document.getElementById('playScaleGrades').addEventListener('click', () => {
+            playScaleOrArpeggio(escalaNotasDisplay); // Play the whole scale
+        });
     }
     else if (selectedAcorde) {
         const opcionesSeleccionadas = acordes[selectedAcorde];
         const notasAcorde = getChordNotes(selectedSemitono, opcionesSeleccionadas.notacion);
-        const notasAcordeDisplay = notasAcorde.map(nota => getFormattedNoteForDisplay(simplifyEnharmonic(nota)));
+        const notasAcordeDisplay = notasAcorde.map(nota => simplifyEnharmonic(nota)); // Get simplified notes for playback
+        const gradosAcordeDisplay = opcionesSeleccionadas.grados; // Use original grades for display
 
         const acordeNotacion = formatChordDisplay(opcionesSeleccionadas.notacion);
 
         resultadoBox.innerHTML = `
             Acorde de ${getFormattedNoteForDisplay(selectedSemitono)} ${selectedAcorde}<br>
-            Notas: ${notasAcordeDisplay.join(' - ')}<br>
-            Grados: ${opcionesSeleccionadas.grados.join(' - ')}
+            Notas: <button class="result-button" id="playChordNotes">${notasAcordeDisplay.map(nota => getFormattedNoteForDisplay(nota)).join(' - ')}</button><br>
+            Grados: <button class="result-button" id="playChordGrades">${gradosAcordeDisplay.join(' - ')}</button>
         `;
+
+        // Add event listeners after elements are in DOM
+        document.getElementById('playChordNotes').addEventListener('click', () => {
+            playScaleOrArpeggio(notasAcordeDisplay); // Play the whole chord
+        });
+
+        document.getElementById('playChordGrades').addEventListener('click', () => {
+            playScaleOrArpeggio(notasAcordeDisplay); // Play the whole chord
+        });
 
         const acordesHtml = `
             <p><strong>Haz clic para añadir a la progresión:</strong></p>

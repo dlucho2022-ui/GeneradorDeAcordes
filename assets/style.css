@@ -1319,3 +1319,31 @@ body:not(.body-sheet-music) .button.playing svg {
     background-color: transparent;
     visibility: hidden; /* Oculta el contenido pero mantiene el espacio */
 }
+/* Estilos para el botón de resultado (notas/grados) */
+.result-button {
+    background-color: #6a0dad; /* Usar el color de acento principal */
+    color: #f0f0f0; /* Texto blanco para contraste */
+    border: 1px solid #7b2edb; /* Borde ligeramente más claro que el fondo */
+    border-radius: 8px; /* Bordes un poco más redondeados */
+    padding: 12px 20px; /* Aumentar el padding para hacerlo más grande */
+    cursor: pointer;
+    font-size: 1.3em; /* Hacer la fuente más grande */
+    font-weight: bold;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s; /* Añadir transform a la transición */
+    width: fit-content;
+    margin: 10px auto; /* Aumentar el margen */
+    display: block;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Añadir una sombra sutil */
+}
+
+.result-button:hover {
+    background-color: #7b2edb; /* Un tono más claro al pasar el ratón */
+    color: #f0f0f0;
+    box-shadow: 0 0 12px rgba(123, 46, 219, 0.6); /* Sombra más pronunciada y con color */
+}
+
+.result-button:active {
+    transform: translateY(2px); /* Efecto de "presionado" más notorio */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra reducida al presionar */
+}

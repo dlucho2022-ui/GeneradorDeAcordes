@@ -305,7 +305,60 @@
                     allowedBlocks = blocks;
                 } 
                 if (allowedBlocks.length === 0) { allowedBlocks.push(activeTab === 'simple' ? 'quarters' : 'three-eighths'); }
-                let currentGeneratedNotes = []; let lastNoteName = null; for (let i = 0; i < numMeasures; i++) { let beatsInCurrentMeasure = 0; const totalBeatsInMeasure = activeTab === 'simple' ? beatsPerMeasure : beatsPerMeasure * 1.5; while (beatsInCurrentMeasure < totalBeatsInMeasure) { const remainingBeats = totalBeatsInMeasure - beatsInCurrentMeasure; let possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats <= remainingBeats); if (possibleBlocks.length === 0) { possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats === Math.min(...allowedBlocks.map(k => rhythmicBlocks[k].beats))); if (possibleBlocks.length === 0) possibleBlocks = [activeTab === 'simple' ? 'quarters' : 'three-eighths']; } const randomBlockKey = possibleBlocks[Math.floor(Math.random() * possibleBlocks.length)]; const blockInfo = rhythmicBlocks[randomBlockKey]; const blockNotes = []; blockInfo.notes.forEach((noteInfo, index) => { let currentNoteName, isChromatic = false; if (noteInfo.isRest) { currentNoteName = null; } else { if (lastNoteName === null) { currentNoteName = diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)]; } else { const lastNotePitch = pitchMap[lastNoteName]; const candidateNotes = diatonicNotePool.filter(noteName => { if (pitchMap[noteName] === undefined) return false; const notePitch = pitchMap[noteName]; return Math.abs(notePitch - lastNotePitch) <= maxDistance; }); currentNoteName = candidateNotes.length > 0 ? candidateNotes[Math.floor(Math.random() * candidateNotes.length)] : diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)]; } if (includeAccidentals && Math.random() < 0.05) { const currentPitch = pitchMap[currentNoteName]; const direction = Math.random() < 0.5 ? -1 : 1; const newPitch = currentPitch + direction; const allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch); if (allPossibleNames.length > 0) { const alteredNoteName = allPossibleNames[0]; if (!diatonicNotePool.includes(alteredNoteName)) { currentNoteName = alteredNoteName; isChromatic = true; } } } } lastNoteName = currentNoteName; blockNotes.push({ name: currentNoteName, duration: noteInfo.duration, type: noteInfo.type, xml: noteInfo.xml, isRest: noteInfo.isRest, isTuplet: noteInfo.isTuplet, dot: noteInfo.dot, isChromatic: isChromatic }); }); addBeaming(blockNotes); currentGeneratedNotes.push(...blockNotes); beatsInCurrentMeasure += blockInfo.beats; } }
+                                let currentGeneratedNotes = [];
+                let lastNoteName = null;
+                for (let i = 0; i < numMeasures; i++) {
+                    let beatsInCurrentMeasure = 0;
+                    const totalBeatsInMeasure = activeTab === 'simple' ? beatsPerMeasure : beatsPerMeasure * 1.5;
+                    while (beatsInCurrentMeasure < totalBeatsInMeasure) {
+                        const remainingBeats = totalBeatsInMeasure - beatsInCurrentMeasure;
+                        let possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats <= remainingBeats);
+                        if (possibleBlocks.length === 0) {
+                            possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats === Math.min(...allowedBlocks.map(k => rhythmicBlocks[k].beats)));
+                            if (possibleBlocks.length === 0) possibleBlocks = [activeTab === 'simple' ? 'quarters' : 'three-eighths'];
+                        }
+                        const randomBlockKey = possibleBlocks[Math.floor(Math.random() * possibleBlocks.length)];
+                        const blockInfo = rhythmicBlocks[randomBlockKey];
+                        const blockNotes = [];
+                        blockInfo.notes.forEach((noteInfo, index) => {
+                            let currentNoteName, isChromatic = false;
+                            if (noteInfo.isRest) {
+                                currentNoteName = null; // No cambiamos lastNoteName
+                            } else {
+                                if (lastNoteName === null) {
+                                    currentNoteName = diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)];
+                                } else {
+                                    const lastNotePitch = pitchMap[lastNoteName];
+                                    const candidateNotes = diatonicNotePool.filter(noteName => {
+                                        if (pitchMap[noteName] === undefined) return false;
+                                        const notePitch = pitchMap[noteName];
+                                        return Math.abs(notePitch - lastNotePitch) <= maxDistance;
+                                    });
+                                    currentNoteName = candidateNotes.length > 0 ? candidateNotes[Math.floor(Math.random() * candidateNotes.length)] : diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)];
+                                }
+
+                                if (includeAccidentals && Math.random() < 0.05) {
+                                    const currentPitch = pitchMap[currentNoteName];
+                                    const direction = Math.random() < 0.5 ? -1 : 1;
+                                    const newPitch = currentPitch + direction;
+                                    const allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch);
+                                    if (allPossibleNames.length > 0) {
+                                        const alteredNoteName = allPossibleNames[Math.floor(Math.random() * allPossibleNames.length)];
+                                        if (!diatonicNotePool.includes(alteredNoteName)) {
+                                            currentNoteName = alteredNoteName;
+                                            isChromatic = true;
+                                        }
+                                    }
+                                }
+                                lastNoteName = currentNoteName; // Actualizamos solo si no es silencio
+                            }
+                            blockNotes.push({ ...noteInfo, name: currentNoteName, isChromatic: isChromatic });
+                        });
+                        addBeaming(blockNotes);
+                        currentGeneratedNotes.push(...blockNotes);
+                        beatsInCurrentMeasure += blockInfo.beats;
+                    }
+                }
                 allGeneratedNotes = currentGeneratedNotes;
                 const musicXML = createMusicXML(allGeneratedNotes, numMeasures, currentKeyData.fifths, selectedKey, timeSignature, selectedClef);
                 osmd.load(musicXML).then(() => { osmd.zoom = parseFloat(document.getElementById('zoom-slider').value); osmd.render(); osmd.cursor.reset(); }).catch(e => console.error(e));

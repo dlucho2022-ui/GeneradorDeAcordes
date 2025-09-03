@@ -1,6 +1,16 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
+:root {
+    --card-bg: linear-gradient(145deg, #2e2e2e, #1c1c1c);
+    --card-radius: 15px;
+    --primary-color: #bb86fc;
+    --surface-color: #333;
+    --on-surface-color: #e0e0e0;
+    --on-primary-color: #121212;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+/* --- Card Layout --- */
 .cards-container {
     display: flex;
     justify-content: center;
@@ -10,76 +20,107 @@
 }
 
 .card {
-    background: linear-gradient(145deg, #2e2e2e, #1c1c1c);
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.23);
-    padding: 20px;
+    position: relative;
     width: 220px;
+    background: var(--card-bg);
+    border-radius: var(--card-radius);
+    box-shadow: 0 10px 20px var(--shadow-color);
     text-align: center;
+    padding: 20px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px var(--shadow-color);
+    z-index: 20;
 }
 
 .card-title {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 1.5em;
-    color: #bb86fc;
-    margin-top: 0;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #bb86fc;
+    color: var(--primary-color);
+    margin: 0 0 15px 0;
+    border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
 }
 
+/* --- Options List --- */
 .card-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     max-height: 200px;
     overflow-y: auto;
+    /* Subtle fade out at the bottom to indicate more content */
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    /* Hide scrollbar */
+    scrollbar-width: none; /* Firefox */
+}
+.card-options::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
 }
 
-.card-option {
-    background-color: #333;
-    color: #e0e0e0;
+/* --- Dropdown Appearance on Hover --- */
+.card:hover .card-options {
+    position: absolute;
+    top: 85px; /* Adjusted to be just below the title */
+    left: 10px; /* Center the 200px dropdown in the 220px card */
+    width: 200px;
+    max-height: 300px;
+    z-index: 30;
+    
+    background: var(--surface-color);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px;
+    
+    /* Make it visible and remove the mask */
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+    
+    overflow-y: auto;
+    
+    /* Smooth animation */
+    transition: all 0.3s ease-out;
+}
+
+/* --- Individual Option Styling --- */
+.card-option {
+    padding: 12px 15px;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
+    color: var(--on-surface-color);
+    text-align: left;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .card-option:hover {
-    background-color: #bb86fc;
-    color: #121212;
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
 }
 
 .card-option.selected {
-    background-color: #6a0dad;
-    color: #f0f0f0;
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
     font-weight: 600;
 }
 
-/* Custom scrollbar for options */
-.card-options::-webkit-scrollbar {
+/* --- Custom Scrollbar for Expanded Dropdown --- */
+.card:hover .card-options::-webkit-scrollbar {
+    display: block;
     width: 8px;
 }
-
-.card-options::-webkit-scrollbar-track {
-    background: #2c2c2c;
-    border-radius: 10px;
+.card:hover .card-options::-webkit-scrollbar-track {
+    background: transparent;
 }
-
-.card-options::-webkit-scrollbar-thumb {
+.card:hover .card-options::-webkit-scrollbar-thumb {
     background: #555;
     border-radius: 10px;
 }
-
-.card-options::-webkit-scrollbar-thumb:hover {
+.card:hover .card-options::-webkit-scrollbar-thumb:hover {
     background: #777;
 }

@@ -72,20 +72,6 @@ main {
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
-/* Adjustments for cards-container within scales-chords-tab */
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-.card {
-    flex: 1;
-    min-width: 200px; /* Adjust as needed */
-    max-width: 30%; /* Adjust as needed */
-}
-
 /* Adjustments for progression-builder within progression-container */
 .progression-builder {
     min-height: 100px; /* Ensure it has enough height */
@@ -106,25 +92,6 @@ main {
     flex: 1; /* Allow them to grow and shrink */
     min-width: 400px; /* Increased minimum width to accommodate wider sliders */
     margin: 0; /* Reset margins */
-}
-
-/* Adjustments for cards-container within scales-chords-tab */
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-.card {
-    flex: 1;
-    min-width: 200px; /* Adjust as needed */
-    max-width: 30%; /* Adjust as needed */
-}
-
-/* Adjustments for progression-builder within progression-container */
-.progression-builder {
-    min-height: 100px; /* Ensure it has enough height */
 }
 
 footer {
@@ -1347,4 +1314,99 @@ body:not(.body-sheet-music) .button.playing svg {
 .result-button:active {
     transform: translateY(2px); /* Efecto de "presionado" más notorio */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra reducida al presionar */
+}
+
+
+/* === CARD STYLES REFINED (Corrected) === */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.card {
+    position: relative;
+    width: 220px;
+    height: 340px; /* Fixed height to prevent layout shifts */
+    background: #1E1E1E;
+    border-radius: 16px;
+    border: 1px solid #bb86fc;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 0 12px rgba(187, 134, 252, 0.25);
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(187, 134, 252, 0.4);
+    z-index: 10;
+}
+
+.card-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.5em;
+    color: #bb86fc;
+    margin: 0 0 15px 0;
+    border-bottom: 2px solid #bb86fc;
+    padding-bottom: 10px;
+}
+
+.card-options {
+    height: 220px; /* Fixed height */
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    transition: opacity 0.2s ease;
+    position: relative; /* Establish stacking context */
+    background: transparent; /* Make sure it's transparent by default */
+}
+
+.card-options::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.card:hover .card-options {
+    position: absolute;
+    top: 80px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px; 
+    height: 600px;
+    overflow-y: auto;
+    
+    /* --- Exact Match Styles --- */
+    background: #1E1E1E; /* Match card background */
+    border: 1px solid #bb86fc;
+    border-top: none; /* Remove top border for seamless look */
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(187, 134, 252, 0.4);
+    border-radius: 0 0 16px 16px; /* Round only bottom corners */
+
+    z-index: 20;
+    padding: 10px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.card-option {
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    color: #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+.card-option:hover {
+    background-color: #bb86fc;
+    color: #121212;
+}
+
+.card-option.selected {
+    background-color: #bb86fc;
+    color: #121212;
+    font-weight: 600;
 }

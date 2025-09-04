@@ -37,6 +37,9 @@
                     <option value="4">4</option>
                 </select>
             </div>
+            <div class="control-row">
+                <button id="global-stop-button">Detener Todo</button>
+            </div>
         </div>
 
         <!-- Piano 1 -->
@@ -180,6 +183,7 @@
 
             const pianoSelector = document.getElementById('piano-count-selector');
             const pianoWrappers = document.querySelectorAll('.piano-wrapper');
+            const globalStopButton = document.getElementById('global-stop-button');
 
             function updateVisiblePianos(count) {
                 pianoWrappers.forEach((wrapper, index) => {
@@ -193,6 +197,12 @@
 
             pianoSelector.addEventListener('change', (e) => updateVisiblePianos(e.target.value));
             
+            globalStopButton.addEventListener('click', () => {
+                pianoWrappers.forEach(wrapper => {
+                    wrapper.dispatchEvent(new CustomEvent('global-stop'));
+                });
+            });
+
             // Set initial state
             updateVisiblePianos(1);
 
@@ -238,6 +248,9 @@
                         activeNote.synth = null;
                     }
                 };
+
+                // Listen for the global stop event
+                pianoWrapper.addEventListener('global-stop', stopDrone);
 
                 const noteButtons = pianoWrapper.querySelectorAll('rect[data-note]');
                 noteButtons.forEach(button => {

@@ -22,166 +22,205 @@
             </ul>
         </nav>
     </header>
-        <main>
-            <!-- Piano 1 -->
-            <div class="piano-wrapper" id="piano-1">
-                <div class="waveform-buttons">
-                    <button class="waveform-button" data-waveform="sine">Sine</button>
-                    <button class="waveform-button" data-waveform="square">Square</button>
-                    <button class="waveform-button" data-waveform="sawtooth">Sawtooth</button>
-                    <button class="waveform-button" data-waveform="triangle">Triangle</button>
-                </div>
-                <div class="piano-container">
-                    <svg class="piano-svg" viewBox="0 0 980 200">
-                        <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
-                        <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
-                        <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
-                        <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
-                        <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
-                        <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
-                        <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
-                        <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
-                        <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
-                        <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
-                        <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
-                        <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
-                        <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
-                        <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
-                        <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
-                        <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
-                        <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
-                        <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
-                        <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
-                        <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
-                        <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
-                        <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
-                        <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
-                        <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
-                    </svg>
-                </div>
+    <main>
+        <div id="global-controls-container">
+            <div class="control-row">
+                <label for="master-volume-slider">Volumen General</label>
+                <input type="range" id="master-volume-slider" min="-40" max="0" value="-6" step="1">
             </div>
+            <div class="control-row">
+                <label for="piano-count-selector">Cantidad de Pianos</label>
+                <select id="piano-count-selector">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+        </div>
 
-            <!-- Piano 2 -->
-            <div class="piano-wrapper" id="piano-2">
-                <div class="waveform-buttons">
-                    <button class="waveform-button" data-waveform="sine">Sine</button>
-                    <button class="waveform-button" data-waveform="square">Square</button>
-                    <button class="waveform-button" data-waveform="sawtooth">Sawtooth</button>
-                    <button class="waveform-button" data-waveform="triangle">Triangle</button>
-                </div>
-                <div class="piano-container">
-                    <svg class="piano-svg" viewBox="0 0 980 200">
-                        <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
-                        <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
-                        <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
-                        <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
-                        <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
-                        <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
-                        <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
-                        <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
-                        <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
-                        <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
-                        <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
-                        <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
-                        <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
-                        <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
-                        <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
-                        <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
-                        <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
-                        <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
-                        <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
-                        <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
-                        <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
-                        <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
-                        <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
-                        <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
-                    </svg>
-                </div>
+        <!-- Piano 1 -->
+        <div class="piano-wrapper" id="piano-1">
+            <div class="waveform-buttons">
+                <button class="waveform-button" data-waveform="sine" title="Sine"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 C 8 0, 24 32, 32 16"></path></svg></button>
+                <button class="waveform-button" data-waveform="square" title="Square"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 H 8 V 8 H 24 V 24 H 32"></path></svg></button>
+                <button class="waveform-button" data-waveform="sawtooth" title="Sawtooth"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 24 L 16 8 L 16 24 L 32 8"></path></svg></button>
+                <button class="waveform-button" data-waveform="triangle" title="Triangle"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 L 8 8 L 24 24 L 32 16"></path></svg></button>
             </div>
+            <div class="piano-container">
+                <svg class="piano-svg" viewBox="0 0 980 200">
+                    <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
+                    <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
+                    <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
+                    <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
+                    <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
+                    <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
+                    <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
+                    <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
+                    <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
+                    <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
+                    <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
+                    <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
+                    <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
+                    <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
+                    <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
+                    <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
+                    <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
+                    <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
+                    <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
+                    <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
+                    <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
+                    <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
+                    <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
+                    <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
+                </svg>
+            </div>
+        </div>
 
-            <!-- Piano 3 -->
-            <div class="piano-wrapper" id="piano-3">
-                <div class="waveform-buttons">
-                    <button class="waveform-button" data-waveform="sine">Sine</button>
-                    <button class="waveform-button" data-waveform="square">Square</button>
-                    <button class="waveform-button" data-waveform="sawtooth">Sawtooth</button>
-                    <button class="waveform-button" data-waveform="triangle">Triangle</button>
-                </div>
-                <div class="piano-container">
-                    <svg class="piano-svg" viewBox="0 0 980 200">
-                        <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
-                        <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
-                        <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
-                        <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
-                        <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
-                        <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
-                        <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
-                        <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
-                        <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
-                        <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
-                        <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
-                        <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
-                        <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
-                        <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
-                        <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
-                        <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
-                        <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
-                        <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
-                        <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
-                        <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
-                        <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
-                        <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
-                        <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
-                        <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
-                    </svg>
-                </div>
+        <!-- Piano 2 -->
+        <div class="piano-wrapper" id="piano-2">
+            <div class="waveform-buttons">
+                <button class="waveform-button" data-waveform="sine" title="Sine"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 C 8 0, 24 32, 32 16"></path></svg></button>
+                <button class="waveform-button" data-waveform="square" title="Square"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 H 8 V 8 H 24 V 24 H 32"></path></svg></button>
+                <button class="waveform-button" data-waveform="sawtooth" title="Sawtooth"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 24 L 16 8 L 16 24 L 32 8"></path></svg></button>
+                <button class="waveform-button" data-waveform="triangle" title="Triangle"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 L 8 8 L 24 24 L 32 16"></path></svg></button>
             </div>
+            <div class="piano-container">
+                <svg class="piano-svg" viewBox="0 0 980 200">
+                    <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
+                    <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
+                    <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
+                    <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
+                    <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
+                    <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
+                    <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
+                    <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
+                    <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
+                    <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
+                    <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
+                    <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
+                    <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
+                    <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
+                    <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
+                    <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
+                    <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
+                    <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
+                    <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
+                    <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
+                    <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
+                    <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
+                    <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
+                    <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
+                </svg>
+            </div>
+        </div>
 
-            <!-- Piano 4 -->
-            <div class="piano-wrapper" id="piano-4">
-                <div class="waveform-buttons">
-                    <button class="waveform-button" data-waveform="sine">Sine</button>
-                    <button class="waveform-button" data-waveform="square">Square</button>
-                    <button class="waveform-button" data-waveform="sawtooth">Sawtooth</button>
-                    <button class="waveform-button" data-waveform="triangle">Triangle</button>
-                </div>
-                <div class="piano-container">
-                    <svg class="piano-svg" viewBox="0 0 980 200">
-                        <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
-                        <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
-                        <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
-                        <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
-                        <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
-                        <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
-                        <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
-                        <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
-                        <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
-                        <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
-                        <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
-                        <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
-                        <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
-                        <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
-                        <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
-                        <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
-                        <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
-                        <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
-                        <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
-                        <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
-                        <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
-                        <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
-                        <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
-                        <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
-                    </svg>
-                </div>
+        <!-- Piano 3 -->
+        <div class="piano-wrapper" id="piano-3">
+            <div class="waveform-buttons">
+                <button class="waveform-button" data-waveform="sine" title="Sine"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 C 8 0, 24 32, 32 16"></path></svg></button>
+                <button class="waveform-button" data-waveform="square" title="Square"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 H 8 V 8 H 24 V 24 H 32"></path></svg></button>
+                <button class="waveform-button" data-waveform="sawtooth" title="Sawtooth"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 24 L 16 8 L 16 24 L 32 8"></path></svg></button>
+                <button class="waveform-button" data-waveform="triangle" title="Triangle"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 L 8 8 L 24 24 L 32 16"></path></svg></button>
             </div>
-        </main>
-    </div>
-    <footer>
-        <p> </p>
-    </footer>
+            <div class="piano-container">
+                <svg class="piano-svg" viewBox="0 0 980 200">
+                    <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
+                    <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
+                    <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
+                    <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
+                    <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
+                    <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
+                    <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
+                    <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
+                    <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
+                    <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
+                    <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
+                    <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
+                    <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
+                    <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
+                    <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
+                    <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
+                    <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
+                    <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
+                    <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
+                    <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
+                    <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
+                    <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
+                    <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
+                    <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Piano 4 -->
+        <div class="piano-wrapper" id="piano-4">
+            <div class="waveform-buttons">
+                <button class="waveform-button" data-waveform="sine" title="Sine"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 C 8 0, 24 32, 32 16"></path></svg></button>
+                <button class="waveform-button" data-waveform="square" title="Square"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 H 8 V 8 H 24 V 24 H 32"></path></svg></button>
+                <button class="waveform-button" data-waveform="sawtooth" title="Sawtooth"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 24 L 16 8 L 16 24 L 32 8"></path></svg></button>
+                <button class="waveform-button" data-waveform="triangle" title="Triangle"><svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"><path d="M 0 16 L 8 8 L 24 24 L 32 16"></path></svg></button>
+            </div>
+            <div class="piano-container">
+                <svg class="piano-svg" viewBox="0 0 980 200">
+                    <rect class="white-key" x="0" y="0" width="70" height="200" data-note="C4"/>
+                    <rect class="white-key" x="70" y="0" width="70" height="200" data-note="D4"/>
+                    <rect class="white-key" x="140" y="0" width="70" height="200" data-note="E4"/>
+                    <rect class="white-key" x="210" y="0" width="70" height="200" data-note="F4"/>
+                    <rect class="white-key" x="280" y="0" width="70" height="200" data-note="G4"/>
+                    <rect class="white-key" x="350" y="0" width="70" height="200" data-note="A4"/>
+                    <rect class="white-key" x="420" y="0" width="70" height="200" data-note="B4"/>
+                    <rect class="white-key" x="490" y="0" width="70" height="200" data-note="C5"/>
+                    <rect class="white-key" x="560" y="0" width="70" height="200" data-note="D5"/>
+                    <rect class="white-key" x="630" y="0" width="70" height="200" data-note="E5"/>
+                    <rect class="white-key" x="700" y="0" width="70" height="200" data-note="F5"/>
+                    <rect class="white-key" x="770" y="0" width="70" height="200" data-note="G5"/>
+                    <rect class="white-key" x="840" y="0" width="70" height="200" data-note="A5"/>
+                    <rect class="white-key" x="910" y="0" width="70" height="200" data-note="B5"/>
+                    <rect class="black-key" x="45" y="0" width="40" height="120" data-note="C#4"/>
+                    <rect class="black-key" x="115" y="0" width="40" height="120" data-note="D#4"/>
+                    <rect class="black-key" x="255" y="0" width="40" height="120" data-note="F#4"/>
+                    <rect class="black-key" x="325" y="0" width="40" height="120" data-note="G#4"/>
+                    <rect class="black-key" x="395" y="0" width="40" height="120" data-note="A#4"/>
+                    <rect class="black-key" x="535" y="0" width="40" height="120" data-note="C#5"/>
+                    <rect class="black-key" x="605" y="0" width="40" height="120" data-note="D#5"/>
+                    <rect class="black-key" x="745" y="0" width="40" height="120" data-note="F#5"/>
+                    <rect class="black-key" x="815" y="0" width="40" height="120" data-note="G#5"/>
+                    <rect class="black-key" x="885" y="0" width="40" height="120" data-note="A#5"/>
+                </svg>
+            </div>
+        </div>
+    </main>
+  
     <script src="https://unpkg.com/tone@14.7.58/build/Tone.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Global Controls ---
+            const masterVolume = new Tone.Volume(-6).toDestination();
+            const masterVolumeSlider = document.getElementById('master-volume-slider');
+            masterVolumeSlider.addEventListener('input', (event) => {
+                masterVolume.volume.value = event.target.value;
+            });
+
+            const pianoSelector = document.getElementById('piano-count-selector');
+            const pianoWrappers = document.querySelectorAll('.piano-wrapper');
+
+            function updateVisiblePianos(count) {
+                pianoWrappers.forEach((wrapper, index) => {
+                    if (index < count) {
+                        wrapper.classList.remove('hidden');
+                    } else {
+                        wrapper.classList.add('hidden');
+                    }
+                });
+            }
+
+            pianoSelector.addEventListener('change', (e) => updateVisiblePianos(e.target.value));
+            
+            // Set initial state
+            updateVisiblePianos(1);
+
+            // --- Piano Instance Logic ---
             const createPianoInstance = (pianoWrapper) => {
                 let activeNote = {
                     noteName: null,
@@ -192,18 +231,13 @@
                 // Waveform button logic
                 const waveformButtons = pianoWrapper.querySelectorAll('.waveform-button');
                 waveformButtons.forEach(button => {
-                    // Set initial active button
                     if (button.dataset.waveform === currentWaveform) {
                         button.classList.add('active');
                     }
-
                     button.addEventListener('click', () => {
                         currentWaveform = button.dataset.waveform;
-                        // Update active class
                         waveformButtons.forEach(btn => btn.classList.remove('active'));
                         button.classList.add('active');
-                        
-                        // If a note is already playing, restart it with the new waveform
                         if (activeNote.noteName) {
                             const playingNote = activeNote.noteName;
                             stopDrone();
@@ -216,22 +250,19 @@
                     if (activeNote.synth) {
                         stopDrone();
                     }
-
                     activeNote.noteName = noteName;
                     activeNote.synth = new Tone.Synth({
-                        oscillator: { type: currentWaveform }, // Use the selected waveform
+                        oscillator: { type: currentWaveform },
                         envelope: { attack: 0.5, decay: 0.1, sustain: 1.0, release: 1.0 }
-                    }).toDestination();
+                    }).connect(masterVolume); // Connect to master volume
 
                     const volumeControl = pianoWrapper.querySelector('.piano-volume');
                     activeNote.synth.volume.value = volumeControl.value;
 
                     activeNote.synth.triggerAttack(noteName);
-
                     if (Tone.Transport.state !== 'started') {
                         Tone.Transport.start();
                     }
-
                     pianoWrapper.querySelector(`[data-note="${noteName}"]`).classList.add('active');
                 };
 
@@ -240,10 +271,8 @@
                         const noteToDeactivate = activeNote.noteName;
                         activeNote.synth.triggerRelease();
                         activeNote.synth.dispose();
-                        
                         const activeButton = pianoWrapper.querySelector(`[data-note="${noteToDeactivate}"]`);
                         if(activeButton) activeButton.classList.remove('active');
-
                         activeNote.noteName = null;
                         activeNote.synth = null;
                     }
@@ -273,13 +302,10 @@
 
                 const volumeContainer = document.createElement('div');
                 volumeContainer.className = 'volume-control-container';
-
                 const volumeLabel = document.createElement('label');
                 volumeLabel.innerText = 'Volumen';
-
                 volumeContainer.appendChild(volumeLabel);
                 volumeContainer.appendChild(pianoVolumeControl);
-
                 const pianoContainer = pianoWrapper.querySelector('.piano-container');
                 pianoWrapper.insertBefore(volumeContainer, pianoContainer);
             };

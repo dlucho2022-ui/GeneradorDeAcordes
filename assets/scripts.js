@@ -81,11 +81,7 @@ let currentProgressionIndex = 0;
 let currentProgression = [];
 let chordVolumeLinear = Math.pow(10, -6 / 20); // Default value from slider
 
-let currentToneNote = null;
-let currentSynth = new Tone.Synth({
-    oscillator: { type: 'sine' }
-}).toDestination();
-currentSynth.volume.value = -10;
+
 
 let chordSampler;
 let arpeggioSampler;
@@ -333,35 +329,29 @@ function playChord(nota, tipo, duracion = null) {
     }
 }
 
-function playNote(noteName) {
-    const toneNoteName = toneNoteMap[noteName];
-    if (!toneNoteName) {
-        console.warn(`No se encontró un mapeo de Tone.js para la nota: ${noteName}`);
-        return;
-    }
+function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
+    // 1. Map notes to objects with their pitch value (0-11)
+    //    Do NOT sort here. Assume chordNoteNames is already in musical order.
+    const notesWithPitch = chordNoteNames.map(name => ({
+        name: name,
+        pitch: mapNotaToSemitone(name)
+    })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
 
-    if (currentToneNote === noteName) {
-        currentSynth.triggerRelease(Tone.now());
-        document.querySelector(`.note-btn[data-note="${currentToneNote}"]`)?.classList.remove('active');
-        currentToneNote = null;
-    } else {
-        if (currentToneNote) {
-            currentSynth.triggerRelease(Tone.now());
-            document.querySelector(`.note-btn[data-note="${currentToneNote}"]`)?.classList.remove('active');
+    // 3. Assign octaves to ensure ascending order based on original sequence
+    let lastPitch = -1; // Use -1 to ensure the first note doesn't trigger an octave jump
+    let currentOctave = startOctave;
+    const playableNotes = notesWithPitch.map(note => {
+        // If the current note's pitch is lower than the previous one, it means we've crossed an octave boundary
+        // For example, B (11) to C (0)
+        if (lastPitch !== -1 && note.pitch < lastPitch) { // Only increment if it's not the very first note
+            currentOctave++;
         }
+        lastPitch = note.pitch;
+        const mappedNote = toneNoteMap[note.name]; // Convert "Do" to "C"
+        return mappedNote ? mappedNote + currentOctave : null;
+    }).filter(n => n);
 
-        currentSynth.triggerAttack(`${toneNoteName}4`);
-        currentToneNote = noteName;
-        document.querySelector(`.note-btn[data-note="${noteName}"]`).classList.add('active');
-    }
-}
-
-function stopAllNotes() {
-    if (currentToneNote) {
-        currentSynth.triggerRelease(Tone.now());
-        document.querySelector(`.note-btn[data-note="${currentToneNote}"]`)?.classList.remove('active');
-        currentToneNote = null;
-    }
+    return playableNotes;
 }
 
 // New function to play a sequence of notes (scale or arpeggio)
@@ -653,7 +643,7 @@ function formatChordDisplay(acorde) {
 
 
 function calcularEscala() {
-    stopAllNotes();
+    // stopAllNotes(); // This function is removed
     const resultadoBox = document.getElementById('resultado-box');
     const contextoBox = document.getElementById('contexto-box');
     const selectedSemitono = selectedTonalidad;
@@ -810,7 +800,7 @@ function generarAcordesDiatonicos(escala, acordesPredefinidos) {
 }
 
 function openTab(tabName, event) {
-    stopAllNotes();
+    // stopAllNotes(); // This function is removed
     if (isPlaying) {
         togglePlay();
     }
@@ -874,7 +864,7 @@ function updateProgressionDisplay() {
 }
 
 function addChordToProgression(nota, tipo, display) {
-    stopAllNotes();
+    // stopAllNotes(); // This function is removed
     if (isPlaying) {
         togglePlay();
     }
@@ -1195,7 +1185,7 @@ const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
 
 function togglePlay() {
-    stopAllNotes();
+    // stopAllNotes(); // This function is removed
 
     const toggleBtn = document.getElementById('toggle-progression-btn');
     const floatingBtn = document.getElementById('floating-play-stop-button');
@@ -1389,21 +1379,6 @@ window.onload = () => {
             if (arpeggioVolume) {
                 arpeggioVolume.volume.value = event.target.value;
             }
-        });
-    }
-
-    const noteButtons = document.querySelectorAll('.note-btn');
-    noteButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const noteName = button.getAttribute('data-note');
-            playNote(noteName);
-        });
-    });
-
-    const noteVolumeControl = document.getElementById('note-volume');
-    if (noteVolumeControl) {
-        noteVolumeControl.addEventListener('input', (event) => {
-            currentSynth.volume.value = event.target.value;
         });
     }
 

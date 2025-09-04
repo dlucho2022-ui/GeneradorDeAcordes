@@ -732,15 +732,16 @@ body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-pl
 
 /* Estilos de Index3.html */
 .piano-container {
-    margin-top: 20px;
+    margin-top: 2px;
     background-color: #333;
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: 2px;
+    padding: 2px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    flex-grow: 1; /* Allow it to take available space */
 }
 
 .piano-svg {
@@ -1409,4 +1410,66 @@ body:not(.body-sheet-music) .button.playing svg {
     background-color: #bb86fc;
     color: #121212;
     font-weight: 600;
+}
+
+/* === Piano Layout (Index3.html) === */
+.piano-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Space between volume and piano */
+    justify-content: center;
+}
+
+.volume-control-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    color: #e0e0e0;
+}
+
+.volume-control-container label {
+    margin-bottom: 10px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+}
+
+.piano-volume {
+    -webkit-appearance: slider-vertical; /* Make it vertical */
+    width: 20px; /* Thickness */
+    height: 100px; /* Length */
+    cursor: pointer;
+}
+
+/* New styles for waveform buttons */
+.waveform-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-right: 20px;
+}
+
+.waveform-button {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    font-size: 0.9em;
+    width: 100px;
+}
+
+.waveform-button:hover {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    box-shadow: 0 0 8px #6a0dad;
+}
+
+.waveform-button.active {
+    background-color: #bb86fc;
+    color: #121212;
+    font-weight: bold;
 }

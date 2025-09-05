@@ -249,7 +249,6 @@
                     }
                 };
 
-                // Listen for the global stop event
                 pianoWrapper.addEventListener('global-stop', stopDrone);
 
                 const noteButtons = pianoWrapper.querySelectorAll('rect[data-note]');
@@ -265,7 +264,7 @@
                             const octaveOffset = svgOctave - 4; // 0 for 1st octave on svg, 1 for 2nd
 
                             const selector = pianoWrapper.querySelector('.octave-selector');
-                            const startingOctave = parseInt(selector.value); // 1, 3, or 5
+                            const startingOctave = parseInt(selector.value);
 
                             const finalOctave = startingOctave + octaveOffset;
                             const noteName = baseNote + finalOctave;
@@ -281,24 +280,19 @@
                     });
                 });
 
-                // Create and append Volume control
-                const pianoVolumeControl = document.createElement('input');
-                pianoVolumeControl.type = 'range';
-                pianoVolumeControl.className = 'piano-volume';
-                pianoVolumeControl.min = '-30';
-                pianoVolumeControl.max = '0';
-                pianoVolumeControl.value = '-6';
-                pianoVolumeControl.addEventListener('input', (event) => {
+                // Create and append Volume control with new structure
+                const volumeContainer = document.createElement('div');
+                volumeContainer.className = 'volume-control-container';
+                volumeContainer.innerHTML = `
+                    <label>Volumen</label>
+                    <div class="fader-body">
+                        <input type="range" min="-30" max="0" value="-6" class="piano-volume">
+                    </div>
+                `;
+                volumeContainer.querySelector('.piano-volume').addEventListener('input', (event) => {
                     if(activeNote.synth) activeNote.synth.volume.value = event.target.value;
                 });
 
-                const volumeContainer = document.createElement('div');
-                volumeContainer.className = 'volume-control-container';
-                const volumeLabel = document.createElement('label');
-                volumeLabel.innerText = 'Volumen';
-                volumeContainer.appendChild(volumeLabel);
-                volumeContainer.appendChild(pianoVolumeControl);
-                
                 // Create and append Octave selector
                 const octaveControlContainer = document.createElement('div');
                 octaveControlContainer.className = 'octave-control-container';
@@ -311,16 +305,13 @@
                     const option = document.createElement('option');
                     option.value = startOctave;
                     option.innerText = octaveRanges[startOctave];
-                    if (startOctave === "3") option.selected = true; // Default to 3-4
+                    if (startOctave === "3") option.selected = true;
                     octaveSelectorEl.appendChild(option);
                 }
                 octaveControlContainer.appendChild(octaveLabel);
                 octaveControlContainer.appendChild(octaveSelectorEl);
 
-                const controlsWrapper = document.createElement('div');
-                controlsWrapper.className = 'piano-controls-wrapper';
-                
-                // Waveform buttons
+                // Create and append Waveform buttons
                 const waveformButtons = document.createElement('div');
                 waveformButtons.className = 'waveform-buttons';
                 const waveforms = ['sine', 'square', 'sawtooth', 'triangle'];
@@ -351,11 +342,13 @@
                     waveformButtons.appendChild(button);
                 });
 
+                const controlsWrapper = document.createElement('div');
+                controlsWrapper.className = 'piano-controls-wrapper';
                 controlsWrapper.appendChild(waveformButtons);
-                controlsWrapper.appendChild(volumeContainer);
                 controlsWrapper.appendChild(octaveControlContainer);
 
                 const pianoContainer = pianoWrapper.querySelector('.piano-container');
+                pianoWrapper.insertBefore(volumeContainer, pianoContainer);
                 pianoWrapper.insertBefore(controlsWrapper, pianoContainer);
             };
 

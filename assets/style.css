@@ -9,8 +9,13 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    box-sizing: border-box;
-    overflow-x: hidden;
+    box-sizing: border-box; /* Añadido de Index2.html */
+    overflow-x: hidden; /* Añadido de Index2.html */
+}
+
+:root {
+    --measure-font-size: 1.8em; /* Default value */
+    --measure-min-height: 80px; /* Default value */
 }
 
 .wrapper {
@@ -25,19 +30,78 @@ body {
 }
 
 header {
-    background-color: #2c2c2c;
+    background-color: #2c2c2c; /* Gris oscuro */
     width: 100%;
     text-align: center;
     padding: 20px 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Añadido de Index2.html */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    color: #f0f0f0; /* Blanco */
+    margin-bottom: 15px;
+}
+
+header p {
+    margin: 5px 0 0;
+    font-size: 1.1em;
+    color: #b0b0b0; /* Gris claro */
 }
 
 main {
     flex-grow: 1;
     width: 90%;
-    max-width: 100%;
+    max-width: 100%; /* Increased width to 100% */
     padding: 20px;
+}
+
+.main-layout-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 20px; /* Space between columns */
+    justify-content: center; /* Center items when they wrap */
+    width: 100%; /* Take full width of main */
+}
+
+.main-layout-container > div {
+    flex: 1; /* Allow items to grow and shrink */
+    min-width: 48%; /* Adjusted minimum width for each column */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Adjustments for progression-builder within progression-container */
+.progression-builder {
+    min-height: 100px; /* Ensure it has enough height */
+}
+
+/* New wrapper for main content sections */
+#main-content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Space between the two main sections */
+    width: 90%; /* Match main's width */
+    max-width: 900px; /* Match main's max-width */
+    margin: 20px auto; /* Center it and add some top margin */
+}
+
+#progression-container {
+    flex: 1; /* Allow them to grow and shrink */
+    min-width: 400px; /* Increased minimum width to accommodate wider sliders */
+    margin: 0; /* Reset margins */
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    background-color: #2c2c2c;
+    color: #b0b0b0;
+    margin-top: auto;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Navegación */
@@ -48,31 +112,622 @@ nav ul {
     justify-content: center;
     align-items: center;
     list-style: none;
-    margin-top: 20px;
+    margin-top: 20px; /* Espacio adicional sobre la navegación */
 }
 
 nav ul li a{
     text-decoration: none;
     color:#bb86fc;
-    border-radius: 25px;
-    padding: 10px 20px;
+    border-radius: 25px; /* Forma de píldora */
+    padding: 10px 20px; /* Relleno más generoso */
     text-align: center;
-    font-weight: 700;
-    border: 1px solid #bb86fc;
-    transition: all 0.3s ease;
+    font-weight: 700; /* Texto en negrita */
+    border: 1px solid #bb86fc; /* Borde sutil con el color del texto */
+    transition: all 0.3s ease; /* Transición suave */
 }
 
 nav ul li a:hover {
     background-color: #7b2edb;
-    color: #f0f0f0;
-    border-color: #7b2edb;
+    color: #f0f0f0; /* Cambia el color del texto al pasar el ratón */
+    border-color: #7b2edb; /* El borde coincide con el fondo */
 }
 
 nav ul li a.active-nav-link {
     background-color: #6a0dad;
     color: #f0f0f0;
     font-weight: bold;
+    border-color: #6a0dad; /* El borde coincide con el fondo */
+}
+
+/* Pestañas (Tabs) - de index.html y Index2.html */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    width: 100%;
+    margin-bottom: -1px;
+}
+
+.tab-button {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-bottom: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-button:hover {
+    background-color: #444;
+}
+
+.tab-button.active {
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
+    color: #f0f0f0;
+    font-weight: bold;
+}
+
+/* Contenido de las pestañas - de index.html */
+.tab-content {
+    background-color: #2c2c2c;
+    padding: 30px;
+    border-radius: 0 5px 5px 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Controles del selector (tonalidad, escala, acorde) - de index.html */
+.selector-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.selector-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 150px;
+}
+
+.selector-group label {
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.selector-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #212121;
+    color: #f0f0f0;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.selector-group select:focus {
+    outline: none;
     border-color: #6a0dad;
+    box-shadow: 0 0 5px #6a0dad;
+}
+
+/* Cajas de resultado y contexto - de index.html */
+.result-box, .context-box {
+    background-color: #212121;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #383838;
+    min-height: 80px;
+}
+
+.alteration {
+    font-size: 0.8em;
+    vertical-align: super;
+}
+
+.alteration.flat {
+    font-size: 1.1em;
+    vertical-align: baseline;
+}
+
+.no-chords-message {
+    color: #b0b0b0;
+}
+
+/* Acordes y progresión - de index.html */
+.acordes-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.acorde-btn {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    font-size: 1.1em;
+    display: inline-block;
+}
+
+.acorde-btn:hover {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    box-shadow: 0 0 8px #6a0dad;
+}
+
+.acorde-btn.playing-chord {
+    background-color: #ff6347; /* Tomate */
+    color: #212121;
+    box-shadow: 0 0 10px #ff6347;
+}
+
+.progression-section {
+    margin-top: 30px;
+}
+
+.progression-section h2 {
+    text-align: center;
+    border-bottom: 2px solid #6a0dad;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.progression-builder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    border: 2px dashed #444;
+    padding: 15px;
+    border-radius: 8px;
+    min-height: 60px;
+}
+
+.progression-chord {
+    background-color: #383838;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: center;
+    position: relative;
+    border: 1px solid #444;
+}
+
+.progression-chord:hover {
+    background-color: #ff6347;
+}
+
+.progression-chord.playing-chord {
+    background-color: #6a0dad;
+    animation: pulse 1s infinite alternate;
+}
+
+.chord-name-display {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.chord-notes-display {
+    font-size: 0.8em;
+    color: #b0b0b0;
+}
+
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 5px #6a0dad;
+    }
+    to {
+        box-shadow: 0 0 20px #6a0dad;
+    }
+}
+
+.progression-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Para que los botones se adapten en pantallas pequeñas */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.control-button {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.2s;
+}
+
+.control-button:hover {
+    background-color: #7b2edb;
+}
+
+.control-button.stopped .stop-icon { display: none; }
+.control-button.playing .play-icon { display: none; }
+.control-button.playing { background-color: #ff6347; }
+.control-button.playing:hover { background-color: #e5533c; }
+
+
+
+.volume-slider {
+    -webkit-appearance: none; /* Remove default styling */
+    appearance: none; /* Standard property for compatibility */
+    width: 250px; /* Increased width for more range */
+    height: 10px; /* Slightly thicker track */
+    background: linear-gradient(to right, #4CAF50, #8BC34A); /* Modern gradient */
+    border-radius: 5px; /* Rounded ends */
+    outline: none;
+    opacity: 0.9; /* Slightly less transparent by default */
+    transition: opacity .2s ease-in-out; /* Smooth transition */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Subtle inner shadow */
+}
+
+.volume-slider:hover {
+    opacity: 1;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px; /* Slightly larger thumb */
+    height: 22px; /* Slightly larger thumb */
+    border-radius: 50%;
+    background: #007bff; /* Vibrant blue */
+    border: 2px solid #ffffff; /* White border */
+    cursor: grab; /* Modern cursor */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    transition: background .2s ease-in-out, box-shadow .2s ease-in-out; /* Smooth transitions */
+}
+
+.volume-slider::-webkit-slider-thumb:active {
+    cursor: grabbing; /* Grabbing cursor when active */
+    background: #0056b3; /* Darker blue when active */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 22px; /* Slightly larger thumb */
+    height: 22px; /* Slightly larger thumb */
+    border-radius: 50%;
+    background: #007bff; /* Vibrant blue */
+    border: 2px solid #ffffff; /* White border */
+    cursor: grab; /* Modern cursor */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    transition: background .2s ease-in-out, box-shadow .2s ease-in-out; /* Smooth transitions */
+}
+
+.volume-slider::-moz-range-thumb:active {
+    cursor: grabbing; /* Grabbing cursor when active */
+    background: #0056b3; /* Darker blue when active */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Piano interactivo - de index.html */
+.piano-box {
+    text-align: center;
+}
+
+.piano-box h2 {
+    color: #6a0dad;
+    margin-bottom: 20px;
+}
+
+.piano-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.piano-keyboard {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.note-btn {
+    position: relative;
+    border: 1px solid #212121;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    font-weight: bold;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.note-btn.white {
+    background-color: #f0f0f0;
+    color: #212121;
+    width: 50px;
+    height: 180px;
+    z-index: 1;
+    margin-right: -10px;
+    padding-bottom: 10px;
+}
+
+.note-btn.white:hover, .note-btn.white.active {
+    background-color: #9370db;
+    color: #212121;
+}
+
+.note-btn.black {
+    background-color: #212121;
+    color: #f0f0f0;
+    width: 30px;
+    height: 120px;
+    margin-right: -10px;
+    z-index: 2;
+    margin-left: -15px;
+    padding-bottom: 5px;
+}
+
+.note-btn.black:hover, .note-btn.black.active {
+    background-color: #9370db;
+    color: #212121;
+}
+
+/* Nuevo estilo para el control de volumen del metrónomo - de index.html */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+}
+
+#metronome-volume {
+    width: 100px;
+}
+
+/* Player controls container - de index.html */
+.player-controls-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 300px; /* Explicitly set width to accommodate wider sliders */
+    margin-top: 20px;
+}
+
+.modal-content {
+    background-color: red; /* Make it clearly visible */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+    width: 300px; /* Fixed width for debugging */
+    height: 200px; /* Fixed height for debugging */
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.control-box h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #eee;
+}
+
+.control-box .volume-control, .control-box .bpm-control, .control-box select {
+    margin-bottom: 10px;
+}
+
+.control-box label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.control-box input[type="range"] {
+    width: 150px;
+}
+
+.control-box select {
+    background-color: #555;
+    color: #eee;
+    border: 1px solid #777;
+    padding: 5px;
+    border-radius: 4px;
+}
+.control-box .control-button {
+    background-color: #555;
+    border: 1px solid #777;
+    color: #eee;
+}
+
+/* Estilos de Index2.html */
+#osmd-container {
+    width: 100%;
+    background-color: white;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.rhythm-patterns-container { width: 100%; }
+.rhythm-patterns { display: none; }
+.rhythm-patterns.active {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* .control-section ya está definido arriba, pero se repite en Index2.html con algunas propiedades */
+/* Se mantiene la definición de Index2.html para las propiedades específicas */
+.control-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    flex: 1;
+    min-width: 320px;
+    box-sizing: border-box;
+}
+
+.selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #383838;
+    padding: 8px 12px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
+}
+
+label, select, span, input[type="number"] { font-size: 16px; color: #e0e0e0; }
+
+select, input[type="number"] { 
+    border: 1px solid #444; 
+    border-radius: 5px; 
+    padding: 5px; 
+    background-color: #212121; 
+    color: #f0f0f0;
+}
+
+input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+input[type="range"] { cursor: pointer; }
+
+#bpm-value, #zoom-value, #interval-value, #metronome-volume-value, #accompaniment-volume-value, #melody-volume-value { 
+    font-weight: bold; 
+    min-width: 50px; 
+    text-align: right; 
+}
+
+.button {
+    border: none;
+    padding: 0px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    color: #f0f0f0;
+    flex-grow: 1;
+    max-width: 300px;
+}
+.button:active { transform: scale(0.98); }
+
+body.body-sheet-music #floating-play-stop-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background-color: #198754;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-playing */
+    background-color: #dc3545; /* Solid red for playing */
+    color: #fff;
+    animation: pulse 1s infinite;
+}
+#floating-play-stop-button:hover { opacity: 0.9; }
+
+#floating-generate-button {
+    position: fixed; top: 85px; left: 15px; z-index: 1000;
+    background-color: #6a0dad;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-generate-button:hover { background-color: #7b2edb; }
+
+#floating-settings-button {
+    position: fixed; top: 155px; left: 15px; z-index: 1000;
+    background-color: #0d6efd;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-settings-button:hover { background-color: #0b5ed7; }
+
+#floating-gear-button {
+    position: fixed; top: 225px; left: 15px; z-index: 1000;
+    background-color: #6c757d; /* Gris */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-gear-button:hover { background-color: #5a6268; }
+
+#floating-notes-button {
+    position: fixed; top: 295px; left: 15px; z-index: 1000;
+    background-color: #fd7e14; /* Naranja */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-notes-button:hover { background-color: #e66a00; }
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 1999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.modal-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+#controls-modal, #gear-modal, #notes-modal {
+    position: fixed;
+    top: 15px;
+    left: 85px;
+    z-index: 2000;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    body { padding: 15px 0; }
+    h1 { font-size: 1.8em; }
+    nav ul { flex-direction: column; gap: 10px; }
+    .button { width: 100%; max-width: 450px; }
+    #controls-modal, #gear-modal, #notes-modal {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 80px;
+    }
 }
 
 /* Estilos de Index3.html */
@@ -86,7 +741,7 @@ nav ul li a.active-nav-link {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 1; /* Allow it to take available space */
 }
 
 .piano-svg {
@@ -105,35 +760,699 @@ nav ul li a.active-nav-link {
     transition: fill 0.1s ease;
 }
 
-.white-key { fill: #f0f0f0; }
-.black-key { fill: #333; }
-.white-key.active, .black-key.active { fill: #9370db; }
-.white-key:hover { fill: #ccc; }
-.black-key:hover { fill: #555; }
+.white-key {
+    fill: #f0f0f0;
+}
+
+.black-key {
+    fill: #333;
+}
+
+.white-key.active {
+    fill: #9370db; /* MediumPurple */
+}
+
+.black-key.active {
+    fill: #9370db; /* MediumPurple */
+}
+
+.white-key:hover {
+    fill: #ccc;
+}
+
+.black-key:hover {
+    fill: #555;
+}
+
+/* Estilos para el control de volumen de piano en Index3.html */
+
+
+/* Estilos para botones flotantes solo en index.html */
+body:not(.body-sheet-music) #floating-play-stop-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1001; /* Higher z-index */
+}
+
+body:not(.body-sheet-music) #floating-button-container {
+    position: fixed;
+    top: 85px; /* Position below the play button (15 + 60 + 10) */
+    left: 15px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+body:not(.body-sheet-music) .button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: #333; /* Default solid color */
+    color: #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+body:not(.body-sheet-music) .button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+body:not(.body-sheet-music) .button svg {
+    width: 24px;
+    height: 24px;
+}
+
+body:not(.body-sheet-music) #floating-play-stop-button.playing {
+    background-color: #dc3545; /* Solid red for playing */
+    color: #fff;
+    animation: pulse 1.5s infinite;
+}
+
+body:not(.body-sheet-music) #floating-play-stop-button.button.stopped {
+    background-color: #198754; /* Solid green for stopped */
+    color: #fff;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+}
+
+body:not(.body-sheet-music) .button svg {
+    transition: all 0.3s ease;
+}
+
+body:not(.body-sheet-music) .button.playing svg {
+    fill: #fff;
+}
+
+
+
+/* Estilos para selector de progresiones predefinidas */
+.predefined-selector-container {
+    margin-top: 15px;
+}
+
+.predefined-select {
+    width: 100%;
+    max-width: 200px; /* Added max-width */
+    padding: 8px 10px; /* Smaller padding */
+    background: linear-gradient(145deg, #2e2e2e, #1c1c1c);
+    color: #e0e0e0;
+    border: 2px solid #444;
+    border-radius: 8px;
+    font-size: 12px; /* Smaller font size */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.predefined-select:focus {
+    outline: none;
+    border-color: #bb86fc;
+    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
+}
+
+.predefined-select option {
+    background-color: #2e2e2e;
+    color: #e0e0e0;
+    padding: 8px;
+}
+
+/* Estilos para el preview de progresión */
+.progression-preview {
+    margin-top: 15px;
+    padding: 15px;
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    border-radius: 10px;
+    border: 1px solid #444;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.preview-chords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.chord-tag {
+    display: inline-block;
+    background: linear-gradient(145deg, #bb86fc, #9d4edd);
+    color: #121212;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+#floating-metronome-button {
+    background: orange;
+}
+
+/* Estilos para el contenedor de PDF a pantalla completa */
+#pdf-fullscreen-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #212121; /* Fondo oscuro */
+    z-index: 999; /* Por debajo de los botones flotantes (z-index: 1000) */
+    display: flex; /* Para centrar el iframe */
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Un poco de padding para el PDF */
+    box-sizing: border-box;
+}
+
+#floating-random-pdf-button {
+    position: fixed; top: 365px; left: 15px; z-index: 1000; /* Position below notes button (295 + 60 + 10) */
+    background-color: #20c997; /* A distinct green color */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#floating-random-pdf-button:hover { background-color: #17a2b8; } /* A slightly different hover color */
+
+#floating-text-input {
+    width: 150px;
+    height: 90px; /* Cambiado a 100px */
+    border-radius: 8px; /* Cambiado a rectangular */
+    border: none;
+    background: #333; /* Mismo fondo que los botones */
+    color: #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    resize: none; /* Evita que el usuario redimensione el textarea */
+    padding: 10px; /* Espacio interno */
+    box-sizing: border-box; /* Incluye padding en el width/height */
+    font-family: 'Roboto', sans-serif; /* Misma fuente que los acordes */
+    font-size: 1.2em; /* Fuente más grande */
+}
+
+#floating-text-input::placeholder {
+    color: #b0b0b0; /* Color del placeholder */
+}
+
+#floating-text-input:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Metronome Popup */
+.metronome-popup {
+    position: fixed; /* Changed to fixed to be relative to viewport */
+    top: 85px; /* Aligned with the top of the floating-button-container */
+    left: 85px; /* 15px (container left) + 60px (button width) + 10px (spacing) */
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000; /* Ensure it's above other content */
+    min-width: 320px; /* Changed from 200px to 320px */
+}
+
+.metronome-popup.visible {
+    display: flex;
+}
+
+.metronome-popup .metronome-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.metronome-popup label {
+    font-size: 0.9em;
+    color: var(--text-color-light);
+}
+
+.metronome-popup input[type="number"],
+.metronome-popup input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-background-color);
+    color: var(--text-color);
+}
+
+.metronome-popup .button-option {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.metronome-popup .button-option:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.metronome-popup #bpm-value-display {
+    font-weight: bold;
+    text-align: center;
+    margin-top: -5px;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+
+/* Estilos para el Generador de Cifrados (index5.html) */
+
+#chart-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fdfdfd;
+    color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-size: 100%; /* Base para el zoom */
+    transition: font-size 0.2s ease-in-out;
+}
+
+.song-section {
+    margin-bottom: 30px;
+}
+
+.song-section h2 {
+    font-family: 'Times New Roman', Times, serif;
+    color: #333;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    font-size: 1.8em; /* Relativo al zoom */
+}
+
+.measures-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.measure {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: var(--measure-font-size); /* Relativo al zoom */
+    font-weight: bold;
+    min-height: var(--measure-min-height);
+    padding: 10px;
+    border: 2px solid #121212; /* Aplica borde a todos los lados */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.measure:focus {
+    outline: 2px solid #bb86fc;
+    background-color: #f0f0f0;
+}
+
+/* Panel de Controles Flotante para Cifrados */
+.floating-controls-container {
+    position: fixed;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    background-color: #2c2c2c;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #444;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.floating-controls-container button,
+.floating-controls-container select {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.floating-controls-container button:hover,
+.floating-controls-container select:hover {
+    background-color: #6a0dad;
+}
+
+.floating-controls-container .btn-danger {
+    background-color: #dc3545;
+}
+
+.floating-controls-container .btn-danger:hover {
+    background-color: #a72836;
+}
+
+/* Nuevos estilos para botones por función */
+.floating-controls-container .btn-measure-edit {
+    background-color: #6a0dad; /* Púrpura */
+}
+.floating-controls-container .btn-measure-edit:hover {
+    background-color: #7b2edb;
+}
+
+.floating-controls-container .btn-structure-edit {
+    background-color: #0d6efd; /* Azul */
+}
+.floating-controls-container .btn-structure-edit:hover {
+    background-color: #0b5ed7;
+}
+
+.floating-controls-container .btn-comment {
+    background-color: #20c997; /* Verde brillante */
+}
+.floating-controls-container .btn-comment:hover {
+    background-color: #17a2b8; /* Un poco más oscuro */
+}
+
+.floating-controls-container .btn-export {
+    background-color: #198754; /* Verde oscuro (éxito) */
+}
+.floating-controls-container .btn-export:hover {
+    background-color: #146c43;
+}
+
+.floating-controls-container label {
+    color: #f0f0f0;
+    font-size: 0.9em;
+    text-align: center;
+    margin-bottom: -5px;
+}
+
+
+/* --- Estilos para Barras de Repetición --- */
+
+.measure.repeat-start {
+    border-left: 4px solid #121212;
+}
+
+.measure.repeat-start::before {
+    content: ':';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 0;
+    font-weight: bold;
+    font-size: 1.2em; /* Relativo al zoom */
+}
+
+.measure.repeat-end {
+    border-right: 4px solid #121212;
+}
+
+.measures-grid .measure.repeat-end {
+    border-right-color: #121212;
+}
+
+.measure.repeat-end::after {
+    content: ':';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 0;
+    font-weight: bold;
+    font-size: 1.2em; /* Relativo al zoom */
+}
+
+.measure.double-bar {
+    border-right: 1px solid #121212;
+}
+
+.measure.double-bar::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: #121212;
+}
+
+/* Estilos para Comentarios Arrastrables */
+.comment-box {
+    position: absolute;
+    z-index: 1100;
+    background-color: transparent;
+    border: none; /* No border */
+    padding: 0; /* No padding on the box itself */
+    border-radius: 3px;
+    max-width: 300px;
+    padding-top: 18px; /* Space for the drag handle */
+}
+
+.comment-drag-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 18px; /* Small top bar */
+    cursor: move;
+    background-color: transparent; /* Invisible */
+    border: none; /* No border */
+}
+
+.comment-content {
+    color: #000000; /* Texto negro para legibilidad */
+    white-space: pre-wrap; /* Respeta saltos de línea y espacios */
+    outline: none; /* Sin borde al hacer foco */
+    min-height: 20px; /* Altura mínima */
+    padding: 5px; /* Padding for content */
+    border: none; /* No border on content area */
+    cursor: text; /* Indicate it's editable */
+}
+
+.measure-placeholder {
+    border-right: 2px solid #121212;
+    border-bottom: 2px solid #121212;
+    box-sizing: border-box;
+    min-height: 60px; /* Misma altura que un compás normal */
+    background-color: transparent;
+    visibility: hidden; /* Oculta el contenido pero mantiene el espacio */
+}
+/* Estilos para el botón de resultado (notas/grados) */
+.result-button {
+    background-color: #6a0dad; /* Usar el color de acento principal */
+    color: #f0f0f0; /* Texto blanco para contraste */
+    border: 1px solid #7b2edb; /* Borde ligeramente más claro que el fondo */
+    border-radius: 8px; /* Bordes un poco más redondeados */
+    padding: 12px 20px; /* Aumentar el padding para hacerlo más grande */
+    cursor: pointer;
+    font-size: 1.3em; /* Hacer la fuente más grande */
+    font-weight: bold;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s; /* Añadir transform a la transición */
+    width: fit-content;
+    margin: 10px auto; /* Aumentar el margen */
+    display: block;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Añadir una sombra sutil */
+}
+
+.result-button:hover {
+    background-color: #7b2edb; /* Un tono más claro al pasar el ratón */
+    color: #f0f0f0;
+    box-shadow: 0 0 12px rgba(123, 46, 219, 0.6); /* Sombra más pronunciada y con color */
+}
+
+.result-button:active {
+    transform: translateY(2px); /* Efecto de "presionado" más notorio */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra reducida al presionar */
+}
+
+
+/* === CARD STYLES REFINED (Corrected) === */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.card {
+    position: relative;
+    width: 220px;
+    height: 340px; /* Fixed height to prevent layout shifts */
+    background: #1E1E1E;
+    border-radius: 16px;
+    border: 1px solid #bb86fc;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 0 12px rgba(187, 134, 252, 0.25);
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(187, 134, 252, 0.4);
+    z-index: 10;
+}
+
+.card-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.5em;
+    color: #bb86fc;
+    margin: 0 0 15px 0;
+    border-bottom: 2px solid #bb86fc;
+    padding-bottom: 10px;
+}
+
+.card-options {
+    height: 220px; /* Fixed height */
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    transition: opacity 0.2s ease;
+    position: relative; /* Establish stacking context */
+    background: transparent; /* Make sure it's transparent by default */
+}
+
+.card-options::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.card:hover .card-options {
+    position: absolute;
+    top: 80px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px; 
+    height: 600px;
+    overflow-y: auto;
+    
+    /* --- Exact Match Styles --- */
+    background: #1E1E1E; /* Match card background */
+    border: 1px solid #bb86fc;
+    border-top: none; /* Remove top border for seamless look */
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(187, 134, 252, 0.4);
+    border-radius: 0 0 16px 16px; /* Round only bottom corners */
+
+    z-index: 20;
+    padding: 10px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.card-option {
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    color: #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+.card-option:hover {
+    background-color: #bb86fc;
+    color: #121212;
+}
+
+.card-option.selected {
+    background-color: #bb86fc;
+    color: #121212;
+    font-weight: 600;
+}
 
 .piano-wrapper {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 20px; /* Reduced gap */
     justify-content: center;
     border: 2px solid #bb86fc;
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 25px;
-    background-color: #2c2c2c;
+    background-color: #2c2c2c; /* Subtle background */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-.piano-controls-wrapper {
+.volume-control-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
     align-items: center;
+    justify-content: center;
+    width: 60px;
+    color: #e0e0e0;
 }
 
+.volume-control-container label {
+    margin-bottom: 10px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+}
+
+.piano-volume {
+    -webkit-appearance: slider-vertical; /* Make it vertical */
+    width: 20px; /* Thickness */
+    height: 100px; /* Length */
+    cursor: pointer;
+}
+
+/* New styles for waveform buttons */
 .waveform-buttons {
     display: flex;
+    flex-direction: column;
     gap: 10px;
+    margin-right: 20px;
 }
 
 .waveform-button {
@@ -144,10 +1463,21 @@ nav ul li a.active-nav-link {
     padding: 8px 12px;
     cursor: pointer;
     transition: background-color 0.2s, box-shadow 0.2s;
+    font-size: 0.9em;
+    width: 100px;
 }
 
-.waveform-button:hover { background-color: #6a0dad; }
-.waveform-button.active { background-color: #bb86fc; color: #121212; }
+.waveform-button:hover {
+    background-color: #6a0dad;
+    color: #f0f0f0;
+    box-shadow: 0 0 8px #6a0dad;
+}
+
+.waveform-button.active {
+    background-color: #bb86fc;
+    color: #121212;
+    font-weight: bold;
+}
 
 #global-controls-container {
     display: flex;
@@ -171,86 +1501,27 @@ nav ul li a.active-nav-link {
     width: 100%;
 }
 
-#global-controls-container label { font-size: 1.2em; font-weight: bold; }
-#master-volume-slider { width: 60%; cursor: pointer; }
-#piano-count-selector { padding: 8px; border-radius: 5px; border: 1px solid #444; background-color: #212121; color: #f0f0f0; font-size: 1em; cursor: pointer; }
-.piano-wrapper.hidden { display: none; }
-
-/* === NUEVO ESTILO PARA FADER DE CONSOLA === */
-
-.volume-control-container {
-  width: 70px;
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #282828;
-  padding: 15px 10px;
-  border-radius: 5px;
-  border: 1px solid #1a1a1a;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+#global-controls-container label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #e0e0e0;
 }
 
-.volume-control-container label {
-    font-size: 0.9em;
-    color: #aaa;
-    margin-bottom: 15px;
+#master-volume-slider {
+    width: 60%;
+    cursor: pointer;
 }
 
-.fader-body {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#piano-count-selector {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #212121;
+    color: #f0f0f0;
+    font-size: 1em;
+    cursor: pointer;
 }
 
-.piano-volume {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 150px; 
-  height: 10px;
-  background: transparent;
-  outline: none;
-  transform: rotate(-90deg);
-  cursor: pointer;
-}
-
-.piano-volume::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 6px;
-  background: #111;
-  border-radius: 3px;
-  border: 1px solid #000;
-}
-
-.piano-volume::-moz-range-track {
-  width: 100%;
-  height: 6px;
-  background: #111;
-  border-radius: 3px;
-  border: 1px solid #000;
-}
-
-.piano-volume::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  margin-top: -12px; /* (alto perilla - alto track) / 2 */
-  width: 25px;
-  height: 30px;
-  background: #c0c0c0; /* Gris plata */
-  border-radius: 2px;
-  border: 1px solid #777;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-}
-
-.piano-volume::-moz-range-thumb {
-  width: 25px;
-  height: 30px;
-  background: #c0c0c0;
-  border-radius: 2px;
-  border: 1px solid #777;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-  cursor: pointer;
+.piano-wrapper.hidden {
+    display: none;
 }

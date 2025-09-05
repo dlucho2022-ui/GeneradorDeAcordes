@@ -44,30 +44,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- PERSISTENCIA DE DATOS ---
+    // --- PERSISTENCIA DE DATOS (REFACTORIZADO PARA FILAS) ---
     function saveSheetMusic() {
         console.log('saveSheetMusic() called.');
         const data = {
             songTitle: document.getElementById('song-title').textContent,
             sections: [],
-            comments: [] // Add comments array
+            comments: []
         };
 
         document.querySelectorAll('.song-section').forEach(sectionDiv => {
             const section = {
                 title: sectionDiv.querySelector('h2').textContent,
-                measures: []
+                rows: []
             };
-            sectionDiv.querySelectorAll('.measures-grid > div').forEach(measureDiv => {
-                section.measures.push({
-                    content: measureDiv.textContent,
-                    isPlaceholder: measureDiv.classList.contains('measure-placeholder')
+            sectionDiv.querySelectorAll('.measure-row').forEach(rowDiv => {
+                const row = {
+                    measures: []
+                };
+                rowDiv.querySelectorAll('.measure').forEach(measureDiv => {
+                    row.measures.push({
+                        content: measureDiv.textContent,
+                        isPlaceholder: measureDiv.classList.contains('measure-placeholder')
+                    });
                 });
+                section.rows.push(row);
             });
             data.sections.push(section);
         });
 
-        // Save comments
         document.querySelectorAll('.comment-box').forEach(commentBox => {
             data.comments.push({
                 content: commentBox.querySelector('.comment-content').textContent,
@@ -82,27 +87,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadSheetMusic() {
         console.log('loadSheetMusic() called.');
-        console.log('Intentando cargar partitura...');
         const savedData = localStorage.getItem('sheetMusicData');
         if (savedData) {
-            console.log('Datos guardados encontrados:', savedData);
             const data = JSON.parse(savedData);
-            console.log('Datos parseados:', data);
 
-            // Clear ALL existing content in chartContainer and remove all comments
+            if (data.sections.length > 0 && data.sections[0].measures) {
+                console.log('Old data format detected. Converting to new format.');
+                data.sections.forEach(section => {
+                    section.rows = [];
+                    let currentRow = { measures: [] };
+                    section.measures.forEach((measure, index) => {
+                        if (index > 0 && index % 4 === 0) {
+                            section.rows.push(currentRow);
+                            currentRow = { measures: [] };
+                        }
+                        currentRow.measures.push(measure);
+                    });
+                    section.rows.push(currentRow);
+                    delete section.measures;
+                });
+            }
+
             chartContainer.innerHTML = '';
-            document.querySelectorAll('.comment-box').forEach(comment => comment.remove()); // Remove existing comments
-            console.log('Contenido de chartContainer y comentarios limpiados.');
+            document.querySelectorAll('.comment-box').forEach(comment => comment.remove());
 
-            // Rebuild song title
             const songTitleElement = document.createElement('h1');
             songTitleElement.id = 'song-title';
             songTitleElement.contentEditable = 'true';
             songTitleElement.textContent = data.songTitle;
             chartContainer.appendChild(songTitleElement);
-            console.log('Título de canción reconstruido.');
 
-            // Rebuild sections
             data.sections.forEach(sectionData => {
                 const newSection = document.createElement('div');
                 newSection.className = 'song-section';
@@ -110,74 +124,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newTitle = document.createElement('h2');
                 newTitle.contentEditable = 'true';
                 newTitle.textContent = sectionData.title;
-                
-                const newGrid = document.createElement('div');
-                newGrid.className = 'measures-grid';
-
                 newSection.appendChild(newTitle);
-                newSection.appendChild(newGrid);
-                chartContainer.appendChild(newSection);
-                console.log(`Sección "${sectionData.title}" reconstruida.`);
 
-                sectionData.measures.forEach(measureData => {
-                    const measureDiv = document.createElement('div');
-                    measureDiv.className = measureData.isPlaceholder ? 'measure measure-placeholder' : 'measure';
-                    measureDiv.contentEditable = 'true';
-                    measureDiv.textContent = measureData.content;
-                    newGrid.appendChild(measureDiv);
-                });
-                console.log(`Medidas para "${sectionData.title}" reconstruidas.`);
+                if (sectionData.rows) {
+                    sectionData.rows.forEach(rowData => {
+                        const newRow = document.createElement('div');
+                        newRow.className = 'measure-row';
+                        const numMeasures = rowData.measures.length;
+                        newRow.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`;
+
+                        rowData.measures.forEach(measureData => {
+                            const measureDiv = document.createElement('div');
+                            measureDiv.className = measureData.isPlaceholder ? 'measure measure-placeholder' : 'measure';
+                            measureDiv.contentEditable = 'true';
+                            measureDiv.textContent = measureData.content;
+                            newRow.appendChild(measureDiv);
+                        });
+                        newSection.appendChild(newRow);
+                    });
+                }
+                chartContainer.appendChild(newSection);
             });
 
-            // Rebuild comments
             if (data.comments) {
                 data.comments.forEach(commentData => {
                     const commentBox = document.createElement('div');
                     commentBox.className = 'comment-box';
-
                     const dragHandle = document.createElement('div');
                     dragHandle.className = 'comment-drag-handle';
-
                     const contentArea = document.createElement('div');
                     contentArea.className = 'comment-content';
                     contentArea.contentEditable = 'true';
                     contentArea.textContent = commentData.content;
-
                     commentBox.appendChild(dragHandle);
                     commentBox.appendChild(contentArea);
-                    
                     commentBox.style.top = commentData.top;
                     commentBox.style.left = commentData.left;
-
                     chartContainer.appendChild(commentBox);
                     makeDraggable(commentBox);
-
-                    // Add blur listener directly to comment content
                     contentArea.addEventListener('blur', saveSheetMusic);
                 });
-                console.log('Comentarios reconstruidos.');
             }
 
-            console.log('Partitura cargada automáticamente.');
         } else {
-            console.log('No se encontraron datos guardados. Usando estructura por defecto.');
-            // If no saved data, ensure the default structure is present
-            if (chartContainer.children.length === 0 || (chartContainer.children.length === 1 && chartContainer.querySelector('#song-title'))) {
-                // Only if completely empty or only song title is present
-                chartContainer.innerHTML = `
-                    <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
-                    <div class="song-section">
-                        <h2 contenteditable="true">Intro</h2>
-                        <div class="measures-grid">
-                            <div class="measure" contenteditable="true"></div>
-                            <div class="measure" contenteditable="true"></div>
-                            <div class="measure" contenteditable="true"></div>
-                            <div class="measure" contenteditable="true"></div>
-                        </div>
+             chartContainer.innerHTML = `
+                <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
+                <div class="song-section">
+                    <h2 contenteditable="true">Intro</h2>
+                    <div class="measure-row" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="measure" contenteditable="true"></div>
+                        <div class="measure" contenteditable="true"></div>
+                        <div class="measure" contenteditable="true"></div>
+                        <div class="measure" contenteditable="true"></div>
                     </div>
-                `;
-                console.log('Estructura por defecto inicializada.');
-            }
+                </div>
+            `;
         }
     }
 
@@ -198,24 +199,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GUARDADO AUTOMÁTICO AL ESCRIBIR ---
     chartContainer.addEventListener('input', (event) => {
-        console.log('Input event detected on:', event.target);
         if (event.target.classList.contains('measure') || 
             event.target.id === 'song-title' || 
             (event.target.tagName === 'H2' && event.target.closest('.song-section'))) {
-            console.log('Input event on comment-content detected.');
             saveSheetMusic();
         }
     });
 
     // --- MANEJO DE CONTROLES ---
 
-    // Selector de tamaño de fuente (Zoom)
     fontSizeSelector.addEventListener('change', (e) => {
         chartContainer.style.fontSize = e.target.value;
-        saveSheetMusic(); // Save on zoom change
+        saveSheetMusic();
     });
 
-    // --- CONTROLES DE FUENTE Y ALTURA DE COMPÁS ---
     const measureFontSizeSlider = document.getElementById('measure-font-size-slider');
     const measureHeightSlider = document.getElementById('measure-height-slider');
 
@@ -239,11 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedMinHeight) {
             measureHeightSlider.value = savedMinHeight;
         }
-        // Apply settings on load
         applyMeasureStyles(measureFontSizeSlider.value, measureHeightSlider.value);
     }
 
-    // Event Listeners for sliders
     measureFontSizeSlider.addEventListener('input', () => {
         applyMeasureStyles(measureFontSizeSlider.value, measureHeightSlider.value);
         saveMeasureSettings();
@@ -254,36 +249,36 @@ document.addEventListener('DOMContentLoaded', () => {
         saveMeasureSettings();
     });
 
-    // Load settings on initial page load
     loadMeasureSettings();
 
-    // Helper function to insert 4 measures
-    function insertMeasures(grid, referenceElement = null) {
-        for (let i = 0; i < 4; i++) {
+    function insertMeasures(row, count, referenceElement = null) {
+        for (let i = 0; i < count; i++) {
             const measure = document.createElement('div');
             measure.className = 'measure';
             measure.contentEditable = 'true';
-            measure.textContent = ''; // Ensure new measures are empty
+            measure.textContent = '';
 
             if (referenceElement) {
-                grid.insertBefore(measure, referenceElement);
+                row.insertBefore(measure, referenceElement);
             } else {
-                grid.appendChild(measure);
+                row.appendChild(measure);
             }
         }
+        const numMeasures = row.children.length;
+        row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`;
     }
 
     // Controles de compás
     document.getElementById('add-start-repeat-btn').addEventListener('click', () => {
         if (focusedMeasure && focusedMeasure.classList.contains('measure')) focusedMeasure.classList.toggle('repeat-start');
         else alert('Hacé clic en un compás primero.');
-        saveSheetMusic(); // Save after repeat change
+        saveSheetMusic();
     });
 
     document.getElementById('add-end-repeat-btn').addEventListener('click', () => {
         if (focusedMeasure && focusedMeasure.classList.contains('measure')) focusedMeasure.classList.toggle('repeat-end');
         else alert('Hacé clic en un compás primero.');
-        saveSheetMusic(); // Save after repeat change
+        saveSheetMusic();
     });
 
     document.getElementById('delete-measure-btn').addEventListener('click', () => {
@@ -291,12 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Hacé clic en el compás que querés eliminar.');
             return;
         }
-        if (confirm('¿Estás seguro de que querés eliminar este compás? Esto dejará un espacio vacío en la grilla.')) {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'measure measure-placeholder';
-            focusedMeasure.parentNode.replaceChild(placeholder, focusedMeasure);
-            focusedMeasure = null;
-            saveSheetMusic(); // Save after deleting measure
+        const row = focusedMeasure.closest('.measure-row');
+        if (row && row.children.length > 1) {
+            focusedMeasure.remove();
+            const numMeasures = row.children.length;
+            row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`;
+            saveSheetMusic();
+        } else {
+            alert('No se puede eliminar el último compás de una fila.');
         }
     });
 
@@ -307,70 +304,59 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Controles de estructura
-    document.getElementById('add-row-btn').addEventListener('click', () => {
-        if (focusedMeasure) {
-            const grid = focusedMeasure.closest('.measures-grid');
-            if (!grid) {
-                alert('El compás seleccionado no está dentro de una grilla de medidas.');
-                return;
-            }
-
-            const measures = Array.from(grid.children);
-            const focusedIndex = measures.indexOf(focusedMeasure);
-            const insertionStartIndex = Math.floor(focusedIndex / 4) * 4 + 4;
-
-            let referenceElement = null;
-            if (insertionStartIndex < measures.length) {
-                referenceElement = measures[insertionStartIndex];
-            }
-            insertMeasures(grid, referenceElement); // Use helper
-        } else if (focusedSectionTitle) {
-            const grid = focusedSectionTitle.nextElementSibling;
-            if (grid && grid.classList.contains('measures-grid')) {
-                insertMeasures(grid, grid.firstChild); // Insert at beginning
-            } else {
-                alert('No se encontró la grilla de compases para esta sección.');
-            }
-        } else {
-            alert('Hacé clic en un compás o en el título de una sección para indicar dónde querés agregar la fila.');
+    document.getElementById('add-measure-btn').addEventListener('click', () => {
+        if (!focusedMeasure) {
+            alert('Hacé clic en un compás para agregar otro a su lado.');
+            return;
         }
-        saveSheetMusic();
+        const row = focusedMeasure.closest('.measure-row');
+        if (row) {
+            const newMeasure = document.createElement('div');
+            newMeasure.className = 'measure';
+            newMeasure.contentEditable = 'true';
+            row.insertBefore(newMeasure, focusedMeasure.nextSibling);
+            
+            const numMeasures = row.children.length;
+            row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`;
+            saveSheetMusic();
+        }
     });
 
-    chartContainer.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent default Enter behavior (new line)
+    // Controles de estructura
+    document.getElementById('add-row-btn').addEventListener('click', () => {
+        let currentSection;
+        if (focusedMeasure) {
+            currentSection = focusedMeasure.closest('.song-section');
+        } else if (focusedSectionTitle) {
+            currentSection = focusedSectionTitle.closest('.song-section');
+        } else {
+            const sections = chartContainer.querySelectorAll('.song-section');
+            if (sections.length > 0) {
+                currentSection = sections[sections.length - 1];
+            }
+        }
 
-            const activeElement = document.activeElement;
+        if (currentSection) {
+            const newRow = document.createElement('div');
+            newRow.className = 'measure-row';
+            insertMeasures(newRow, 4);
+            currentSection.appendChild(newRow);
+            saveSheetMusic();
+        } else {
+            alert('No se encontró una sección para agregar la fila.');
+        }
+    });
 
-            if (activeElement && activeElement.classList.contains('measure')) {
-                const grid = activeElement.closest('.measures-grid');
-                if (grid) {
-                    const measures = Array.from(grid.children);
-                    const focusedIndex = measures.indexOf(activeElement);
-                    const insertionStartIndex = Math.floor(focusedIndex / 4) * 4 + 4; // After current row
-
-                    let referenceElement = null;
-                    if (insertionStartIndex < measures.length) {
-                        referenceElement = measures[insertionStartIndex];
-                    }
-                    insertMeasures(grid, referenceElement);
-                    saveSheetMusic();
-                    // Optional: move focus to the first new measure
-                    if (referenceElement) {
-                        referenceElement.previousElementSibling.focus();
-                    } else {
-                        grid.lastElementChild.focus();
-                    }
-                }
-            } else if (activeElement && activeElement.tagName === 'H2' && activeElement.closest('.song-section')) {
-                const grid = activeElement.nextElementSibling;
-                if (grid && grid.classList.contains('measures-grid')) {
-                    insertMeasures(grid); // Append to end of section
-                    saveSheetMusic();
-                    grid.lastElementChild.focus(); // Move focus to first new measure
-                }
+    document.getElementById('delete-row-btn').addEventListener('click', () => {
+        if (!focusedMeasure) {
+            alert('Hacé clic en un compás de la fila que querés eliminar.');
+            return;
+        }
+        const row = focusedMeasure.closest('.measure-row');
+        if (row) {
+            if (confirm('¿Estás seguro de que querés eliminar esta fila completa?')) {
+                row.remove();
+                saveSheetMusic();
             }
         }
     });
@@ -383,81 +369,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTitle = document.createElement('h2');
         newTitle.contentEditable = 'true';
         newTitle.textContent = `Sección ${sectionCount}`;
-        
-        const newGrid = document.createElement('div');
-        newGrid.className = 'measures-grid';
-
         newSection.appendChild(newTitle);
-        newSection.appendChild(newGrid);
-        chartContainer.appendChild(newSection);
-        addRow(newGrid);
-        saveSheetMusic(); // Ensure save after adding section
-    });
 
-    document.getElementById('delete-row-btn').addEventListener('click', () => {
-        if (!focusedMeasure) {
-            alert('Hacé clic en un compás de la sección cuya última fila querés eliminar.');
-            return;
-        }
-        const grid = focusedMeasure.closest('.measures-grid');
-        if (grid) {
-            const measures = grid.querySelectorAll('.measure');
-            if (measures.length > 4) {
-                if (confirm('¿Estás seguro de que querés eliminar la última fila de esta sección?')) {
-                    for (let i = 0; i < 4; i++) {
-                        grid.removeChild(grid.lastElementChild);
-                    }
-                }
-            } else {
-                alert('No se puede eliminar la única fila de una sección.');
-            }
-        }
-        saveSheetMusic(); // Save after deleting row
+        const newRow = document.createElement('div');
+        newRow.className = 'measure-row';
+        insertMeasures(newRow, 4);
+        newSection.appendChild(newRow);
+
+        chartContainer.appendChild(newSection);
+        saveSheetMusic();
     });
 
     document.getElementById('delete-section-btn').addEventListener('click', () => {
-        if (!focusedMeasure) {
-            alert('Hacé clic en un compás de la sección que querés eliminar.');
+        if (!focusedMeasure && !focusedSectionTitle) {
+            alert('Hacé clic en un compás o título de la sección que querés eliminar.');
             return;
         }
-        const section = focusedMeasure.closest('.song-section');
+        let section;
+        if(focusedMeasure) {
+            section = focusedMeasure.closest('.song-section');
+        } else {
+            section = focusedSectionTitle.closest('.song-section');
+        }
+
         if (section) {
             if (chartContainer.getElementsByClassName('song-section').length > 1) {
                 if (confirm('¿Estás seguro de que querés eliminar esta sección completa?')) {
                     section.remove();
-                    focusedMeasure = null; // Reset focus
+                    focusedMeasure = null;
+                    focusedSectionTitle = null;
+                    saveSheetMusic();
                 }
             } else {
                 alert('No se puede eliminar la única sección.');
             }
         }
-        saveSheetMusic(); // Save after deleting section
     });
 
     document.getElementById('add-comment-btn').addEventListener('click', () => {
         const commentBox = document.createElement('div');
         commentBox.className = 'comment-box';
-
         const dragHandle = document.createElement('div');
         dragHandle.className = 'comment-drag-handle';
-
         const contentArea = document.createElement('div');
         contentArea.className = 'comment-content';
         contentArea.contentEditable = 'true';
         contentArea.textContent = 'Escribí acá...';
-
         commentBox.appendChild(dragHandle);
         commentBox.appendChild(contentArea);
-        
-        // Posición inicial (centro de la vista)
         commentBox.style.top = `${window.innerHeight / 2 - 50}px`;
         commentBox.style.left = `${window.innerWidth / 2 - 75}px`;
-
         chartContainer.appendChild(commentBox);
         makeDraggable(commentBox);
-        saveSheetMusic(); // Save after adding comment
-
-        // Add blur listener directly to comment content
+        saveSheetMusic();
         contentArea.addEventListener('blur', saveSheetMusic);
     });
 
@@ -466,34 +430,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const songTitle = document.getElementById('song-title').textContent.trim();
         const filename = songTitle ? `${songTitle}.pdf` : 'cifrado.pdf';
 
-        // Temporarily hide elements for a clean capture
-        const elementsToHide = [
-            document.querySelector('.floating-controls-container'),
-            // Comments are now included by being children of chartContainer
-        ];
+        const elementsToHide = [document.querySelector('.floating-controls-container')];
         const placeholders = document.querySelectorAll('.measure-placeholder');
 
         elementsToHide.forEach(el => { if (el) el.style.visibility = 'hidden'; });
         placeholders.forEach(p => p.style.display = 'none');
 
-        // Generate canvas from the chart container with explicit dimensions
         const canvas = await html2canvas(chartContainer, {
-            width: chartContainer.scrollWidth, // Explicitly set width
-            height: chartContainer.scrollHeight, // Explicitly set height
+            width: chartContainer.scrollWidth,
+            height: chartContainer.scrollHeight,
             scale: 2,
             useCORS: true,
             logging: false,
             backgroundColor: '#FFFFFF'
         });
 
-        // Restore visibility of hidden elements
         elementsToHide.forEach(el => { if (el) el.style.visibility = 'visible'; });
         placeholders.forEach(p => p.style.display = '');
 
-        // Get image data from canvas
         const imgData = canvas.toDataURL('image/jpeg', 0.8);
-
-        // Setup PDF document
         const pdf = new window.jspdf.jsPDF({
             orientation: 'portrait',
             unit: 'mm',
@@ -503,22 +458,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         const marginTop = 10;
-        const marginBottom = 10; // Revert to 10 for now for simplicity
+        const marginBottom = 10;
         const marginHorizontal = 0;
-        
         const usableWidth = pdfWidth - (marginHorizontal * 2);
         const usableHeight = pdfHeight - marginTop - marginBottom;
-
-        // Calculate image dimensions to fit in PDF, maintaining aspect ratio
         const imgProps = pdf.getImageProperties(imgData);
         const imgAspectRatio = imgProps.height / imgProps.width;
-        const pdfImageWidth = usableWidth; // Adjusted for right margin issue
+        const pdfImageWidth = usableWidth;
         const pdfImageHeight = pdfImageWidth * imgAspectRatio;
 
-        // --- HYBRID LOGIC ---
         if (pdfImageHeight <= usableHeight) {
-            // --- SINGLE PAGE LOGIC ---
-            // Content fits on one page, create a custom-height PDF
             const customPageHeight = pdfImageHeight + marginTop + marginBottom;
             const singlePagePdf = new window.jspdf.jsPDF({
                 orientation: 'portrait',
@@ -527,16 +476,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             singlePagePdf.addImage(imgData, 'JPEG', marginHorizontal, marginTop, pdfImageWidth, pdfImageHeight);
             singlePagePdf.save(filename);
-
         } else {
-            // --- MULTI-PAGE LOGIC ---
-            // Content is too long, use standard A4 pages
             let heightLeft = pdfImageHeight;
             let position = 0;
-            
             pdf.addImage(imgData, 'JPEG', marginHorizontal, marginTop, pdfImageWidth, pdfImageHeight);
             heightLeft -= usableHeight;
-
             while (heightLeft > 0) {
                 position -= usableHeight;
                 pdf.addPage();
@@ -547,22 +491,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Cargar datos al iniciar
     loadSheetMusic();
 
-    // --- FUNCIÓN PARA REINICIAR LA PARTITURA ---
     function resetChart() {
         if (confirm('¿Estás seguro de que quieres reiniciar la partitura? Se borrará todo el contenido.')) {
-            // Limpiar el localStorage
             localStorage.removeItem('sheetMusicData');
-            console.log('Datos de partitura borrados del localStorage.');
-
-            // Reestablecer la estructura por defecto
             chartContainer.innerHTML = `
                 <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
                 <div class="song-section">
                     <h2 contenteditable="true">Intro</h2>
-                    <div class="measures-grid">
+                    <div class="measure-row" style="grid-template-columns: repeat(4, 1fr);">
                         <div class="measure" contenteditable="true"></div>
                         <div class="measure" contenteditable="true"></div>
                         <div class="measure" contenteditable="true"></div>
@@ -570,14 +508,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-            // Eliminar todos los comentarios existentes del DOM
             document.querySelectorAll('.comment-box').forEach(comment => comment.remove());
-            console.log('Estructura de partitura reestablecida a la configuración por defecto.');
-            // No es necesario llamar a saveSheetMusic() aquí, ya que loadSheetMusic() se encarga de la persistencia
-            // al inicio si no hay datos guardados, y el estado inicial ya está establecido.
         }
     }
 
-    // --- EVENT LISTENERS ---
     document.getElementById('reset-chart-btn').addEventListener('click', resetChart);
 });

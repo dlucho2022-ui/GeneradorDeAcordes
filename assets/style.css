@@ -1086,7 +1086,7 @@ body:not(.body-sheet-music) .button.playing svg {
     font-size: 1.8em; /* Relativo al zoom */
 }
 
-.measures-grid {
+.measure-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
 }
@@ -1218,7 +1218,7 @@ body:not(.body-sheet-music) .button.playing svg {
     border-right: 4px solid #121212;
 }
 
-.measures-grid .measure.repeat-end {
+.measure-row .measure.repeat-end {
     border-right-color: #121212;
 }
 
@@ -1286,7 +1286,7 @@ body:not(.body-sheet-music) .button.playing svg {
     box-sizing: border-box;
     min-height: 60px; /* Misma altura que un compás normal */
     background-color: transparent;
-    visibility: hidden; /* Oculta el contenido pero mantiene el espacio */
+    display: none; /* No ocupa espacio en el layout */
 }
 /* Estilos para el botón de resultado (notas/grados) */
 .result-button {

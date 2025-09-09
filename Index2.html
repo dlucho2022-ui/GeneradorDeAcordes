@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -707,6 +708,180 @@
                 }
             }
 
+            function saveSettings() {
+                const settings = {
+                    key: document.getElementById('key-selector').value,
+                    clef: document.getElementById('clef-selector').value,
+                    measures: document.getElementById('measure-selector').value,
+                    interval: document.getElementById('interval-slider').value,
+                    minNote: document.getElementById('min-note-slider').value,
+                    maxNote: document.getElementById('max-note-slider').value,
+                    accidentals: document.getElementById('include-accidentals').checked,
+                    ties: document.getElementById('include-ties').checked,
+                    
+                    timeSigSimple: document.getElementById('time-signature-selector-simple').value,
+                    simpleQuarters: document.getElementById('include-quarters').checked,
+                    simpleEighths: document.getElementById('include-eighths').checked,
+                    simpleSixteenths: document.getElementById('include-sixteenth-patterns').checked,
+                    simpleTriplets: document.getElementById('include-triplets').checked,
+                    simpleQuarterTriplets: document.getElementById('include-quarter-triplets').checked,
+                    simpleDottedQuarters: document.getElementById('include-two-dotted-quarters').checked,
+                    simpleSyncopations: document.getElementById('include-syncopations').checked,
+
+                    timeSigCompound: document.getElementById('time-signature-selector-compound').value,
+                    compoundDottedQuarter: document.getElementById('include-dotted-quarter').checked,
+                    compoundThreeEighths: document.getElementById('include-three-eighths').checked,
+                    compoundDuplet: document.getElementById('include-eighth-duplet').checked,
+                    compoundRests: document.getElementById('include-compound-rests').checked,
+                    compoundSixteenths: document.getElementById('include-compound-sixteenths').checked,
+
+                    activeTab: document.querySelector('.tab-button.active').dataset.tab,
+
+                    bpm: document.getElementById('bpm-slider').value,
+                    zoom: document.getElementById('zoom-slider').value,
+                    melodyVol: document.getElementById('melody-volume-slider').value,
+                    metroVol: document.getElementById('metronome-volume-slider').value,
+                    accompVol: document.getElementById('accompaniment-volume-slider').value,
+                    visualGuide: document.getElementById('visual-guide-checkbox').checked,
+                    autoscroll: document.getElementById('autoscroll-checkbox').checked,
+                    loop: document.getElementById('loop-playback-checkbox').checked
+                };
+                localStorage.setItem('osmdGeneratorSettings', JSON.stringify(settings));
+            }
+
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('osmdGeneratorSettings');
+                if (!savedSettings) {
+                    // If no settings, run a default generation
+                    loadChords('C');
+                    updateNoteRangeSliders(document.getElementById('clef-selector').value);
+                    generateAndRenderMeasure();
+                    return;
+                }
+
+                const settings = JSON.parse(savedSettings);
+
+                const setSliderValue = (sliderId, value, updateText = true) => {
+                    const slider = document.getElementById(sliderId);
+                    if (!slider) return;
+                    slider.value = value;
+                    if (updateText) {
+                        const valueSpan = document.getElementById(sliderId.replace('-slider', '-value'));
+                        if (valueSpan) {
+                            if (sliderId.includes('-volume-')) {
+                                valueSpan.textContent = value < -47 ? "-Inf" : `${value} dB`;
+                            } else if (sliderId === 'zoom-slider'){
+                                valueSpan.textContent = `${Math.round(parseFloat(value) * 100)}%`;
+                            } else {
+                                valueSpan.textContent = value;
+                            }
+                        }
+                    }
+                };
+                
+                const setCheckbox = (id, checked) => {
+                    const el = document.getElementById(id);
+                    if (el) el.checked = checked;
+                };
+                const setSelect = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = value;
+                };
+
+                // Gear Modal
+                setSelect('key-selector', settings.key);
+                setSelect('clef-selector', settings.clef);
+                document.getElementById('measure-selector').value = settings.measures;
+                setSliderValue('interval-slider', settings.interval);
+                setCheckbox('include-accidentals', settings.accidentals);
+                setCheckbox('include-ties', settings.ties);
+
+                // Notes Modal - Tabs
+                if (settings.activeTab) {
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.rhythm-patterns').forEach(container => container.classList.remove('active'));
+                    const tabButton = document.querySelector(`.tab-button[data-tab="${settings.activeTab}"]`);
+                    if (tabButton) {
+                        tabButton.classList.add('active');
+                        const rhythmContainer = document.getElementById(`${settings.activeTab}-rhythms`);
+                        if (rhythmContainer) rhythmContainer.classList.add('active');
+                    }
+                }
+                
+                // Notes Modal - Simple
+                setSelect('time-signature-selector-simple', settings.timeSigSimple);
+                setCheckbox('include-quarters', settings.simpleQuarters);
+                setCheckbox('include-eighths', settings.simpleEighths);
+                setCheckbox('include-sixteenth-patterns', settings.simpleSixteenths);
+                setCheckbox('include-triplets', settings.simpleTriplets);
+                setCheckbox('include-quarter-triplets', settings.simpleQuarterTriplets);
+                setCheckbox('include-two-dotted-quarters', settings.simpleDottedQuarters);
+                setCheckbox('include-syncopations', settings.simpleSyncopations);
+
+                // Notes Modal - Compound
+                setSelect('time-signature-selector-compound', settings.timeSigCompound);
+                setCheckbox('include-dotted-quarter', settings.compoundDottedQuarter);
+                setCheckbox('include-three-eighths', settings.compoundThreeEighths);
+                setCheckbox('include-eighth-duplet', settings.compoundDuplet);
+                setCheckbox('include-compound-rests', settings.compoundRests);
+                setCheckbox('include-compound-sixteenths', settings.compoundSixteenths);
+
+                // Controls Modal
+                setSliderValue('bpm-slider', settings.bpm);
+                setSliderValue('zoom-slider', settings.zoom);
+                setSliderValue('melody-volume-slider', settings.melodyVol);
+                setSliderValue('metronome-volume-slider', settings.metroVol);
+                setSliderValue('accompaniment-volume-slider', settings.accompVol);
+                setCheckbox('visual-guide-checkbox', settings.visualGuide);
+                setCheckbox('autoscroll-checkbox', settings.autoscroll);
+                setCheckbox('loop-playback-checkbox', settings.loop);
+
+                document.getElementById('bpm-slider').dispatchEvent(new Event('input'));
+                document.getElementById('zoom-slider').dispatchEvent(new Event('input'));
+                document.getElementById('melody-volume-slider').dispatchEvent(new Event('input'));
+                document.getElementById('metronome-volume-slider').dispatchEvent(new Event('input'));
+                document.getElementById('accompaniment-volume-slider').dispatchEvent(new Event('input'));
+                document.getElementById('interval-slider').dispatchEvent(new Event('input'));
+                
+                loadChords(settings.key);
+                updateNoteRangeSliders(settings.clef);
+                
+                setSliderValue('min-note-slider', settings.minNote, false);
+                setSliderValue('max-note-slider', settings.maxNote, false);
+                document.getElementById('min-note-value').textContent = getNoteNameFromPitch(parseInt(settings.minNote, 10));
+                document.getElementById('max-note-value').textContent = getNoteNameFromPitch(parseInt(settings.maxNote, 10));
+
+                generateAndRenderMeasure();
+            }
+
+            function setupEventListeners() {
+                const controlsToSave = [
+                    'key-selector', 'clef-selector', 'measure-selector', 'interval-slider',
+                    'min-note-slider', 'max-note-slider', 'include-accidentals', 'include-ties',
+                    'time-signature-selector-simple', 'include-quarters', 'include-eighths',
+                    'include-sixteenth-patterns', 'include-triplets', 'include-quarter-triplets',
+                    'include-two-dotted-quarters', 'include-syncopations',
+                    'time-signature-selector-compound', 'include-dotted-quarter',
+                    'include-three-eighths', 'include-eighth-duplet', 'include-compound-rests',
+                    'include-compound-sixteenths', 'bpm-slider', 'zoom-slider',
+                    'melody-volume-slider', 'metronome-volume-slider', 'accompaniment-volume-slider',
+                    'visual-guide-checkbox', 'autoscroll-checkbox', 'loop-playback-checkbox'
+                ];
+
+                controlsToSave.forEach(id => {
+                    const control = document.getElementById(id);
+                    if (control) {
+                        const eventType = control.type === 'range' ? 'input' : 'change';
+                        control.addEventListener(eventType, saveSettings);
+                    }
+                });
+
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.addEventListener('click', saveSettings);
+                });
+            }
+
+            // --- EVENT LISTENERS ---
             floatingPlayStopButton.addEventListener('click', () => {
                 const pdfViewerContainer = document.getElementById('pdf-viewer-container');
                 if (pdfViewerContainer.style.display === 'flex') {
@@ -778,91 +953,67 @@
                 });
             });
 
-            const melodyVolumeSlider = document.getElementById('melody-volume-slider');
-            const melodyVolumeValue = document.getElementById('melody-volume-value');
-            sampler.volume.value = parseInt(melodyVolumeSlider.value, 10);
-            melodyVolumeSlider.addEventListener('input', e => {
+            document.getElementById('melody-volume-slider').addEventListener('input', e => {
                 const volumeDb = parseInt(e.target.value, 10);
                 sampler.volume.value = volumeDb;
-                melodyVolumeValue.textContent = `${volumeDb} dB`;
+                document.getElementById('melody-volume-value').textContent = `${volumeDb} dB`;
             });
 
-            const metronomeSlider = document.getElementById('metronome-volume-slider');
-            const metronomeValueSpan = document.getElementById('metronome-volume-value');
-            metronomePlayer.volume.value = parseInt(metronomeSlider.value, 10);
-            metronomeSlider.addEventListener('input', e => {
+            document.getElementById('metronome-volume-slider').addEventListener('input', e => {
                 const volumeDb = parseInt(e.target.value, 10);
                 metronomePlayer.volume.value = volumeDb;
-                metronomeValueSpan.textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
+                document.getElementById('metronome-volume-value').textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
             });
 
-            const accompanimentSlider = document.getElementById('accompaniment-volume-slider');
-            const accompanimentValueSpan = document.getElementById('accompaniment-volume-value');
-            const initialAccompanimentVol = parseInt(accompanimentSlider.value, 10);
-            players.chord1.volume.value = initialAccompanimentVol;
-            players.chord2.volume.value = initialAccompanimentVol;
-            accompanimentSlider.addEventListener('input', e => {
+            document.getElementById('accompaniment-volume-slider').addEventListener('input', e => {
                 const volumeDb = parseInt(e.target.value, 10);
                 players.chord1.volume.value = volumeDb;
                 players.chord2.volume.value = volumeDb;
-                accompanimentValueSpan.textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
+                document.getElementById('accompaniment-volume-value').textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
             });
-
-            const bpmSlider = document.getElementById('bpm-slider');
-            const bpmValue = document.getElementById('bpm-value');
-            Tone.Transport.bpm.value = parseInt(bpmSlider.value, 10);
             
-            bpmSlider.addEventListener('input', (e) => {
+            document.getElementById('bpm-slider').addEventListener('input', (e) => {
                 const newBpm = parseInt(e.target.value, 10);
                 Tone.Transport.bpm.value = newBpm;
-                bpmValue.textContent = newBpm;
+                document.getElementById('bpm-value').textContent = newBpm;
                 stopPlayback();
             });
 
-            const zoomSlider = document.getElementById('zoom-slider');
-            const zoomValue = document.getElementById('zoom-value');
-            zoomSlider.addEventListener('input', (e) => {
-                zoomValue.textContent = `${Math.round(parseFloat(e.target.value) * 100)}%`;
+            document.getElementById('zoom-slider').addEventListener('input', (e) => {
+                document.getElementById('zoom-value').textContent = `${Math.round(parseFloat(e.target.value) * 100)}%`;
             });
-            zoomSlider.addEventListener('change', (e) => {
+            document.getElementById('zoom-slider').addEventListener('change', (e) => {
                 osmd.zoom = parseFloat(e.target.value);
                 osmd.render();
             });
 
-            const intervalSlider = document.getElementById('interval-slider');
-            const intervalValue = document.getElementById('interval-value');
-            intervalSlider.addEventListener('input', (e) => {
-                intervalValue.textContent = e.target.value;
+            document.getElementById('interval-slider').addEventListener('input', (e) => {
+                document.getElementById('interval-value').textContent = e.target.value;
             });
 
-            const minNoteSlider = document.getElementById('min-note-slider');
-            const minNoteValue = document.getElementById('min-note-value');
-            const maxNoteSlider = document.getElementById('max-note-slider');
-            const maxNoteValue = document.getElementById('max-note-value');
-
-            minNoteSlider.addEventListener('input', e => {
+            document.getElementById('min-note-slider').addEventListener('input', e => {
                 const pitch = parseInt(e.target.value, 10);
-                minNoteValue.textContent = getNoteNameFromPitch(pitch);
-                if (pitch > parseInt(maxNoteSlider.value, 10)) {
-                    maxNoteSlider.value = pitch;
-                    maxNoteValue.textContent = getNoteNameFromPitch(pitch);
+                document.getElementById('min-note-value').textContent = getNoteNameFromPitch(pitch);
+                if (pitch > parseInt(document.getElementById('max-note-slider').value, 10)) {
+                    document.getElementById('max-note-slider').value = pitch;
+                    document.getElementById('max-note-value').textContent = getNoteNameFromPitch(pitch);
                 }
             });
-            minNoteSlider.addEventListener('change', generateAndRenderMeasure);
+            document.getElementById('min-note-slider').addEventListener('change', generateAndRenderMeasure);
 
-            maxNoteSlider.addEventListener('input', e => {
+            document.getElementById('max-note-slider').addEventListener('input', e => {
                 const pitch = parseInt(e.target.value, 10);
-                maxNoteValue.textContent = getNoteNameFromPitch(pitch);
-                if (pitch < parseInt(minNoteSlider.value, 10)) {
-                    minNoteSlider.value = pitch;
-                    minNoteValue.textContent = getNoteNameFromPitch(pitch);
+                document.getElementById('max-note-value').textContent = getNoteNameFromPitch(pitch);
+                if (pitch < parseInt(document.getElementById('min-note-slider').value, 10)) {
+                    document.getElementById('min-note-slider').value = pitch;
+                    document.getElementById('min-note-value').textContent = getNoteNameFromPitch(pitch);
                 }
             });
-            maxNoteSlider.addEventListener('change', generateAndRenderMeasure);
+            document.getElementById('max-note-slider').addEventListener('change', generateAndRenderMeasure);
             
-            loadChords('C');
-            updateNoteRangeSliders(document.getElementById('clef-selector').value);
-            generateAndRenderMeasure();
+            // --- FINAL INITIALIZATION ---
+            setupEventListeners();
+            loadSettings();
         });
     </script>
 

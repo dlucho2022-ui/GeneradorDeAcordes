@@ -1585,28 +1585,32 @@ function addChordFromInput() {
 }
 
 async function playMidiBeat() {
-    if (Tone.context.state === 'suspended') {
-        await Tone.start();
+    try {
+        if (Tone.context.state === 'suspended') {
+            await Tone.start();
+        }
+
+        await Tone.loaded();
+
+        const midi = await Midi.fromUrl("assets/midi_drum_patterns/midi_beat_1.mid");
+
+        Tone.Transport.stop();
+        Tone.Transport.cancel();
+
+        const track = midi.tracks[0];
+
+        const midiPart = new Tone.Part((time, note) => {
+            console.log(`Triggering drumSampler: note=${note.name}, duration=${note.duration}, time=${time}, velocity=${note.velocity}`);
+            drumSampler.triggerAttackRelease(note.name, note.duration, time, note.velocity);
+        }, track.notes).start(0);
+
+        if (midi.header.tempos.length > 0) {
+            Tone.Transport.bpm.value = midi.header.tempos[0].bpm;
+        }
+
+        Tone.Transport.start();
+    } catch (error) {
+        console.error("Error al reproducir el MIDI:", error);
+        alert("Hubo un error al cargar o reproducir el archivo MIDI. Revisa la consola para más detalles.");
     }
-    // Load the MIDI file
-    const midi = await Midi.fromUrl("assets/midi_drum_patterns/midi_beat_1.mid");
-
-    // Stop any previous playback
-    Tone.Transport.stop();
-    Tone.Transport.cancel();
-
-    // Get the first track
-    const track = midi.tracks[0];
-
-    // Create a part for the track
-    const midiPart = new Tone.Part((time, note) => {
-        drumSampler.triggerAttackRelease(note.name, note.duration, time, note.velocity);
-    }, track.notes).start(0);
-
-    // Set the transport BPM
-    if (midi.header.tempos.length > 0) {
-        Tone.Transport.bpm.value = midi.header.tempos[0].bpm;
-    }
-    // Start the transport
-    Tone.Transport.start();
 }

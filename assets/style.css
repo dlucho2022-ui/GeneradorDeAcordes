@@ -624,6 +624,36 @@ input[type="range"] { cursor: pointer; }
     text-align: right; 
 }
 
+/* Estilos para el selector de patrón de batería */
+#drum-pattern-select {
+    width: 100%; /* Ocupa todo el ancho disponible en su contenedor */
+    padding: 8px 10px;
+    background-color: #212121; /* Fondo oscuro */
+    color: #f0f0f0; /* Texto claro */
+    border: 1px solid #444; /* Borde sutil */
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    -webkit-appearance: none; /* Eliminar estilos por defecto de navegador */
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23f0f0f0%22%20d%3D%22M208%2096L128%20176%2048%2096z%22%2F%3E%3C%2Fsvg%3E'); /* Flecha personalizada */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+#drum-pattern-select:focus {
+    outline: none;
+    border-color: #6a0dad;
+    box-shadow: 0 0 5px #6a0dad;
+}
+
+#drum-pattern-select option {
+    background-color: #212121;
+    color: #f0f0f0;
+}
+
 /* General Button Styles */
 .button {
     background-color: #4CAF50; /* Green */

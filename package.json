@@ -1,0 +1,24 @@
+{
+  "name": "generadordeacordes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dlucho2022-ui/GeneradorDeAcordes.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dlucho2022-ui/GeneradorDeAcordes/issues"
+  },
+  "homepage": "https://github.com/dlucho2022-ui/GeneradorDeAcordes#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}

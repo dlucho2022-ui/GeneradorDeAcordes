@@ -624,17 +624,25 @@ input[type="range"] { cursor: pointer; }
     text-align: right; 
 }
 
+/* General Button Styles */
 .button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px 20px;
     border: none;
-    padding: 0px;
-    font-size: 16px;
-    font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    color: #f0f0f0;
-    flex-grow: 1;
-    max-width: 300px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+}
+
+#save-profile-button {
+    background-color: #007bff; /* Blue for save button */
+    color: white;
 }
 .button:active { transform: scale(0.98); }
 
@@ -710,7 +718,7 @@ body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-pl
     opacity: 1;
     pointer-events: auto;
 }
-#controls-modal, #gear-modal, #notes-modal {
+#controls-modal, #gear-modal, #notes-modal, #profiles-modal {
     position: fixed;
     top: 15px;
     left: 85px;
@@ -723,7 +731,7 @@ body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-pl
     h1 { font-size: 1.8em; }
     nav ul { flex-direction: column; gap: 10px; }
     .button { width: 100%; max-width: 450px; }
-    #controls-modal, #gear-modal, #notes-modal {
+    #controls-modal, #gear-modal, #notes-modal, #profiles-modal {
         left: 50%;
         transform: translateX(-50%);
         top: 80px;
@@ -1197,7 +1205,7 @@ body:not(.body-sheet-music) .button.playing svg {
 }
 
 
-/* --- Estilos para Barras de Repetición --- */
+/* === Estilos para Barras de Repetición === */
 
 .measure.repeat-start {
     border-left: 4px solid #121212;
@@ -1524,4 +1532,67 @@ body:not(.body-sheet-music) .button.playing svg {
 
 .piano-wrapper.hidden {
     display: none;
+}
+
+/* Profile Management Styles */
+#floating-profiles-button {
+    position: fixed;
+    top: 435px; /* Positioned below other buttons */
+    left: 15px;
+    z-index: 1000;
+    background-color: #ffc107; /* A distinct yellow/gold color */
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+
+#floating-profiles-button:hover {
+    background-color: #e0a800;
+}
+
+#profiles-modal {
+    position: fixed;
+    top: 15px;
+    left: 85px;
+    z-index: 2000;
+    display: none; /* Hidden by default */
+}
+
+#profiles-modal hr {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #444;
+    margin: 15px 0;
+}
+
+#profiles-modal input[type="text"] {
+    flex-grow: 1;
+    background-color: #212121;
+    border: 1px solid #444;
+    color: #f0f0f0;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+.button-danger {
+    background-color: #dc3545 !important;
+}
+
+.button-danger:hover {
+    background-color: #c82333 !important;
+}
+
+/* Add profiles modal to the responsive media query */
+@media (max-width: 768px) {
+    #profiles-modal {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 80px;
+    }
 }

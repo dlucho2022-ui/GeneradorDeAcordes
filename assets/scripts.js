@@ -87,6 +87,7 @@ let chordSampler;
 let arpeggioSampler;
 let pianoVolume;
 let arpeggioVolume;
+let drumSampler;
 
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
@@ -245,6 +246,14 @@ async function loadAudioFiles() {
             release: 0.5,
             baseUrl: "https://tonejs.github.io/audio/salamander/",
         }).connect(arpeggioVolume);
+
+        drumSampler = new Tone.Sampler({
+            urls: {
+                'C3': 'kick.wav',
+            },
+            baseUrl: "assets/audios/drum_sample/",
+        }).toDestination();
+
     } catch (e) {
         console.error("Error initializing Tone.Sampler:", e);
     }
@@ -1455,6 +1464,8 @@ window.onload = () => {
         }
     });
 
+    document.getElementById('play-midi-btn').addEventListener('click', playMidiBeat);
+
     
 };
 
@@ -1571,4 +1582,31 @@ function addChordFromInput() {
 
     addChordToProgression(normalizedRootNote, normalizedChordType, chordDisplay);
     inputElement.value = ''; // Limpiar el input después de añadir
+}
+
+async function playMidiBeat() {
+    if (Tone.context.state === 'suspended') {
+        await Tone.start();
+    }
+    // Load the MIDI file
+    const midi = await Midi.fromUrl("assets/midi_drum_patterns/midi_beat_1.mid");
+
+    // Stop any previous playback
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+
+    // Get the first track
+    const track = midi.tracks[0];
+
+    // Create a part for the track
+    const midiPart = new Tone.Part((time, note) => {
+        drumSampler.triggerAttackRelease(note.name, note.duration, time, note.velocity);
+    }, track.notes).start(0);
+
+    // Set the transport BPM
+    if (midi.header.tempos.length > 0) {
+        Tone.Transport.bpm.value = midi.header.tempos[0].bpm;
+    }
+    // Start the transport
+    Tone.Transport.start();
 }

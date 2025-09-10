@@ -232,6 +232,7 @@ async function loadAudioFiles() {
     // Initialize volumes
     pianoVolume = new Tone.Volume(-6).toDestination();
     arpeggioVolume = new Tone.Volume(-12).toDestination(); // Default arpeggio volume
+    drumVolume = new Tone.Volume(-6).toDestination(); // Default drum volume
 
     // Initialize Samplers
     try {
@@ -254,7 +255,7 @@ async function loadAudioFiles() {
                 'F#2': 'closed_hihat.wav', // MIDI note 30
             },
             baseUrl: "assets/audios/drum_sample/",
-        }).toDestination();
+        }).connect(drumVolume); // Connect to drumVolume
 
     } catch (e) {
         console.error("Error initializing Tone.Sampler:", e);
@@ -1206,6 +1207,7 @@ function togglePlay() {
             chordLoop.stop(0).dispose();
         }
         Tone.Transport.stop();
+        Tone.Transport.cancel(); // Cancel all scheduled events, including MIDI
         stopAudio(); // Stop any lingering chord audio
         if (chordSampler) {
             chordSampler.releaseAll();
@@ -1243,6 +1245,8 @@ function startChordLoop() {
 
     const bpm = document.getElementById('bpm-input').value;
     Tone.Transport.bpm.value = bpm;
+
+    playMidiBeat(); // Start MIDI beat when progression starts
 
     chordLoop = new Tone.Loop(time => {
         const chord = currentProgression[currentProgressionIndex];
@@ -1389,6 +1393,15 @@ window.onload = () => {
         arpeggioVolumeControl.addEventListener('input', (event) => {
             if (arpeggioVolume) {
                 arpeggioVolume.volume.value = event.target.value;
+            }
+        });
+    }
+
+    const drumVolumeControl = document.getElementById('drum-volume');
+    if (drumVolumeControl) {
+        drumVolumeControl.addEventListener('input', (event) => {
+            if (drumVolume) {
+                drumVolume.volume.value = event.target.value;
             }
         });
     }
@@ -1596,15 +1609,14 @@ async function playMidiBeat() {
 
         const midi = await Midi.fromUrl("assets/midi_drum_patterns/midi_beat_1.mid");
 
-        Tone.Transport.stop();
-        Tone.Transport.cancel();
-
         const track = midi.tracks[0];
 
-        const midiPart = new Tone.Part((time, note) => {
+                const midiPart = new Tone.Part((time, note) => {
             console.log(`Triggering drumSampler: note=${note.name}, duration=${note.duration}, time=${time}, velocity=${note.velocity}`);
             drumSampler.triggerAttackRelease(note.name, note.duration, time, note.velocity);
         }, track.notes).start(0);
+        midiPart.loop = true; // Enable looping
+        midiPart.loopEnd = '1m'; // Loop every measure (one bar)
 
         if (midi.header.tempos.length > 0) {
             Tone.Transport.bpm.value = midi.header.tempos[0].bpm;

@@ -252,8 +252,10 @@ async function loadAudioFiles() {
         drumSampler = new Tone.Sampler({
             urls: {
                 'C2': 'kick.wav',
-                'D2': 'snare_hit.wav', // MIDI note 26
-                'F#2': 'closed_hihat.wav', // MIDI note 30
+                'D2': 'snare_hit.wav', 
+                'E2': 'snare_rim.wav', 
+                'F#2': 'closed_hihat.wav', 
+                'A#2': 'half_hihat.wav',
             },
             baseUrl: "assets/audios/drum_sample/",
         }).connect(drumVolume); // Connect to drumVolume
@@ -531,6 +533,7 @@ function getDiatonicIndexFromGrade(grado) {
     const baseGrado = grado.replace(/[#b]/g, '');
     return gradoMap[baseGrado] || 0;
 }
+
 
 let selectedTonalidad = "Do";
 let selectedEscala = "";

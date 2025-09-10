@@ -80,6 +80,7 @@ let currentTimeout = null;
 let currentProgressionIndex = 0;
 let currentProgression = [];
 let chordVolumeLinear = Math.pow(10, -6 / 20); // Default value from slider
+let selectedDrumPattern = "midi_beat_1.mid"; // Default drum pattern
 
 
 
@@ -1481,6 +1482,17 @@ window.onload = () => {
 
     document.getElementById('play-midi-btn').addEventListener('click', playMidiBeat);
 
+    const drumPatternSelect = document.getElementById('drum-pattern-select');
+    if (drumPatternSelect) {
+        drumPatternSelect.addEventListener('change', (event) => {
+            selectedDrumPattern = event.target.value;
+            // If progression is playing, restart it to apply new drum pattern
+            if (isPlaying) {
+                togglePlay(); // This will stop and then restart the progression, applying the new MIDI
+            }
+        });
+    }
+
     
 };
 
@@ -1607,7 +1619,7 @@ async function playMidiBeat() {
 
         await Tone.loaded();
 
-        const midi = await Midi.fromUrl("assets/midi_drum_patterns/midi_beat_1.mid");
+        const midi = await Midi.fromUrl(`assets/midi_drum_patterns/${selectedDrumPattern}`);
 
         const track = midi.tracks[0];
 

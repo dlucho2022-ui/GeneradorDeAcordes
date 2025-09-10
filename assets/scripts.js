@@ -233,7 +233,7 @@ async function loadAudioFiles() {
     // Initialize volumes
     pianoVolume = new Tone.Volume(-6).toDestination();
     arpeggioVolume = new Tone.Volume(-12).toDestination(); // Default arpeggio volume
-    drumVolume = new Tone.Volume(-6).toDestination(); // Default drum volume
+    drumVolume = new Tone.Volume(-6).toDestination(); // Default drum volume (master for drums)
 
     // Initialize Samplers
     try {
@@ -258,7 +258,7 @@ async function loadAudioFiles() {
                 'A#2': 'half_hihat.wav',
             },
             baseUrl: "assets/audios/drum_sample/",
-        }).connect(drumVolume); // Connect to drumVolume
+        }).connect(drumVolume); // Connect to the master drum volume
 
     } catch (e) {
         console.error("Error initializing Tone.Sampler:", e);

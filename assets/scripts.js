@@ -250,8 +250,8 @@ async function loadAudioFiles() {
         drumSampler = new Tone.Sampler({
             urls: {
                 'C2': 'kick.wav',
-                'D3': 'snare_hit.wav',
-                'F#2': 'closed_hihat.wav',
+                'D2': 'snare_hit.wav', // MIDI note 26
+                'F#2': 'closed_hihat.wav', // MIDI note 30
             },
             baseUrl: "assets/audios/drum_sample/",
         }).toDestination();

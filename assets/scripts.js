@@ -79,6 +79,7 @@ let currentAudio = null;
 let currentTimeout = null;
 let currentProgressionIndex = 0;
 let currentProgression = [];
+let currentMidiPart = null; // Variable to hold the current MIDI part
 let chordVolumeLinear = Math.pow(10, -6 / 20); // Default value from slider
 let selectedDrumPattern = "midi_beat_1.mid"; // Default drum pattern
 
@@ -173,12 +174,9 @@ function updateMetronomeBPM(bpm) {
         metronomeInterval = setInterval(playMetronomeClick, intervalMs);
     }
     if(isPlaying){ // If progression is playing, update its tempo too
-        Tone.Transport.bpm.value = bpm;
-        // Stop and restart the chordLoop to ensure timing is re-calculated
-        if (chordLoop) {
-            chordLoop.stop().dispose(); // Stop and dispose the old loop
-        }
-        startChordLoop(); // Re-create and start the loop with the new BPM
+        Tone.Transport.bpm.value = bpm; // Set the new BPM first
+        togglePlay(); // Stop everything cleanly
+        togglePlay(); // Start again with the new BPM
     }
 }
 
@@ -1210,6 +1208,10 @@ function togglePlay() {
         if (chordLoop) {
             chordLoop.stop(0).dispose();
         }
+        if (currentMidiPart) {
+            currentMidiPart.stop(0).dispose();
+            currentMidiPart = null;
+        }
         Tone.Transport.stop();
         Tone.Transport.cancel(); // Cancel all scheduled events, including MIDI
         stopAudio(); // Stop any lingering chord audio
@@ -1623,21 +1625,31 @@ async function playMidiBeat() {
         await Tone.loaded();
 
         const midi = await Midi.fromUrl(`assets/midi_drum_patterns/${selectedDrumPattern}`);
+        
+        // --- FINAL FIX: Synchronize the transport's PPQ with the MIDI file's PPQ ---
+        Tone.Transport.PPQ = midi.header.ppq;
 
         const track = midi.tracks[0];
 
-                const midiPart = new Tone.Part((time, note) => {
-            console.log(`Triggering drumSampler: note=${note.name}, duration=${note.duration}, time=${time}, velocity=${note.velocity}`);
-            drumSampler.triggerAttackRelease(note.name, note.duration, time, note.velocity);
-        }, track.notes).start(0);
-        midiPart.loop = true; // Enable looping
-        midiPart.loopEnd = '1m'; // Loop every measure (one bar)
+        // Convert notes to use ticks for time, so they scale with BPM
+        const events = track.notes.map(note => ({
+            time: note.ticks + 'i',
+            name: note.name,
+            duration: note.duration,
+            velocity: note.velocity
+        }));
 
-        if (midi.header.tempos.length > 0) {
-            Tone.Transport.bpm.value = midi.header.tempos[0].bpm;
+        if (currentMidiPart) {
+            currentMidiPart.dispose();
         }
 
-        Tone.Transport.start();
+        currentMidiPart = new Tone.Part((time, event) => {
+            drumSampler.triggerAttackRelease(event.name, event.duration, time, event.velocity);
+        }, events).start(0);
+
+        currentMidiPart.loop = true;
+        currentMidiPart.loopEnd = midi.durationTicks + 'i';
+
     } catch (error) {
         console.error("Error al reproducir el MIDI:", error);
         alert("Hubo un error al cargar o reproducir el archivo MIDI. Revisa la consola para más detalles.");

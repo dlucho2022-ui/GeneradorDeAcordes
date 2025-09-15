@@ -18,6 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
         metronomePlayer.start(time);
     }, "4n");
 
+    const spanishToEnglishMap = {
+        'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'si': 'B',
+        'do#': 'C#', 'reb': 'Db',
+        're#': 'D#', 'mib': 'Eb',
+        'fa#': 'F#', 'solb': 'Gb',
+        'sol#': 'G#', 'lab': 'Ab',
+        'la#': 'A#', 'sib': 'Bb'
+    };
+    const sortedSpanishNotes = Object.keys(spanishToEnglishMap).sort((a, b) => b.length - a.length);
+
     const chordMappings = {
         'C': ['C4', 'E4', 'G4'], 'C#': ['C#4', 'F4', 'G#4'], 'Db': ['Db4', 'F4', 'Ab4'], 'D': ['D4', 'F#4', 'A4'], 'D#': ['D#4', 'G4', 'A#4'], 'Eb': ['Eb4', 'G4', 'Bb4'], 'E': ['E4', 'G#4', 'B4'], 'F': ['F4', 'A4', 'C5'], 'F#': ['F#4', 'A#4', 'C#5'], 'Gb': ['Gb4', 'Bb4', 'Db5'], 'G': ['G4', 'B4', 'D5'], 'G#': ['G#4', 'C5', 'D#5'], 'Ab': ['Ab4', 'C5', 'Eb5'], 'A': ['A4', 'C#5', 'E5'], 'A#': ['A#4', 'D5', 'F5'], 'Bb': ['Bb4', 'D5', 'F5'], 'B': ['B4', 'D#5', 'F#5'],
         'Cm': ['C4', 'Eb4', 'G4'], 'C#m': ['C#4', 'E4', 'G#4'], 'Dbm': ['Db4', 'E4', 'Ab4'], 'Dm': ['D4', 'F4', 'A4'], 'D#m': ['D#4', 'F#4', 'A#4'], 'Ebm': ['Eb4', 'Gb4', 'Bb4'], 'Em': ['E4', 'G4', 'B4'], 'Fm': ['F4', 'Ab4', 'C5'], 'F#m': ['F#4', 'A4', 'C#5'], 'Gbm': ['Gb4', 'A4', 'Db5'], 'Gm': ['G4', 'Bb4', 'D5'], 'G#m': ['G#4', 'B4', 'D#5'], 'Abm': ['Ab4', 'B4', 'Eb5'], 'Am': ['A4', 'C5', 'E5'], 'A#m': ['A#4', 'C#5', 'F5'], 'Bbm': ['Bb4', 'Db5', 'F5'], 'Bm': ['B4', 'D5', 'F#5'],
@@ -26,10 +36,27 @@ document.addEventListener('DOMContentLoaded', () => {
         'Cmaj7': ['C4', 'E4', 'G4', 'B4'], 'C#maj7': ['C#4', 'F4', 'G#4', 'C5'], 'Dbmaj7': ['Db4', 'F4', 'Ab4', 'C5'], 'Dmaj7': ['D4', 'F#4', 'A4', 'C#5'], 'D#maj7': ['D#4', 'G4', 'A#4', 'D5'], 'Ebmaj7': ['Eb4', 'G4', 'Bb4', 'D5'], 'Emaj7': ['E4', 'G#4', 'B4', 'D#5'], 'Fmaj7': ['F4', 'A4', 'C5', 'E5'], 'F#maj7': ['F#4', 'A#4', 'C#5', 'F5'], 'Gbmaj7': ['Gb4', 'Bb4', 'Db5', 'F5'], 'Gmaj7': ['G4', 'B4', 'D5', 'F#5'], 'G#maj7': ['G#4', 'C5', 'D#5', 'G5'], 'Abmaj7': ['Ab4', 'C5', 'Eb5', 'G5'], 'Amaj7': ['A4', 'C#5', 'E5', 'G#5'], 'A#maj7': ['A#4', 'D5', 'F5', 'A5'], 'Bbmaj7': ['Bb4', 'D5', 'F5', 'A5'], 'Bmaj7': ['B4', 'D#5', 'F#5', 'A#5'],
     };
 
+    function translateChord(spanishChord) {
+        const lowerChord = spanishChord.toLowerCase().trim();
+        for (const spanishNote of sortedSpanishNotes) {
+            if (lowerChord.startsWith(spanishNote)) {
+                const englishNote = spanishToEnglishMap[spanishNote];
+                const suffix = spanishChord.substring(spanishNote.length);
+                return englishNote + suffix;
+            }
+        }
+        return spanishChord;
+    }
+
     function playChord(chordName) {
         if (Tone.context.state !== 'running') { Tone.start(); }
-        const notes = chordMappings[chordName.trim()];
-        if (notes) { sampler.triggerAttackRelease(notes, '1n'); }
+        const englishChord = translateChord(chordName);
+        const notes = chordMappings[englishChord.trim()];
+        if (notes) { 
+            sampler.triggerAttackRelease(notes, '1n'); 
+        } else {
+            console.warn(`Acorde no encontrado: ${chordName} (traducido a ${englishChord})`);
+        }
     }
 
     function makeDraggable(element) {
@@ -328,11 +355,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Acordes y Progresión ---
         chartContainer.addEventListener('keydown', function(event) {
-            if (event.target.classList.contains('measure') && event.key === 'Enter') {
-                event.preventDefault();
-                const chordName = event.target.textContent;
-                playChord(chordName);
-                event.target.blur();
+            if (event.target.classList.contains('measure')) {
+                if (event.key === 'Enter' || event.key === 'Tab') {
+                    const chordName = event.target.textContent;
+                    playChord(chordName);
+
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        event.target.blur();
+                    }
+                }
             }
         });
 
@@ -343,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (progressionSequence) {
                     progressionSequence.dispose();
                 }
-                metronomeLoop.stop(); // Detener el metrónomo explícitamente
+                metronomeLoop.stop();
                 playProgressionBtn.textContent = 'Reproducir Progresión';
             } else {
                 const measures = document.querySelectorAll('.measure');
@@ -356,7 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 progressionSequence = new Tone.Sequence((time, chord) => {
-                    const notes = chordMappings[chord];
+                    const englishChord = translateChord(chord);
+                    const notes = chordMappings[englishChord];
                     if (notes) { sampler.triggerAttackRelease(notes, '1n', time); }
                 }, chords, '1m');
 

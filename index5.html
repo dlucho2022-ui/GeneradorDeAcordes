@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Cifrados</title>
     <link rel="stylesheet" href="assets/style.css">
+    <style>
+        .selected-measure {
+            background-color: #d1e7ff !important;
+            box-shadow: inset 0 0 0 2px #007bff;
+        }
+    </style>
 </head>
 <body>
 <div class="wrapper">
@@ -69,7 +75,9 @@
     <div class="control-group">
         <button id="add-row-btn" class="btn-structure-edit">Agregar Fila</button>
         <button id="add-section-btn" class="btn-structure-edit">Agregar Sección</button>
-        <button id="play-progression-btn" class="btn-structure-edit">Reproducir Progresión</button>
+        <button id="play-progression-btn" class="btn-structure-edit">Reproducir</button>
+        <input type="checkbox" id="loop-progression-checkbox" style="margin-left: 5px;">
+        <label for="loop-progression-checkbox">Repetir</label>
         <button id="delete-row-btn" class="btn-danger">Eliminar Fila</button>
         <button id="delete-section-btn" class="btn-danger">Eliminar Sección</button>
     </div>

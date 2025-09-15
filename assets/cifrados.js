@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let focusedMeasure = null;
     let focusedSectionTitle = null;
     let progressionSequence; // Referencia para la secuencia de acordes
+    
+    // --- Variables para selección por arrastre ---
+    let isSelecting = false;
+    let selectionStartMeasure = null;
 
     // --- LÓGICA DE AUDIO --- 
     const sampler = new Tone.Sampler({
@@ -332,6 +336,41 @@ document.addEventListener('DOMContentLoaded', () => {
     Tone.loaded().then(() => {
         console.log("Piano sampler y metrónomo listos.");
 
+        // --- Lógica de Selección (Click y Arrastre) ---
+        chartContainer.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('measure')) {
+                // e.preventDefault(); // BUG FIX: Esto prevenía la edición.
+                isSelecting = true;
+                selectionStartMeasure = e.target;
+
+                document.querySelectorAll('.selected-measure').forEach(m => m.classList.remove('selected-measure'));
+                selectionStartMeasure.classList.add('selected-measure');
+            }
+        });
+
+        chartContainer.addEventListener('mouseover', (e) => {
+            if (isSelecting && e.target.classList.contains('measure')) {
+                const allMeasures = Array.from(document.querySelectorAll('.measure'));
+                const startIndex = allMeasures.indexOf(selectionStartMeasure);
+                const currentIndex = allMeasures.indexOf(e.target);
+
+                const minIndex = Math.min(startIndex, currentIndex);
+                const maxIndex = Math.max(startIndex, currentIndex);
+
+                allMeasures.forEach((measure, index) => {
+                    if (index >= minIndex && index <= maxIndex) {
+                        measure.classList.add('selected-measure');
+                    } else {
+                        measure.classList.remove('selected-measure');
+                    }
+                });
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isSelecting = false;
+        });
+
         // --- Controles del Metrónomo ---
         const bpmSlider = document.getElementById('metronome-bpm-slider');
         const bpmInput = document.getElementById('metronome-bpm-input');
@@ -369,6 +408,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const playProgressionBtn = document.getElementById('play-progression-btn');
+        const loopCheckbox = document.getElementById('loop-progression-checkbox');
+
         playProgressionBtn.addEventListener('click', function() {
             if (Tone.Transport.state === 'started') {
                 Tone.Transport.stop();
@@ -376,28 +417,78 @@ document.addEventListener('DOMContentLoaded', () => {
                     progressionSequence.dispose();
                 }
                 metronomeLoop.stop();
-                playProgressionBtn.textContent = 'Reproducir Progresión';
+                playProgressionBtn.textContent = 'Reproducir';
             } else {
-                const measures = document.querySelectorAll('.measure');
-                const chords = Array.from(measures).map(measure => measure.textContent.trim()).filter(Boolean);
-                if (chords.length === 0) return;
+                const selectedMeasures = document.querySelectorAll('.selected-measure');
+                let measuresToPlay;
+
+                if (selectedMeasures.length > 0) {
+                    measuresToPlay = Array.from(selectedMeasures);
+                } else {
+                    measuresToPlay = Array.from(document.querySelectorAll('.measure'));
+                }
+
+                const playbackEvents = [];
+                measuresToPlay.forEach((measure, measureIndex) => {
+                    const parts = measure.textContent.trim().split(/(\s+)/).filter(Boolean);
+                    const chords = parts.filter((_, i) => i % 2 === 0);
+                    const spacings = parts.filter((_, i) => i % 2 !== 0);
+
+                    if (chords.length === 1 && chords[0]) {
+                        playbackEvents.push([`${measureIndex}:0`, { chord: chords[0], duration: '1n' }]);
+                    } else if (chords.length === 2) {
+                        playbackEvents.push([`${measureIndex}:0`, { chord: chords[0], duration: '2n' }]);
+                        playbackEvents.push([`${measureIndex}:2`, { chord: chords[1], duration: '2n' }]);
+                    } else if (chords.length === 4) {
+                        playbackEvents.push([`${measureIndex}:0`, { chord: chords[0], duration: '4n' }]);
+                        playbackEvents.push([`${measureIndex}:1`, { chord: chords[1], duration: '4n' }]);
+                        playbackEvents.push([`${measureIndex}:2`, { chord: chords[2], duration: '4n' }]);
+                        playbackEvents.push([`${measureIndex}:3`, { chord: chords[3], duration: '4n' }]);
+                    } else if (chords.length === 3) {
+                        let beats = [1, 1, 1, 1]; // 4 beats total
+                        if (spacings.length === 2) {
+                            if (spacings[0].length > 1 && spacings[1].length === 1) { // La  Re Do
+                                beats = [2, 1, 1];
+                            } else if (spacings[0].length === 1 && spacings[1].length > 1) { // La Re  Do
+                                beats = [1, 2, 1];
+                            } else { // La Re Do
+                                beats = [1, 1, 2];
+                            }
+                        } else { // Default for 3 chords
+                            beats = [1, 1, 2];
+                        }
+                        let currentTime = 0;
+                        chords.forEach((chord, i) => {
+                            playbackEvents.push([`${measureIndex}:${currentTime}`, { chord: chord, duration: `${beats[i]}n` }]);
+                            currentTime += beats[i];
+                        });
+                    }
+                });
+
+                if (playbackEvents.length === 0) return;
                 if (Tone.context.state !== 'running') { Tone.start(); }
 
                 if (progressionSequence) {
                     progressionSequence.dispose();
                 }
 
-                progressionSequence = new Tone.Sequence((time, chord) => {
-                    const englishChord = translateChord(chord);
+                progressionSequence = new Tone.Part((time, value) => {
+                    const englishChord = translateChord(value.chord);
                     const notes = chordMappings[englishChord];
-                    if (notes) { sampler.triggerAttackRelease(notes, '1n', time); }
-                }, chords, '1m');
+                    if (notes) { 
+                        sampler.triggerAttackRelease(notes, value.duration, time); 
+                    }
+                }, playbackEvents);
 
-                progressionSequence.loop = false;
+                const lastEvent = playbackEvents[playbackEvents.length - 1];
+                const lastMeasure = parseInt(lastEvent[0].split(':')[0]) + 1;
+                progressionSequence.loopEnd = `${lastMeasure}m`;
+                progressionSequence.loop = loopCheckbox.checked;
+
                 metronomeLoop.start(0);
                 progressionSequence.start(0);
                 Tone.Transport.start();
-                playProgressionBtn.textContent = 'Detener Progresión';
+                playProgressionBtn.textContent = 'Detener';
             }
         });
     });

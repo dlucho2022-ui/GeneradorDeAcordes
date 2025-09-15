@@ -69,8 +69,18 @@
     <div class="control-group">
         <button id="add-row-btn" class="btn-structure-edit">Agregar Fila</button>
         <button id="add-section-btn" class="btn-structure-edit">Agregar Sección</button>
+        <button id="play-progression-btn" class="btn-structure-edit">Reproducir Progresión</button>
         <button id="delete-row-btn" class="btn-danger">Eliminar Fila</button>
         <button id="delete-section-btn" class="btn-danger">Eliminar Sección</button>
+    </div>
+
+    <!-- Controles de Metrónomo -->
+    <div class="control-group">
+        <label for="metronome-bpm-slider">BPM:</label>
+        <input type="range" id="metronome-bpm-slider" value="120" min="40" max="240">
+        <input type="number" id="metronome-bpm-input" value="120" min="40" max="240" style="width: 60px;">
+        <label for="metronome-volume-slider">Volumen Metrónomo:</label>
+        <input type="range" id="metronome-volume-slider" min="-40" max="0" value="-10">
     </div>
 
     <!-- Acciones de Documento/Globales -->
@@ -81,23 +91,23 @@
     </div>
 </div>
 
-
-
 <main id="chart-container">
     <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
     <div class="song-section">
         <h2 contenteditable="true">Intro</h2>
         <div class="measure-row">
-            <div class="measure" contenteditable="true"></div>
-            <div class="measure" contenteditable="true"></div>
-            <div class="measure" contenteditable="true"></div>
-            <div class="measure" contenteditable="true"></div>
+            <div class="measure" contenteditable="true">Cmaj7</div>
+            <div class="measure" contenteditable="true">Fmaj7</div>
+            <div class="measure" contenteditable="true">Dm7</div>
+            <div class="measure" contenteditable="true">G7</div>
         </div>
     </div>
 </main>
 
+<script src="https://unpkg.com/tone@14.7.58/build/Tone.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="assets/cifrados.js"></script>
+
 </body>
 </html>

@@ -466,6 +466,17 @@ function simplifyEnharmonic(note) {
     }
 }
 
+function smartSimplify(notes) {
+    const simplified = notes.map(n => simplifyEnharmonic(n));
+    const baseNotes = simplified.map(n => n.replace(/[#bx]/g, ''));
+    const uniqueBaseNotes = new Set(baseNotes);
+    if (uniqueBaseNotes.size === baseNotes.length) {
+        return simplified;
+    } else {
+        return notes;
+    }
+}
+
 function getProperNoteNameForScale(rootNote, intervalIndex, semitoneInterval) {
     const rootBaseNote = rootNote.replace(/[#bx]/g, ''); 
     const rootBaseIndex = notasBase.indexOf(rootBaseNote);
@@ -693,7 +704,7 @@ function calcularEscala() {
             }
         }
 
-        const escalaNotasDisplay = escalaNotas.map(nota => simplifyEnharmonic(nota)); // Get simplified notes for playback
+        const escalaNotasDisplay = smartSimplify(escalaNotas); // Get simplified notes for playback
         const gradosDisplay = grados; // Use original grades for display
 
         const acordesPredefinidos = opcionesSeleccionadas.acordes;

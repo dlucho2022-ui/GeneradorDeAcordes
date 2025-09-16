@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'Cmaj7': ['C4', 'E4', 'G4', 'B4'], 'C#maj7': ['C#4', 'F4', 'G#4', 'C5'], 'Dbmaj7': ['Db4', 'F4', 'Ab4', 'C5'], 'Dmaj7': ['D4', 'F#4', 'A4', 'C#5'], 'D#maj7': ['D#4', 'G4', 'A#4', 'D5'], 'Ebmaj7': ['Eb4', 'G4', 'Bb4', 'D5'], 'Emaj7': ['E4', 'G#4', 'B4', 'D#5'], 'Fmaj7': ['F4', 'A4', 'C5', 'E5'], 'F#maj7': ['F#4', 'A#4', 'C#5', 'F5'], 'Gbmaj7': ['Gb4', 'Bb4', 'Db5', 'F5'], 'Gmaj7': ['G4', 'B4', 'D5', 'F#5'], 'G#maj7': ['G#4', 'C5', 'D#5', 'G5'], 'Abmaj7': ['Ab4', 'C5', 'Eb5', 'G5'], 'Amaj7': ['A4', 'C#5', 'E5', 'G#5'], 'A#maj7': ['A#4', 'D5', 'F5', 'A5'], 'Bbmaj7': ['Bb4', 'D5', 'F5', 'A5'], 'Bmaj7': ['B4', 'D#5', 'F#5', 'A#5'],
         'Cdim': ['C4', 'Eb4', 'Gb4'], 'C#dim': ['C#4', 'E4', 'G4'], 'Dbdim': ['Db4', 'E4', 'G4'], 'Ddim': ['D4', 'F4', 'Ab4'], 'D#dim': ['D#4', 'F#4', 'A4'], 'Ebdim': ['Eb4', 'Gb4', 'A4'], 'Edim': ['E4', 'G4', 'Bb4'], 'Fdim': ['F4', 'Ab4', 'B4'], 'F#dim': ['F#4', 'A4', 'C5'], 'Gbdim': ['Gb4', 'A4', 'C5'], 'Gdim': ['G4', 'Bb4', 'Db5'], 'G#dim': ['G#4', 'B4', 'D5'], 'Abdim': ['Ab4', 'B4', 'D5'], 'Adim': ['A4', 'C5', 'Eb5'], 'A#dim': ['A#4', 'C#5', 'E5'], 'Bbdim': ['Bb4', 'Db5', 'E5'], 'Bdim': ['B4', 'D5', 'F5'],
         'Cdim7': ['C4', 'Eb4', 'Gb4', 'A4'], 'C#dim7': ['C#4', 'E4', 'G4', 'Bb4'], 'Dbdim7': ['Db4', 'E4', 'G4', 'Bb4'], 'Ddim7': ['D4', 'F4', 'Ab4', 'B4'], 'D#dim7': ['D#4', 'F#4', 'A4', 'C5'], 'Ebdim7': ['Eb4', 'Gb4', 'A4', 'C5'], 'Edim7': ['E4', 'G4', 'Bb4', 'Db5'], 'Fdim7': ['F4', 'Ab4', 'B4', 'D5'], 'F#dim7': ['F#4', 'A4', 'C5', 'Eb5'], 'Gbdim7': ['Gb4', 'A4', 'C5', 'Eb5'], 'Gdim7': ['G4', 'Bb4', 'Db5', 'E5'], 'G#dim7': ['G#4', 'B4', 'D5', 'F5'], 'Abdim7': ['Ab4', 'B4', 'D5', 'F5'], 'Adim7': ['A4', 'C5', 'Eb5', 'Gb5'], 'A#dim7': ['A#4', 'C#5', 'E5', 'G5'], 'Bbdim7': ['Bb4', 'Db5', 'E5', 'G5'], 'Bdim7': ['B4', 'D5', 'F5', 'Ab5'],
+        // Suspended 2nd
+        'Csus2': ['C4', 'D4', 'G4'], 'C#sus2': ['C#4', 'D#4', 'G#4'], 'Dbsus2': ['Db4', 'Eb4', 'Ab4'], 'Dsus2': ['D4', 'E4', 'A4'], 'D#sus2': ['D#4', 'F4', 'A#4'], 'Ebsus2': ['Eb4', 'F4', 'Bb4'], 'Esus2': ['E4', 'F#4', 'B4'], 'Fsus2': ['F4', 'G4', 'C5'], 'F#sus2': ['F#4', 'G#4', 'C#5'], 'Gbsus2': ['Gb4', 'Ab4', 'Db5'], 'Gsus2': ['G4', 'A4', 'D5'], 'G#sus2': ['G#4', 'A#4', 'D#5'], 'Absus2': ['Ab4', 'Bb4', 'Eb5'], 'Asus2': ['A4', 'B4', 'E5'], 'A#sus2': ['A#4', 'C5', 'F5'], 'Bbsus2': ['Bb4', 'C5', 'F5'], 'Bsus2': ['B4', 'C#5', 'F#5'],
+        // Suspended 4th
+        'Csus4': ['C4', 'F4', 'G4'], 'C#sus4': ['C#4', 'F#4', 'G#4'], 'Dbsus4': ['Db4', 'Gb4', 'Ab4'], 'Dsus4': ['D4', 'G4', 'A4'], 'D#sus4': ['D#4', 'G#4', 'A#4'], 'Ebsus4': ['Eb4', 'Ab4', 'Bb4'], 'Esus4': ['E4', 'A4', 'B4'], 'Fsus4': ['F4', 'Bb4', 'C5'], 'F#sus4': ['F#4', 'B4', 'C#5'], 'Gbsus4': ['Gb4', 'B4', 'Db5'], 'Gsus4': ['G4', 'C5', 'D5'], 'G#sus4': ['G#4', 'C#5', 'D#5'], 'Absus4': ['Ab4', 'Db5', 'Eb5'], 'Asus4': ['A4', 'D5', 'E5'], 'A#sus4': ['A#4', 'D#5', 'F5'], 'Bbsus4': ['Bb4', 'Eb5', 'F5'], 'Bsus4': ['B4', 'E5', 'F#5'],
     };
 
     function translateChord(spanishChord) {
@@ -56,12 +60,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playChord(chordName) {
         if (Tone.context.state !== 'running') { Tone.start(); }
-        const englishChord = translateChord(chordName);
-        const notes = chordMappings[englishChord.trim()];
-        if (notes) { 
-            sampler.triggerAttackRelease(notes, '1n'); 
+
+        if (chordName.includes('/')) {
+            const parts = chordName.split('/');
+            const chordPart = parts[0].trim();
+            const bassPart = parts[1].trim();
+
+            const englishChord = translateChord(chordPart);
+            const chordNotes = chordMappings[englishChord];
+
+            if (chordNotes) {
+                // Translate the bass note part and assume octave 3
+                const englishBass = translateChord(bassPart);
+                const bassNote = englishBass + '3';
+                
+                // The final notes are the bass note plus the original chord notes
+                const finalNotes = [bassNote, ...chordNotes];
+                
+                sampler.triggerAttackRelease(finalNotes, '1n');
+            } else {
+                console.warn(`Acorde no encontrado (parte del acorde con bajo cambiado): ${chordPart}`);
+            }
         } else {
-            console.warn(`Acorde no encontrado: ${chordName} (traducido a ${englishChord})`);
+            const englishChord = translateChord(chordName);
+            const notes = chordMappings[englishChord.trim()];
+            if (notes) {
+                sampler.triggerAttackRelease(notes, '1n');
+            } else {
+                console.warn(`Acorde no encontrado: ${chordName} (traducido a ${englishChord})`);
+            }
         }
     }
 
@@ -478,10 +505,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 progressionSequence = new Tone.Part((time, value) => {
-                    const englishChord = translateChord(value.chord);
-                    const notes = chordMappings[englishChord];
-                    if (notes) { 
-                        sampler.triggerAttackRelease(notes, value.duration, time); 
+                    let notesToPlay;
+                    if (value.chord.includes('/')) {
+                        const parts = value.chord.split('/');
+                        const chordPart = parts[0].trim();
+                        const bassPart = parts[1].trim();
+
+                        const englishChord = translateChord(chordPart);
+                        const chordNotes = chordMappings[englishChord];
+
+                        if (chordNotes) {
+                            const englishBass = translateChord(bassPart);
+                            const bassNote = englishBass + '3';
+                            notesToPlay = [bassNote, ...chordNotes];
+                        } else {
+                            console.warn(`Acorde no encontrado (parte del acorde con bajo cambiado en progresión): ${chordPart}`);
+                            return; // Skip playing if chord part is not found
+                        }
+                    } else {
+                        const englishChord = translateChord(value.chord);
+                        notesToPlay = chordMappings[englishChord];
+                    }
+
+                    if (notesToPlay) {
+                        sampler.triggerAttackRelease(notesToPlay, value.duration, time);
+                    } else {
+                        console.warn(`Acorde no encontrado en progresión: ${value.chord}`);
                     }
                 }, playbackEvents);
 

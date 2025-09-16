@@ -1633,15 +1633,47 @@ body:not(.body-sheet-music) .button.playing svg {
     }
 }
 
-.playback-controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 8px; /* For spacing between button, checkbox, and label */
-    background: rgba(255, 255, 255, 0.8); /* A slight background to make it readable */
-    padding: 5px;
-    border-radius: 5px;
-}
+    .playback-controls {
+        position: absolute;
+        top: -40px;
+        left: 10px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 8px; /* For spacing between button, checkbox, and label */
+        background: rgba(255, 255, 255, 0.8); /* A slight background to make it readable */
+        padding: 10px; /* Increased padding */
+        border-radius: 5px;
+    }
+
+    .playback-controls label {
+        color: #121212; /* Dark color for readability on light background */
+    }
+
+    #play-progression-btn {
+        width: 40px; /* Fixed width */
+        height: 40px; /* Fixed height */
+        border-radius: 50%; /* Make it round */
+        background-color: #28a745; /* Green color */
+        color: white; /* Icon color */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0; /* Remove padding */
+        border: none; /* Remove border */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #play-progression-btn:hover {
+        background-color: #218838; /* Darker green on hover */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    #play-progression-btn.playing {
+        background-color: #dc3545; /* Red color for playing/stop state */
+    }
+
+    #play-progression-btn.playing:hover {
+        background-color: #c82333; /* Darker red on hover */
+    }

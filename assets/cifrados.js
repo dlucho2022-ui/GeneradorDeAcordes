@@ -450,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 metronomeLoop.stop();
                 playProgressionBtn.innerHTML = playIcon;
+                playProgressionBtn.classList.remove('playing'); // Remove playing class
             } else {
                 const selectedMeasures = document.querySelectorAll('.selected-measure');
                 let measuresToPlay;
@@ -543,6 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 progressionSequence.start(0);
                 Tone.Transport.start();
                 playProgressionBtn.innerHTML = stopIcon;
+                playProgressionBtn.classList.add('playing'); // Add playing class
             }
         });
     });

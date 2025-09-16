@@ -335,6 +335,18 @@ function playStringChord(nota, tipo, duracion = '1n', time = undefined) {
     
     const playableNotes = getPlayablePianoNotes(reorderedNotes);
 
+    const toneToFileNoteMap = {
+        'C': 'c', 'C#': 'cs', 'D': 'd', 'D#': 'ds', 'E': 'e', 'F': 'f', 'F#': 'fs', 'G': 'g', 'G#': 'gs', 'A': 'a', 'A#': 'as', 'B': 'b'
+    };
+
+    const fileNoteNames = playableNotes.map(toneNote => {
+        const noteName = toneNote.replace(/[0-9]/g, '');
+        const octave = toneNote.replace(/[^0-9]/g, '');
+        const fileNoteName = toneToFileNoteMap[noteName];
+        return fileNoteName ? fileNoteName + octave : toneNote;
+    });
+    console.log("Buscando samples de cuerdas:", fileNoteNames);
+
     if (stringSampler && playableNotes.length > 0) {
         stringSampler.triggerAttackRelease(playableNotes, duracion, time);
     } else {

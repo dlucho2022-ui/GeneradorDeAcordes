@@ -298,8 +298,8 @@ function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
     // 1. Map notes to objects with their pitch value (0-11)
     //    Do NOT sort here. Assume chordNoteNames is already in musical order.
     const notesWithPitch = chordNoteNames.map(name => ({
-        name: name,
-        pitch: mapNotaToSemitone(name)
+        name: simplifyEnharmonic(name),
+        pitch: mapNotaToSemitone(simplifyEnharmonic(name))
     })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
 
     // 3. Assign octaves to ensure ascending order based on original sequence

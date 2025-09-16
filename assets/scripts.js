@@ -72,23 +72,21 @@ const acordes = {
 
 const todasLasOpciones = { ...escalas_modos, ...acordes };
 
-const audios_acordes = {};
 let audioContext;
 let isPlaying = false;
-let currentAudio = null;
-let currentTimeout = null;
 let currentProgressionIndex = 0;
 let currentProgression = [];
 let currentMidiPart = null; // Variable to hold the current MIDI part
-let chordVolumeLinear = Math.pow(10, -6 / 20); // Default value from slider
 let selectedDrumPattern = "midi_beat_1.mid"; // Default drum pattern
 
 
 
 let chordSampler;
 let arpeggioSampler;
+let stringSampler; // For user's string samples
 let pianoVolume;
 let arpeggioVolume;
+let stringVolume; // For user's string samples
 let drumSampler;
 
 const acorde_audio_map = {
@@ -227,14 +225,29 @@ async function loadAudioFiles() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // Initialize Salamander Piano Sampler
     // Initialize volumes
     pianoVolume = new Tone.Volume(-6).toDestination();
-    arpeggioVolume = new Tone.Volume(-12).toDestination(); // Default arpeggio volume
-    drumVolume = new Tone.Volume(-6).toDestination(); // Default drum volume (master for drums)
+    arpeggioVolume = new Tone.Volume(-12).toDestination();
+    stringVolume = new Tone.Volume(-6).toDestination();
+    drumVolume = new Tone.Volume(-6).toDestination();
+
+    // --- Generate URLs for user's custom string samples ---
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const fileNotes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g', 'gs', 'a', 'as', 'b'];
+    const octaves = [3, 4, 5];
+    const stringUrls = {};
+
+    for (const octave of octaves) {
+      for (let i = 0; i < notes.length; i++) {
+        const toneNote = notes[i] + octave;
+        const fileNote = fileNotes[i] + octave + '.wav';
+        stringUrls[toneNote] = fileNote;
+      }
+    }
 
     // Initialize Samplers
     try {
+        // Piano samplers
         chordSampler = new Tone.Sampler({
             urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
             release: 0.5,
@@ -247,6 +260,13 @@ async function loadAudioFiles() {
             baseUrl: "https://tonejs.github.io/audio/salamander/",
         }).connect(arpeggioVolume);
 
+        // NEW: String sampler
+        stringSampler = new Tone.Sampler({
+            urls: stringUrls,
+            release: 0.5,
+            baseUrl: "assets/audios/", 
+        }).connect(stringVolume);
+
         drumSampler = new Tone.Sampler({
             urls: {
                 'C2': 'kick.wav',
@@ -256,30 +276,21 @@ async function loadAudioFiles() {
                 'A#2': 'half_hihat.wav',
             },
             baseUrl: "assets/audios/drum_sample/",
-        }).connect(drumVolume); // Connect to the master drum volume
+        }).connect(drumVolume);
 
     } catch (e) {
         console.error("Error initializing Tone.Sampler:", e);
     }
 
-    const notas_audio = ["c", "c-sharp", "d", "d-sharp", "e", "f", "f-sharp", "g", "g-sharp", "a", "a-sharp", "b"];
-    const tipos_acorde = ["7", "m7", "dim7", "m7b5", "maj7", "m-maj7", "aug-maj7", "7b5", "7aug5", ];
-    for (const nota of notas_audio) {
-        for (const tipo of tipos_acorde) {
-            const audioKey = `${nota}-${tipo}`;
-            audios_acordes[audioKey] = new Audio(`assets/audios/${nota}-${tipo}.mp3`);
-        }
-    }
-    
     await loadMetronomeSound();
 
     // Debugging: Check if samplers are loaded
-    Promise.all([chordSampler.loaded, arpeggioSampler.loaded])
+    Promise.all([chordSampler.loaded, arpeggioSampler.loaded, stringSampler.loaded, drumSampler.loaded])
         .then(() => {
-            console.log("Samplers de piano cargados correctamente.");
+            console.log("Todos los samplers cargados correctamente.");
         })
         .catch(e => {
-            console.error("Error al cargar los samplers de piano:", e);
+            console.error("Error al cargar los samplers:", e);
         });
 }
 
@@ -308,64 +319,29 @@ function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
     return playableNotes;
 }
 
-function playChord(nota, tipo, duracion = null) {
-    stopAudio();
-    let notaParaAudio = nota;
-    if (!notaAudioMap.hasOwnProperty(nota)) {
-        if (enarmonicos_map.hasOwnProperty(nota)) {
-            notaParaAudio = enarmonicos_map[nota];
-        } else {
-            console.warn(`No se encontró un mapeo de audio para la nota ${nota}.`);
-            return;
-        }
+function playStringChord(nota, tipo, duracion = '1n', time = undefined) {
+    const chordNotes = getChordNotes(nota, tipo);
+
+    if (chordNotes.length === 0) {
+        console.warn(`No se pudieron obtener las notas para el acorde (strings) ${nota}${tipo}`);
+        return;
     }
-    const notaAudio = notaAudioMap[notaParaAudio];
-    const tipoAudio = acorde_audio_map[tipo] || tipo;
-    const key = `${notaAudio}-${tipoAudio}`;
 
-    const audio = audios_acordes[key];
-    if (audio) {
-        audio.volume = chordVolumeLinear;
-        audio.currentTime = 0;
-        audio.loop = false;
-        audio.play().catch(e => console.error("Error al reproducir el audio:", e));
-        currentAudio = audio;
+    // Reordenar notas a tónica, quinta, tercera, séptima.
+    let reorderedNotes = chordNotes;
+    if (chordNotes.length === 4) {
+        reorderedNotes = [chordNotes[0], chordNotes[2], chordNotes[1], chordNotes[3]];
+    }
+    
+    const playableNotes = getPlayablePianoNotes(reorderedNotes);
 
-        if (duracion !== null) {
-            currentTimeout = setTimeout(() => {
-                stopAudio();
-            }, duracion);
-        }
+    if (stringSampler && playableNotes.length > 0) {
+        stringSampler.triggerAttackRelease(playableNotes, duracion, time);
     } else {
-        console.warn(`No se encontró el archivo de audio para ${notaParaAudio}-${tipoAudio}.`);
-        currentAudio = null;
+        // console.warn(`Sampler de cuerdas no está listo o no hay notas para reproducir para el acorde ${nota}${tipo}`);
     }
 }
 
-function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
-    // 1. Map notes to objects with their pitch value (0-11)
-    //    Do NOT sort here. Assume chordNoteNames is already in musical order.
-    const notesWithPitch = chordNoteNames.map(name => ({
-        name: name,
-        pitch: mapNotaToSemitone(name)
-    })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
-
-    // 3. Assign octaves to ensure ascending order based on original sequence
-    let lastPitch = -1; // Use -1 to ensure the first note doesn't trigger an octave jump
-    let currentOctave = startOctave;
-    const playableNotes = notesWithPitch.map(note => {
-        // If the current note's pitch is lower than the previous one, it means we've crossed an octave boundary
-        // For example, B (11) to C (0)
-        if (lastPitch !== -1 && note.pitch < lastPitch) { // Only increment if it's not the very first note
-            currentOctave++;
-        }
-        lastPitch = note.pitch;
-        const mappedNote = toneNoteMap[note.name]; // Convert "Do" to "C"
-        return mappedNote ? mappedNote + currentOctave : null;
-    }).filter(n => n);
-
-    return playableNotes;
-}
 
 // New function to play a sequence of notes (scale or arpeggio)
 async function playScaleOrArpeggio(notes, octave = 4, duration = '8n') { // Keep octave parameter
@@ -404,17 +380,7 @@ async function playScaleOrArpeggio(notes, octave = 4, duration = '8n') { // Keep
     }
 }
 
-function stopAudio() {
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        currentAudio = null;
-    }
-    if (currentTimeout) {
-        clearTimeout(currentTimeout);
-        currentTimeout = null;
-    }
-}
+
 
 function simplifyEnharmonic(note) {
     // This function translates theoretically correct but hard-to-read note names
@@ -908,17 +874,17 @@ function addChordToProgression(nota, tipo, display) {
     currentProgression.push(chord);
     updateProgressionDisplay();
     
-    // Play original string sound for preview
-    playChord(nota, tipo, 1000);
-
-    // Play piano sampler for preview
+    // Play piano preview
     if (chordSampler && notes && notes.length > 0) {
         const simplifiedNotes = notes.map(n => simplifyEnharmonic(n));
         const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
         if (pianoNotes.length > 0) {
-            chordSampler.triggerAttackRelease(pianoNotes, '1s'); // Play for 1 second
+            chordSampler.triggerAttackRelease(pianoNotes, '1s');
         }
     }
+
+    // Play string preview
+    playStringChord(nota, tipo, '1s');
 }
 
 function removeChordFromProgression(index) {
@@ -1209,7 +1175,7 @@ function loadPredefinedProgression(index) {
 const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>`;
 const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
 
-function togglePlay() {
+async function togglePlay() {
     // stopAllNotes(); // This function is removed
 
     const toggleBtn = document.getElementById('toggle-progression-btn');
@@ -1225,12 +1191,14 @@ function togglePlay() {
         }
         Tone.Transport.stop();
         Tone.Transport.cancel(); // Cancel all scheduled events, including MIDI
-        stopAudio(); // Stop any lingering chord audio
         if (chordSampler) {
             chordSampler.releaseAll();
         }
         if (arpeggioSampler) {
             arpeggioSampler.releaseAll();
+        }
+        if (stringSampler) {
+            stringSampler.releaseAll();
         }
 
         isPlaying = false;
@@ -1246,15 +1214,15 @@ function togglePlay() {
 
     } else {
         if (currentProgression.length > 0) {
-            startChordLoop();
+            await startChordLoop();
         }
     }
 }
 
 // New function to encapsulate chord loop starting logic
-function startChordLoop() {
+async function startChordLoop() {
     if (Tone.context.state === 'suspended') {
-        Tone.context.resume();
+        await Tone.start();
     }
 
     isPlaying = true;
@@ -1263,26 +1231,29 @@ function startChordLoop() {
     const bpm = document.getElementById('bpm-input').value;
     Tone.Transport.bpm.value = bpm;
 
-    playMidiBeat(); // Start MIDI beat when progression starts
+    await playMidiBeat(); // Start MIDI beat when progression starts
 
     chordLoop = new Tone.Loop(time => {
         const chord = currentProgression[currentProgressionIndex];
         const indexToHighlight = currentProgressionIndex;
 
-        playChord(chord.nota, chord.tipo);
+        // Play String Chord
+        playStringChord(chord.nota, chord.tipo, '1n', time);
 
         if (chordSampler && arpeggioSampler && chord.notes && chord.notes.length > 0) {
+            
+            // Play Piano Chord (not reordered)
             const simplifiedNotes = chord.notes.map(n => simplifyEnharmonic(n));
             const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
             if (pianoNotes.length > 0) {
-                chordSampler.triggerAttackRelease(pianoNotes, '1n', time); // Use chordSampler for full chord
+                chordSampler.triggerAttackRelease(pianoNotes, '1n', time);
             }
 
             const rootNote = chord.notes[0]; // Get the root note
             if (rootNote) {
                 const playableRootNote = getPlayablePianoNotes([simplifyEnharmonic(rootNote)]);
                 if (playableRootNote.length > 0) {
-                    arpeggioSampler.triggerAttackRelease(playableRootNote, '8n', Tone.Transport.now()); // Play root on beat 1
+                    arpeggioSampler.triggerAttackRelease(playableRootNote, '8n', time); // Use time from loop
                 }
             }
 
@@ -1290,7 +1261,7 @@ function startChordLoop() {
             if (thirdNote) {
                 const playableThirdNote = getPlayablePianoNotes([simplifyEnharmonic(thirdNote)]);
                 if (playableThirdNote.length > 0) {
-                    arpeggioSampler.triggerAttackRelease(playableThirdNote, '8n', Tone.Transport.now() + Tone.Time('0:1').toSeconds()); // Use arpeggioSampler
+                    arpeggioSampler.triggerAttackRelease(playableThirdNote, '8n', time + Tone.Time('0:1').toSeconds()); // Use time from loop
                 }
             }
 
@@ -1298,7 +1269,7 @@ function startChordLoop() {
             if (fifthNote) {
                 const playableFifthNote = getPlayablePianoNotes([simplifyEnharmonic(fifthNote)]);
                 if (playableFifthNote.length > 0) {
-                    arpeggioSampler.triggerAttackRelease(playableFifthNote, '8n', Tone.Transport.now() + Tone.Time('0:2').toSeconds()); // Use arpeggioSampler
+                    arpeggioSampler.triggerAttackRelease(playableFifthNote, '8n', time + Tone.Time('0:2').toSeconds()); // Use time from loop
                 }
             }
 
@@ -1306,7 +1277,7 @@ function startChordLoop() {
             if (seventhNote) {
                 const playableSeventhNote = getPlayablePianoNotes([simplifyEnharmonic(seventhNote)]);
                 if (playableSeventhNote.length > 0) {
-                    arpeggioSampler.triggerAttackRelease(playableSeventhNote, '8n', Tone.Transport.now() + Tone.Time('0:3').toSeconds()); // Use arpeggioSampler
+                    arpeggioSampler.triggerAttackRelease(playableSeventhNote, '8n', time + Tone.Time('0:3').toSeconds()); // Use time from loop
                 }
             }
         }
@@ -1384,17 +1355,7 @@ window.onload = () => {
     floatingBtn.innerHTML = playIconSVG;
     floatingBtn.classList.add('stopped');
 
-    const chordVolumeControl = document.getElementById('chord-volume');
-    chordVolumeControl.addEventListener('input', (event) => {
-        // Convert dB to linear volume (amplitude)
-        const linearVolume = Math.pow(10, event.target.value / 20);
-        // Clamp the value between 0.0 and 1.0 to prevent errors
-        chordVolumeLinear = Math.max(0, Math.min(1, linearVolume));
-        // Update volume of currently playing audio if it exists
-        if (currentAudio && !currentAudio.paused) {
-            currentAudio.volume = chordVolumeLinear;
-        }
-    });
+    
 
         const pianoVolumeControl = document.getElementById('piano-volume');
     if (pianoVolumeControl) {
@@ -1410,6 +1371,15 @@ window.onload = () => {
         arpeggioVolumeControl.addEventListener('input', (event) => {
             if (arpeggioVolume) {
                 arpeggioVolume.volume.value = event.target.value;
+            }
+        });
+    }
+
+    const stringVolumeControl = document.getElementById('string-volume');
+    if (stringVolumeControl) {
+        stringVolumeControl.addEventListener('input', (event) => {
+            if (stringVolume) {
+                stringVolume.volume.value = event.target.value;
             }
         });
     }
@@ -1659,7 +1629,7 @@ async function playMidiBeat() {
         }, events).start(0);
 
         currentMidiPart.loop = true;
-        currentMidiPart.loopEnd = midi.durationTicks + 'i';
+        currentMidiPart.loopEnd = '1m';
 
     } catch (error) {
         console.error("Error al reproducir el MIDI:", error);

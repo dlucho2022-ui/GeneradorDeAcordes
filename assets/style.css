@@ -1098,10 +1098,15 @@ body:not(.body-sheet-music) .button.playing svg {
 
 /* Estilos para el Generador de Cifrados (index5.html) */
 
-#chart-container {
+.chart-wrapper {
+    position: relative;
     width: 100%;
     max-width: 900px;
     margin: 20px auto;
+}
+
+#chart-container {
+    width: 100%;
     padding: 20px;
     background-color: #fdfdfd;
     color: #121212;
@@ -1109,6 +1114,7 @@ body:not(.body-sheet-music) .button.playing svg {
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     font-size: 100%; /* Base para el zoom */
     transition: font-size 0.2s ease-in-out;
+    box-sizing: border-box;
 }
 
 .song-section {
@@ -1625,4 +1631,17 @@ body:not(.body-sheet-music) .button.playing svg {
         transform: translateX(-50%);
         top: 80px;
     }
+}
+
+.playback-controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* For spacing between button, checkbox, and label */
+    background: rgba(255, 255, 255, 0.8); /* A slight background to make it readable */
+    padding: 5px;
+    border-radius: 5px;
 }

@@ -75,9 +75,6 @@
     <div class="control-group">
         <button id="add-row-btn" class="btn-structure-edit">Agregar Fila</button>
         <button id="add-section-btn" class="btn-structure-edit">Agregar Sección</button>
-        <button id="play-progression-btn" class="btn-structure-edit">Reproducir</button>
-        <input type="checkbox" id="loop-progression-checkbox" style="margin-left: 5px;">
-        <label for="loop-progression-checkbox">Repetir</label>
         <button id="delete-row-btn" class="btn-danger">Eliminar Fila</button>
         <button id="delete-section-btn" class="btn-danger">Eliminar Sección</button>
     </div>
@@ -99,7 +96,17 @@
     </div>
 </div>
 
-<main id="chart-container">
+<div class="chart-wrapper">
+    <div class="playback-controls">
+        <button id="play-progression-btn" class="btn-structure-edit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+              <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+            </svg>
+        </button>
+        <input type="checkbox" id="loop-progression-checkbox">
+        <label for="loop-progression-checkbox">Repetir</label>
+    </div>
+<div id="chart-container">
     <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
     <div class="song-section">
         <h2 contenteditable="true">Intro</h2>
@@ -111,6 +118,7 @@
         </div>
     </div>
 </main>
+</div>
 
 <script src="https://unpkg.com/tone@14.7.58/build/Tone.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

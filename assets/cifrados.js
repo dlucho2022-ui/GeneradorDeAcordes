@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'C7': ['C4', 'E4', 'G4', 'Bb4'], 'C#7': ['C#4', 'F4', 'G#4', 'B4'], 'Db7': ['Db4', 'F4', 'Ab4', 'B4'], 'D7': ['D4', 'F#4', 'A4', 'C5'], 'D#7': ['D#4', 'G4', 'A#4', 'C#5'], 'Eb7': ['Eb4', 'G4', 'Bb4', 'Db5'], 'E7': ['E4', 'G#4', 'B4', 'D5'], 'F7': ['F4', 'A4', 'C5', 'Eb5'], 'F#7': ['F#4', 'A#4', 'C#5', 'E5'], 'Gb7': ['Gb4', 'Bb4', 'Db5', 'Fb5'], 'G7': ['G4', 'B4', 'D5', 'F5'], 'G#7': ['G#4', 'C5', 'D#5', 'F#5'], 'Ab7': ['Ab4', 'C5', 'Eb5', 'Gb5'], 'A7': ['A4', 'C#5', 'E5', 'G5'], 'A#7': ['A#4', 'D5', 'F5', 'G#5'], 'Bb7': ['Bb4', 'D5', 'F5', 'Ab5'], 'B7': ['B4', 'D#5', 'F#5', 'A5'],
         'Cm7': ['C4', 'Eb4', 'G4', 'Bb4'], 'C#m7': ['C#4', 'E4', 'G#4', 'B4'], 'Dbm7': ['Db4', 'E4', 'Ab4', 'B4'], 'Dm7': ['D4', 'F4', 'A4', 'C5'], 'D#m7': ['D#4', 'F#4', 'A#4', 'C#5'], 'Ebm7': ['Eb4', 'Gb4', 'Bb4', 'Db5'], 'Em7': ['E4', 'G4', 'B4', 'D5'], 'Fm7': ['F4', 'Ab4', 'C5', 'Eb5'], 'F#m7': ['F#4', 'A4', 'C#5', 'E5'], 'Gbm7': ['Gb4', 'A4', 'Db5', 'Fb5'], 'Gm7': ['G4', 'Bb4', 'D5', 'F5'], 'G#m7': ['G#4', 'B4', 'D#5', 'F#5'], 'Abm7': ['Ab4', 'B4', 'Eb5', 'Gb5'], 'Am7': ['A4', 'C5', 'E5', 'G5'], 'A#m7': ['A#4', 'C#5', 'F5', 'G#5'], 'Bbm7': ['Bb4', 'Db5', 'F5', 'Ab5'], 'Bm7': ['B4', 'D5', 'F#5', 'A5'],
         'Cmaj7': ['C4', 'E4', 'G4', 'B4'], 'C#maj7': ['C#4', 'F4', 'G#4', 'C5'], 'Dbmaj7': ['Db4', 'F4', 'Ab4', 'C5'], 'Dmaj7': ['D4', 'F#4', 'A4', 'C#5'], 'D#maj7': ['D#4', 'G4', 'A#4', 'D5'], 'Ebmaj7': ['Eb4', 'G4', 'Bb4', 'D5'], 'Emaj7': ['E4', 'G#4', 'B4', 'D#5'], 'Fmaj7': ['F4', 'A4', 'C5', 'E5'], 'F#maj7': ['F#4', 'A#4', 'C#5', 'F5'], 'Gbmaj7': ['Gb4', 'Bb4', 'Db5', 'F5'], 'Gmaj7': ['G4', 'B4', 'D5', 'F#5'], 'G#maj7': ['G#4', 'C5', 'D#5', 'G5'], 'Abmaj7': ['Ab4', 'C5', 'Eb5', 'G5'], 'Amaj7': ['A4', 'C#5', 'E5', 'G#5'], 'A#maj7': ['A#4', 'D5', 'F5', 'A5'], 'Bbmaj7': ['Bb4', 'D5', 'F5', 'A5'], 'Bmaj7': ['B4', 'D#5', 'F#5', 'A#5'],
+        'Cdim': ['C4', 'Eb4', 'Gb4'], 'C#dim': ['C#4', 'E4', 'G4'], 'Dbdim': ['Db4', 'E4', 'G4'], 'Ddim': ['D4', 'F4', 'Ab4'], 'D#dim': ['D#4', 'F#4', 'A4'], 'Ebdim': ['Eb4', 'Gb4', 'A4'], 'Edim': ['E4', 'G4', 'Bb4'], 'Fdim': ['F4', 'Ab4', 'B4'], 'F#dim': ['F#4', 'A4', 'C5'], 'Gbdim': ['Gb4', 'A4', 'C5'], 'Gdim': ['G4', 'Bb4', 'Db5'], 'G#dim': ['G#4', 'B4', 'D5'], 'Abdim': ['Ab4', 'B4', 'D5'], 'Adim': ['A4', 'C5', 'Eb5'], 'A#dim': ['A#4', 'C#5', 'E5'], 'Bbdim': ['Bb4', 'Db5', 'E5'], 'Bdim': ['B4', 'D5', 'F5'],
+        'Cdim7': ['C4', 'Eb4', 'Gb4', 'A4'], 'C#dim7': ['C#4', 'E4', 'G4', 'Bb4'], 'Dbdim7': ['Db4', 'E4', 'G4', 'Bb4'], 'Ddim7': ['D4', 'F4', 'Ab4', 'B4'], 'D#dim7': ['D#4', 'F#4', 'A4', 'C5'], 'Ebdim7': ['Eb4', 'Gb4', 'A4', 'C5'], 'Edim7': ['E4', 'G4', 'Bb4', 'Db5'], 'Fdim7': ['F4', 'Ab4', 'B4', 'D5'], 'F#dim7': ['F#4', 'A4', 'C5', 'Eb5'], 'Gbdim7': ['Gb4', 'A4', 'C5', 'Eb5'], 'Gdim7': ['G4', 'Bb4', 'Db5', 'E5'], 'G#dim7': ['G#4', 'B4', 'D5', 'F5'], 'Abdim7': ['Ab4', 'B4', 'D5', 'F5'], 'Adim7': ['A4', 'C5', 'Eb5', 'Gb5'], 'A#dim7': ['A#4', 'C#5', 'E5', 'G5'], 'Bbdim7': ['Bb4', 'Db5', 'E5', 'G5'], 'Bdim7': ['B4', 'D5', 'F5', 'Ab5'],
     };
 
     function translateChord(spanishChord) {
@@ -411,13 +413,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const loopCheckbox = document.getElementById('loop-progression-checkbox');
 
         playProgressionBtn.addEventListener('click', function() {
+            const playIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>`;
+            const stopIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-fill" viewBox="0 0 16 16"><path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/></svg>`;
+
             if (Tone.Transport.state === 'started') {
                 Tone.Transport.stop();
                 if (progressionSequence) {
                     progressionSequence.dispose();
                 }
                 metronomeLoop.stop();
-                playProgressionBtn.textContent = 'Reproducir';
+                playProgressionBtn.innerHTML = playIcon;
             } else {
                 const selectedMeasures = document.querySelectorAll('.selected-measure');
                 let measuresToPlay;
@@ -488,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 metronomeLoop.start(0);
                 progressionSequence.start(0);
                 Tone.Transport.start();
-                playProgressionBtn.textContent = 'Detener';
+                playProgressionBtn.innerHTML = stopIcon;
             }
         });
     });

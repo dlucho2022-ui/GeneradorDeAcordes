@@ -1331,6 +1331,17 @@ async function startChordLoop() {
                 }
             }
 
+            // NEW: Repeat the third note for 3-note chords
+            if (chord.notes.length === 3) {
+                const thirdNoteRepeat = chord.notes[1];
+                if (thirdNoteRepeat) {
+                    const playableThirdNoteRepeat = getPlayablePianoNotes([simplifyEnharmonic(thirdNoteRepeat)]);
+                    if (playableThirdNoteRepeat.length > 0) {
+                        arpeggioSampler.triggerAttackRelease(playableThirdNoteRepeat, '8n', time + Tone.Time('0:3').toSeconds()); // Use time from loop
+                    }
+                }
+            }
+
             const seventhNote = chord.notes[3];
             if (seventhNote) {
                 const playableSeventhNote = getPlayablePianoNotes([simplifyEnharmonic(seventhNote)]);

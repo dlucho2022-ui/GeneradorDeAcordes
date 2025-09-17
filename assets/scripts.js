@@ -46,7 +46,7 @@ const escalas_modos = {
     "Dórico ♯4": { "intervalos": [0, 2, 3, 6, 7, 9, 10], "grados": ["1", "2", "b3", "#4", "5", "6", "b7"], "acordes": ["m7", "7", "maj7", "7", "m△7", "m7b5", "△7#5"] },
     "Frigio Dominante": { "intervalos": [0, 1, 4, 5, 7, 8, 10], "grados": ["1", "b2", "3", "4", "5", "b6", "b7"], "acordes": ["7", "maj7", "m7b5", "m△7", "m7b5", "△7#5", "m7"] },
     "Superlocrio 𝄫7": { "intervalos": [0, 1, 3, 4, 6, 8, 9], "grados": ["1", "b2", "b3", "b4", "b5", "b6", "bb7"], "acordes": ["m7b5", "m△7", "m7", "△7#5", "7", "7", "m7b5"] },
-    "Menor Armónica Bebop": { "intervalos": [0, 2, 3, 5, 7, 8, 10, 11], "grados": ["1", "2", "b3", "4", "5", "b6", "b7", "7"], "acordes":["m7", "m7b5", "maj7", "m7", "m7", "maj7", "7", "dim7"] },
+    "Menor Armónica Bebop": { "intervalos": [0, 2, 3, 5, 7, 8, 10, 11], "grados": ["1", "2", "b3", "4", "5", "b6", "b7", "7"], "acordes": ["m7", "m7b5", "maj7", "m7", "m7", "maj7", "7", "dim7"] },
     "Doble Armónica": { "intervalos": [0, 1, 4, 5, 7, 8, 11], "grados": ["1", "b2", "3", "4", "5", "b6", "7"], "acordes": ["maj7", "maj7", "m7b5", "m△7", "7b5", "△7#5", "dim7"] },
     "Lidio ♯2": { "intervalos": [0, 3, 4, 6, 7, 9, 11], "grados": ["1", "#2", "3", "#4", "5", "6", "7"], "acordes": ["maj7", "dim7", "m△7", "7b5", "△7#5", "dim7", "maj7"] },
     "Ultrafrigio": { "intervalos": [0, 1, 3, 4, 7, 8, 9], "grados": ["1", "b2", "b3", "b4", "5", "b6", "bb7"], "acordes": ["m7b5", "m△7", "7b5", "△7#5", "dim7", "maj7", "maj7"] },
@@ -62,6 +62,8 @@ const acordes = {
     "Mayor Séptima (maj7)": { "intervalos": [0, 4, 7, 11], "grados": ["1", "3", "5", "7"], "notacion": "maj7" },
     "Menor Séptima (m7)": { "intervalos": [0, 3, 7, 10], "grados": ["1", "b3", "5", "b7"], "notacion": "m7" },
     "Séptima de Dominante (7)": { "intervalos": [0, 4, 7, 10], "grados": ["1", "3", "5", "b7"], "notacion": "7" },
+    "Sexta (6)": { "intervalos": [0, 4, 7, 9], "grados": ["1", "3", "5", "6"], "notacion": "6" },
+    "Menor Sexta (m6)": { "intervalos": [0, 3, 7, 9], "grados": ["1", "b3", "5", "6"], "notacion": "m6" },
     "Menor Séptima con Quinta Disminuida (m7b5)": { "intervalos": [0, 3, 6, 10], "grados": ["1", "b3", "b5", "b7"], "notacion": "m7b5" },
     "Disminuido Séptima (dim7)": { "intervalos": [0, 3, 6, 9], "grados": ["1", "b3", "b5", "bb7"], "notacion": "dim7" },
     "Menor Séptima Mayor (m△7)": { "intervalos": [0, 3, 7, 11], "grados": ["1", "b3", "5", "7"], "notacion": "m△7" },
@@ -487,7 +489,7 @@ function smartSimplify(notes) {
 
 function getProperNoteNameForScale(rootNote, intervalIndex, semitoneInterval) {
     const rootBaseNote = rootNote.replace(/[#bx]/g, ''); 
-    const rootBaseIndex = notasBase.indexOf(rootBaseNote);
+    const rootBaseIndex = notasBase.indexOf(rootBaseNote); 
     const targetBaseNote = notasBase[(rootBaseIndex + intervalIndex) % 7];
     const rootSemitone = mapNotaToSemitone(rootNote);
     const targetNoteSemitone = (rootSemitone + semitoneInterval + 12) % 12;
@@ -526,7 +528,7 @@ function getFormattedNoteForDisplay(note) {
 }
 
 function escapeHtmlQuotesForJs(str) {
-    return str.replace(/'/g, "'" ).replace(/"/g, '\"');
+    return str.replace(/'/g, "'" ).replace(/"/g, '"');
 }
 
 function getBluesNotes(rootNote) {

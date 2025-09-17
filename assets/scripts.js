@@ -70,6 +70,10 @@ const acordes = {
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
     "Cuarta Suspendida (sus4)": { "intervalos": [0, 5, 7], "grados": ["1", "4", "5"], "notacion": "sus4" },
     "Segunda Suspendida (sus2)": { "intervalos": [0, 2, 7], "grados": ["1", "2", "5"], "notacion": "sus2" },
+    "Mayor (Triada)": { "intervalos": [0, 4, 7], "grados": ["1", "3", "5"], "notacion": "maj" },
+    "Menor (Triada)": { "intervalos": [0, 3, 7], "grados": ["1", "b3", "5"], "notacion": "m" },
+    "Aumentado (Triada)": { "intervalos": [0, 4, 8], "grados": ["1", "3", "#5"], "notacion": "aug" },
+    "Disminuido (Triada)": { "intervalos": [0, 3, 6], "grados": ["1", "b3", "b5"], "notacion": "dim" }
 };
 
 const todasLasOpciones = { ...escalas_modos, ...acordes };
@@ -97,7 +101,11 @@ const acorde_audio_map = {
   , "△7#5": "aug-maj7", "△7": "maj7", "7#5": "7aug5", "7b5": "7b5",
     "7#9": "7", "7b9": "7",
     "sus4": "sus4",
-    "sus2": "sus2"
+    "sus2": "sus2",
+    "maj": "maj",
+    "m": "m",
+    "aug": "aug",
+    "dim": "dim"
 };
 const notaAudioMap = {
     "Do": "c", "Do#": "c-sharp", "Reb": "c-sharp", "Re": "d", "Re#": "d-sharp", "Mib": "d-sharp", "Mi": "e",
@@ -500,7 +508,12 @@ function getFormattedNoteForDisplay(note) {
     return note.replace(/x/g, '<span class="alteration">x</span>').replace(/bb/g, '<span class="alteration flat">bb</span>');
 }
 
+function escapeHtmlQuotesForJs(str) {
+    return str.replace(/'/g, "'" ).replace(/"/g, '\"');
+}
+
 function getBluesNotes(rootNote) {
+
     const semitonosBlues = [0, 3, 5, 6, 7, 10];
     const rootSemitone = mapNotaToSemitone(rootNote);
     const escala = [];
@@ -640,16 +653,38 @@ function renderSelectors() {
     });
 }
 
-function formatChordDisplay(acorde) {
+function formatChordDisplay(acorde, forOnClick = false) {
     if (!acorde) return '';
-    if (acorde === 'sus4' || acorde === 'sus2') {
-        return `<span>${acorde}</span>`;
+    let formattedSuffix = '';
+
+    if (acorde === 'sus4') {
+        formattedSuffix = 'sus4';
+    } else if (acorde === 'sus2') {
+        formattedSuffix = 'sus2';
+    } else if (acorde === 'maj') {
+        formattedSuffix = ''; // Mayor (triada) se muestra sin sufijo
+    } else if (acorde === 'm') {
+        formattedSuffix = 'm';
+    } else if (acorde === 'aug') {
+        formattedSuffix = 'aug';
+    } else if (acorde === 'dim') {
+        formattedSuffix = 'dim'; // O '°' si se prefiere
+    } else {
+        // Existing logic for 7th chords
+        formattedSuffix = acorde.replace('maj7', '△7').replace('m7b5', 'ø7').replace('dim7', '°');
     }
-    let formatted = acorde.replace('maj7', '△7').replace('m7b5', 'ø7').replace('dim7', '°').replace('maj', '');
-    if (formatted == 'aug') {
-        return `<span class="acorde-subscript">${formatted}</span>`;
+
+    if (forOnClick) {
+        return formattedSuffix; // Return plain text for onclick
+    } else {
+        // Add a non-breaking space before the suffix if it's not empty
+        // This ensures "Do aug" instead of "Doaug"
+        if (formattedSuffix === '') return ''; // No space for empty suffix
+        if (formattedSuffix === 'm') return `<span>m</span>`; // Special case for minor
+        if (formattedSuffix === 'aug') return `&nbsp;<span class="acorde-subscript">aug</span>`;
+        if (formattedSuffix === 'dim') return `&nbsp;<span class="acorde-subscript">dim</span>`;
+        return `&nbsp;<span>${formattedSuffix}</span>`;
     }
-    return `<span>${formatted}</span>`;
 }
 
 
@@ -740,6 +775,7 @@ function calcularEscala() {
         const gradosAcordeDisplay = opcionesSeleccionadas.grados; // Use original grades for display
 
         const acordeNotacion = formatChordDisplay(opcionesSeleccionadas.notacion);
+        const escapedAcordeNotacion = escapeHtmlQuotesForJs(formatChordDisplay(opcionesSeleccionadas.notacion, true)); // Pass true for forOnClick
 
         resultadoBox.innerHTML = `
             Acorde de ${getFormattedNoteForDisplay(selectedSemitono)} ${selectedAcorde}<br>
@@ -759,7 +795,7 @@ function calcularEscala() {
         const acordesHtml = `
             <p><strong>Haz clic para añadir a la progresión:</strong></p>
             <ul class="acordes-list">
-                <li class="acorde-btn" onclick="addChordToProgression('${selectedSemitono}', '${opcionesSeleccionadas.notacion}', '${acordeNotacion}')">${getFormattedNoteForDisplay(selectedSemitono)}${acordeNotacion}</li>
+                <li class="acorde-btn" onclick="addChordToProgression('${selectedSemitono}', '${opcionesSeleccionadas.notacion}', '${escapedAcordeNotacion}')">${getFormattedNoteForDisplay(selectedSemitono)}${acordeNotacion}</li>
             </ul>
         `;
 
@@ -782,7 +818,8 @@ function generarAcordesDiatonicos(escala, acordesPredefinidos) {
             const notaAcorde = escala[index];
             const acordeDisplay = formatChordDisplay(acorde);
             const tipoAudioKey = acorde_audio_map[acorde];
-            return `<li class="acorde-btn" onclick="addChordToProgression('${notaAcorde}', '${acorde}', '${acordeDisplay}')">${getFormattedNoteForDisplay(notaAcorde)}${acordeDisplay}</li>`;
+            const escapedAcordeDisplay = escapeHtmlQuotesForJs(formatChordDisplay(acorde, true)); // Pass true for forOnClick
+            return `<li class="acorde-btn" onclick="addChordToProgression('${notaAcorde}', '${acorde}', '${escapedAcordeDisplay}')">${getFormattedNoteForDisplay(notaAcorde)}${acordeDisplay}</li>`;
         }).join('');
     }
 
@@ -804,7 +841,8 @@ function generarAcordesDiatonicos(escala, acordesPredefinidos) {
         }
 
         const acordeDisplay = formatChordDisplay(tipoAcorde);
-        acordesArray.push(`<li class="acorde-btn" onclick="addChordToProgression('${nota}', '${tipoAudio}', '${acordeDisplay}')">${getFormattedNoteForDisplay(nota)}${acordeDisplay}</li>`);
+        const escapedAcordeDisplay = escapeHtmlQuotesForJs(formatChordDisplay(tipoAcorde, true)); // Pass true for forOnClick
+        acordesArray.push(`<li class="acorde-btn" onclick="addChordToProgression('${nota}', '${tipoAudio}', '${escapedAcordeDisplay}')">${getFormattedNoteForDisplay(nota)}${acordeDisplay}</li>`);
     }
 
     return acordesArray.join('');
@@ -888,7 +926,7 @@ function addChordToProgression(nota, tipo, display) {
     const chord = {
         nota: nota,
         tipo: tipo,
-        display: `${getFormattedNoteForDisplay(nota)}${display}`,
+        display: `${getFormattedNoteForDisplay(nota)}${formatChordDisplay(tipo)}`,
         notes: notes
     };
     currentProgression.push(chord);
@@ -955,7 +993,7 @@ function generateRandomProgression() {
         const chord = {
             nota: nota,
             tipo: tipoData.notacion,
-            display: `${getFormattedNoteForDisplay(nota)}${display}`,
+            display: `${getFormattedNoteForDisplay(nota)}${formatChordDisplay(tipoData.notacion)}`,
             notes: notes
         };
         currentProgression.push(chord);
@@ -1181,7 +1219,7 @@ function loadPredefinedProgression(index) {
         const chordObj = {
             nota: chord.nota,
             tipo: chord.tipo,
-            display: `${getFormattedNoteForDisplay(chord.nota)}${display}`,
+            display: `${getFormattedNoteForDisplay(chord.nota)}${formatChordDisplay(chord.tipo)}`,
             notes: notes
         };
         currentProgression.push(chordObj);
@@ -1360,7 +1398,7 @@ window.onload = () => {
             const dynamicChords = generateDynamicProgression(parseInt(e.target.value));
             chords.innerHTML = dynamicChords.map(chord => {
                 const display = formatChordDisplay(chord.tipo);
-                return `<span class="chord-tag">${getFormattedNoteForDisplay(chord.nota)}${display}</span>`;
+                return `<span class="chord-tag">${getFormattedNoteForDisplay(chord.nota)}${formatChordDisplay(chord.tipo)}</span>`;
             }).join(' → ');
 
             preview.style.display = 'block';
@@ -1585,7 +1623,11 @@ function addChordFromInput() {
         "7#5": "Séptima con Quinta Aumentada (7#5)", "7aug5": "Séptima con Quinta Aumentada (7#5)",
         "7b5": "Séptima con Quinta Disminuida (7b5)",
         "sus4": "Cuarta Suspendida (sus4)", "cuartasuspendida": "Cuarta Suspendida (sus4)",
-        "sus2": "Segunda Suspendida (sus2)", "segundasuspendida": "Segunda Suspendida (sus2)"
+        "sus2": "Segunda Suspendida (sus2)", "segundasuspendida": "Segunda Suspendida (sus2)",
+        "maj": "Mayor (Triada)", "major": "Mayor (Triada)",
+        "m": "Menor (Triada)", "minor": "Menor (Triada)",
+        "aug": "Aumentado (Triada)",
+        "dim": "Disminuido (Triada)"
     };
 
     const lowerCaseChordTypeInput = chordTypeInput.toLowerCase();

@@ -2003,16 +2003,19 @@ document.addEventListener("DOMContentLoaded", function() {
     const openPdfButton = document.getElementById('open-pdf-button');
     const osmdContainer = document.getElementById('osmd-container');
     const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+    const pdfZoomSlider = document.getElementById('pdf-zoom-slider');
+    const pdfZoomValue = document.getElementById('pdf-zoom-value');
 
     let pdfDoc = null,
         pageNum = 1,
         pageRendering = false,
         pageNumPending = null,
-        scale = 1.5,
+        scale = 2, // Initial scale set to 200%
         canvas = document.getElementById('pdf-canvas'),
         ctx = canvas.getContext('2d');
 
-    function renderPage(num) {
+    function renderPage(num, newScale) {
+        scale = newScale || scale;
         pageRendering = true;
         pdfDoc.getPage(num).then(function(page) {
             const viewport = page.getViewport({scale: scale});
@@ -2076,6 +2079,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (pdfViewerContainer) pdfViewerContainer.style.display = 'block';
             } else {
                 alert("No se encontró la lista de PDFs.");
+            }
+        });
+    }
+
+    if (pdfZoomSlider) {
+        pdfZoomSlider.addEventListener('input', (e) => {
+            if (pdfZoomValue) {
+                pdfZoomValue.textContent = `${Math.round(parseFloat(e.target.value) * 100)}%`;
+            }
+        });
+        pdfZoomSlider.addEventListener('change', (e) => {
+            const newScale = parseFloat(e.target.value);
+            if (pdfDoc) {
+                renderPage(pageNum, newScale);
             }
         });
     }

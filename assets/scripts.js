@@ -117,6 +117,75 @@ let arpeggioVolumeValue;
 let stringVolumeValue;
 let drumVolumeValue;
 
+function initializeSamplersAndVolumes() {
+    // Get current slider values
+    const pianoSliderValue = document.getElementById('piano-volume') ? parseFloat(document.getElementById('piano-volume').value) : -6;
+    const arpeggioSliderValue = document.getElementById('arpeggio-volume') ? parseFloat(document.getElementById('arpeggio-volume').value) : -12;
+    const stringSliderValue = document.getElementById('string-volume') ? parseFloat(document.getElementById('string-volume').value) : -6;
+    const drumSliderValue = document.getElementById('drum-volume') ? parseFloat(document.getElementById('drum-volume').value) : -6;
+
+    // Initialize volumes with current slider values
+    pianoVolume = new Tone.Volume(pianoSliderValue).toDestination();
+    arpeggioVolume = new Tone.Volume(arpeggioSliderValue).toDestination();
+    stringVolume = new Tone.Volume(stringSliderValue).toDestination();
+    drumVolume = new Tone.Volume(drumSliderValue).toDestination();
+
+    // Store current volumes (now directly from sliders)
+    pianoVolumeValue = pianoVolume.volume.value;
+    arpeggioVolumeValue = arpeggioVolume.volume.value;
+    stringVolumeValue = stringVolume.volume.value;
+    drumVolumeValue = drumVolume.volume.value;
+
+    // --- Generate URLs for user's custom string samples ---
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const fileNotes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g', 'gs', 'a', 'as', 'b'];
+    const octaves = [3, 4, 5];
+    const stringUrls = {};
+
+    for (const octave of octaves) {
+        for (let i = 0; i < notes.length; i++) {
+            const toneNote = notes[i] + octave;
+            const fileNote = fileNotes[i] + octave + '.wav';
+            stringUrls[toneNote] = fileNote;
+        }
+    }
+
+    // Initialize Samplers
+    try {
+        chordSampler = new Tone.Sampler({
+            urls: { 'C4': 'C4.mp3', 'D#4': 'Ds4.mp3', 'F#4': 'Fs4.mp3', 'A4': 'A4.mp3' },
+            release: 0.5,
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+        }).connect(pianoVolume);
+
+        arpeggioSampler = new Tone.Sampler({
+            urls: { 'C4': 'C4.mp3', 'D#4': 'Ds4.mp3', 'F#4': 'Fs4.mp3', 'A4': 'A4.mp3' },
+            release: 0.5,
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+        }).connect(arpeggioVolume);
+
+        stringSampler = new Tone.Sampler({
+            urls: stringUrls,
+            release: 0.5,
+            baseUrl: "assets/audios/",
+        }).connect(stringVolume);
+
+        drumSampler = new Tone.Sampler({
+            urls: {
+                'C2': 'kick.wav',
+                'D2': 'snare_hit.wav',
+                'E2': 'snare_rim.wav',
+                'F#2': 'closed_hihat.wav',
+                'A#2': 'half_hihat.wav',
+                'D#3': 'ride.wav',
+            },
+            baseUrl: "assets/audios/drum_sample/",
+        }).connect(drumVolume);
+
+    } catch (e) {
+        console.error("Error initializing Tone.Sampler:", e);
+    }
+}
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
     "dim7": "dim7", "m△7": "m-maj7",
@@ -263,86 +332,87 @@ async function loadAudioFiles() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // Get current slider values
-    const pianoSliderValue = document.getElementById('piano-volume') ? parseFloat(document.getElementById('piano-volume').value) : -6;
-    const arpeggioSliderValue = document.getElementById('arpeggio-volume') ? parseFloat(document.getElementById('arpeggio-volume').value) : -12;
-    const stringSliderValue = document.getElementById('string-volume') ? parseFloat(document.getElementById('string-volume').value) : -6;
-    const drumSliderValue = document.getElementById('drum-volume') ? parseFloat(document.getElementById('drum-volume').value) : -6;
+    // Solo inicializar volúmenes y samplers si no existen
+    if (!pianoVolume) { // Check if any of the volumes/samplers are not initialized
+        const pianoSliderValue = document.getElementById('piano-volume') ? parseFloat(document.getElementById('piano-volume').value) : -6;
+        const arpeggioSliderValue = document.getElementById('arpeggio-volume') ? parseFloat(document.getElementById('arpeggio-volume').value) : -12;
+        const stringSliderValue = document.getElementById('string-volume') ? parseFloat(document.getElementById('string-volume').value) : -6;
+        const drumSliderValue = document.getElementById('drum-volume') ? parseFloat(document.getElementById('drum-volume').value) : -6;
 
-    // Initialize volumes with current slider values
-    pianoVolume = new Tone.Volume(pianoSliderValue).toDestination();
-    arpeggioVolume = new Tone.Volume(arpeggioSliderValue).toDestination();
-    stringVolume = new Tone.Volume(stringSliderValue).toDestination();
-    drumVolume = new Tone.Volume(drumSliderValue).toDestination();
+        pianoVolume = new Tone.Volume(pianoSliderValue).toDestination();
+        arpeggioVolume = new Tone.Volume(arpeggioSliderValue).toDestination();
+        stringVolume = new Tone.Volume(stringSliderValue).toDestination();
+        drumVolume = new Tone.Volume(drumSliderValue).toDestination();
 
-    // Store current volumes (now directly from sliders)
-    pianoVolumeValue = pianoVolume.volume.value;
-    arpeggioVolumeValue = arpeggioVolume.volume.value;
-    stringVolumeValue = stringVolume.volume.value;
-    drumVolumeValue = drumVolume.volume.value;
+        pianoVolumeValue = pianoVolume.volume.value;
+        arpeggioVolumeValue = arpeggioVolume.volume.value;
+        stringVolumeValue = stringVolume.volume.value;
+        drumVolumeValue = drumVolume.volume.value;
 
-    // --- Generate URLs for user's custom string samples ---
-    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const fileNotes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g', 'gs', 'a', 'as', 'b'];
-    const octaves = [3, 4, 5];
-    const stringUrls = {};
+        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const fileNotes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g', 'gs', 'a', 'as', 'b'];
+        const octaves = [3, 4, 5];
+        const stringUrls = {};
 
-    for (const octave of octaves) {
-      for (let i = 0; i < notes.length; i++) {
-        const toneNote = notes[i] + octave;
-        const fileNote = fileNotes[i] + octave + '.wav';
-        stringUrls[toneNote] = fileNote;
-      }
+        for (const octave of octaves) {
+            for (let i = 0; i < notes.length; i++) {
+                const toneNote = notes[i] + octave;
+                const fileNote = fileNotes[i] + octave + '.wav';
+                stringUrls[toneNote] = fileNote;
+            }
+        }
+
+        try {
+            chordSampler = new Tone.Sampler({
+                urls: { 'C4': 'C4.mp3', 'D#4': 'Ds4.mp3', 'F#4': 'Fs4.mp3', 'A4': 'A4.mp3' },
+                release: 0.5,
+                baseUrl: "https://tonejs.github.io/audio/salamander/",
+            }); // No connect here, will connect later
+
+            arpeggioSampler = new Tone.Sampler({
+                urls: { 'C4': 'C4.mp3', 'D#4': 'Ds4.mp3', 'F#4': 'Fs4.mp3', 'A4': 'A4.mp3' },
+                release: 0.5,
+                baseUrl: "https://tonejs.github.io/audio/salamander/",
+            }); // No connect here, will connect later
+
+            stringSampler = new Tone.Sampler({
+                urls: stringUrls,
+                release: 0.5,
+                baseUrl: "assets/audios/",
+            }); // No connect here, will connect later
+
+            drumSampler = new Tone.Sampler({
+                urls: {
+                    'C2': 'kick.wav',
+                    'D2': 'snare_hit.wav',
+                    'E2': 'snare_rim.wav',
+                    'F#2': 'closed_hihat.wav',
+                    'A#2': 'half_hihat.wav',
+                    'D#3': 'ride.wav',
+                },
+                baseUrl: "assets/audios/drum_sample/",
+            }); // No connect here, will connect later
+
+        } catch (e) {
+            console.error("Error initializing Tone.Sampler:", e);
+        }
     }
 
-    // Initialize Samplers
-    try {
-        // Piano samplers
-        chordSampler = new Tone.Sampler({
-            urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
-            release: 0.5,
-            baseUrl: "https://tonejs.github.io/audio/salamander/",
-        }).connect(pianoVolume);
-
-        arpeggioSampler = new Tone.Sampler({
-            urls: { 'C4':'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', 'A4':'A4.mp3' },
-            release: 0.5,
-            baseUrl: "https://tonejs.github.io/audio/salamander/",
-        }).connect(arpeggioVolume);
-
-        // NEW: String sampler
-        stringSampler = new Tone.Sampler({
-            urls: stringUrls,
-            release: 0.5,
-            baseUrl: "assets/audios/", 
-        }).connect(stringVolume);
-
-        drumSampler = new Tone.Sampler({
-            urls: {
-                'C2': 'kick.wav',
-                'D2': 'snare_hit.wav', 
-                'E2': 'snare_rim.wav', 
-                'F#2': 'closed_hihat.wav', 
-                'A#2': 'half_hihat.wav',
-                'D#3': 'ride.wav',
-            },
-            baseUrl: "assets/audios/drum_sample/",
-        }).connect(drumVolume);
-
-    } catch (e) {
-        console.error("Error initializing Tone.Sampler:", e);
-    }
+    // Ensure samplers are loaded (this part remains, as it loads the audio buffers)
+    await Promise.all([
+        chordSampler ? chordSampler.loaded : Promise.resolve(),
+        arpeggioSampler ? arpeggioSampler.loaded : Promise.resolve(),
+        stringSampler ? stringSampler.loaded : Promise.resolve(),
+        drumSampler ? drumSampler.loaded : Promise.resolve()
+    ])
+    .then(() => {
+        console.log("Todos los samplers cargados correctamente.");
+    })
+    .catch(e => {
+        console.error("Error al cargar los samplers:", e);
+    });
 
     await loadMetronomeSound();
-
-    // Debugging: Check if samplers are loaded
-    Promise.all([chordSampler.loaded, arpeggioSampler.loaded, stringSampler.loaded, drumSampler.loaded])
-        .then(() => {
-            console.log("Todos los samplers cargados correctamente.");
-        })
-        .catch(e => {
-            console.error("Error al cargar los samplers:", e);
-        });
 }
 
 function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
@@ -408,6 +478,12 @@ function playStringChord(nota, tipo, duracion = '1n', time = undefined) {
 
 // New function to play a sequence of notes (scale or arpeggio)
 async function playScaleOrArpeggio(notes, octave = 4, duration = '8n') { // Keep octave parameter
+    // Ensure samplers are initialized and loaded before playing
+    if (!arpeggioSampler || !arpeggioSampler.loaded) { // Check if arpeggioSampler is not loaded
+        initializeSamplersAndVolumes(); // Ensure samplers are created
+        await loadAudioFiles(); // Ensure audio files are loaded into samplers
+    }
+
     if (!arpeggioSampler || !arpeggioSampler.loaded) {
         console.warn("Sampler de arpegio no cargado. No se puede reproducir la escala/arpegio.");
         return;
@@ -433,12 +509,12 @@ async function playScaleOrArpeggio(notes, octave = 4, duration = '8n') { // Keep
     const allNotesToPlay = [...fullAscendingSequence, ...fullAscendingSequence.slice(0, -1).reverse()];
 
     let time = Tone.now();
-    const noteDuration = Tone.Time(duration).toSeconds();
+    const noteDuration = Tone.Time('8n').toSeconds(); // Forzar a corchea
     const delayBetweenNotes = noteDuration * 0.1;
 
     for (let i = 0; i < allNotesToPlay.length; i++) {
         const note = allNotesToPlay[i];
-        arpeggioSampler.triggerAttackRelease(note, duration, time);
+        arpeggioSampler.triggerAttackRelease(note, '8n', time); // Forzar a corchea
         time += noteDuration + delayBetweenNotes;
     }
 }
@@ -1318,14 +1394,25 @@ async function togglePlay() {
             currentMidiPart = null;
         }
 
-        // Mute all samplers by disconnecting them
-        if (chordSampler) chordSampler.releaseAll().disconnect();
-        if (arpeggioSampler) arpeggioSampler.releaseAll().disconnect();
-        if (stringSampler) stringSampler.releaseAll().disconnect();
-        if (drumSampler) drumSampler.releaseAll().disconnect();
+        // Dispose of samplers and volumes to prevent residual sound
+        if (chordSampler) chordSampler.dispose();
+        if (arpeggioSampler) arpeggioSampler.dispose();
+        if (stringSampler) stringSampler.dispose();
+        if (drumSampler) drumSampler.dispose();
+        if (pianoVolume) pianoVolume.dispose();
+        if (arpeggioVolume) arpeggioVolume.dispose();
+        if (stringVolume) stringVolume.dispose();
+        if (drumVolume) drumVolume.dispose();
 
-        // Re-initialize all audio components to ensure a clean state
-        await loadAudioFiles();
+        // Set samplers and volumes to null so they are re-initialized on next play
+        chordSampler = null;
+        arpeggioSampler = null;
+        stringSampler = null;
+        drumSampler = null;
+        pianoVolume = null;
+        arpeggioVolume = null;
+        stringVolume = null;
+        drumVolume = null;
 
         isPlaying = false;
         toggleBtn.classList.remove('playing');
@@ -1337,7 +1424,8 @@ async function togglePlay() {
 
     } else {
         if (currentProgression.length > 0) {
-            await loadAudioFiles(); // Ensure everything is ready before playing
+            // Re-initialize samplers and volumes when starting playback
+            initializeSamplersAndVolumes();
             await startChordLoop();
         }
     }
@@ -1448,7 +1536,8 @@ window.onload = () => {
 
     renderSelectors();
     renderPredefinedProgressionsSelector();
-    loadAudioFiles();
+    initializeSamplersAndVolumes(); // Call the new function to create samplers and volumes
+    loadAudioFiles(); // Still call this to load the audio buffers into the samplers
     
     calcularEscala();
 

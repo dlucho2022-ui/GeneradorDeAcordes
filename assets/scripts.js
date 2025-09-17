@@ -47,6 +47,8 @@ const escalas_modos = {
     "Frigio Dominante": { "intervalos": [0, 1, 4, 5, 7, 8, 10], "grados": ["1", "b2", "3", "4", "5", "b6", "b7"], "acordes": ["7", "maj7", "m7b5", "m△7", "m7b5", "△7#5", "m7"] },
     "Superlocrio 𝄫7": { "intervalos": [0, 1, 3, 4, 6, 8, 9], "grados": ["1", "b2", "b3", "b4", "b5", "b6", "bb7"], "acordes": ["m7b5", "m△7", "m7", "△7#5", "7", "7", "m7b5"] },
     "Menor Armónica Bebop": { "intervalos": [0, 2, 3, 5, 7, 8, 10, 11], "grados": ["1", "2", "b3", "4", "5", "b6", "b7", "7"], "acordes": ["m7", "m7b5", "maj7", "m7", "m7", "maj7", "7", "dim7"] },
+    "Bebop Dominante": { "intervalos": [0, 2, 4, 5, 7, 9, 10, 11], "grados": ["1", "2", "3", "4", "5", "6", "b7", "7"], "acordes": ["7", "m7", "m7b5", "maj7", "m7", "m7", "maj7", "dim7"] },
+    "Bebop Mayor": { "intervalos": [0, 2, 4, 5, 7, 8, 9, 11], "grados": ["1", "2", "3", "4", "5", "b6", "6", "7"], "acordes": ["maj7", "m7", "m7", "maj7", "7", "dim7", "m7", "m7b5"] },
     "Doble Armónica": { "intervalos": [0, 1, 4, 5, 7, 8, 11], "grados": ["1", "b2", "3", "4", "5", "b6", "7"], "acordes": ["maj7", "maj7", "m7b5", "m△7", "7b5", "△7#5", "dim7"] },
     "Lidio ♯2": { "intervalos": [0, 3, 4, 6, 7, 9, 11], "grados": ["1", "#2", "3", "#4", "5", "6", "7"], "acordes": ["maj7", "dim7", "m△7", "7b5", "△7#5", "dim7", "maj7"] },
     "Ultrafrigio": { "intervalos": [0, 1, 3, 4, 7, 8, 9], "grados": ["1", "b2", "b3", "b4", "5", "b6", "bb7"], "acordes": ["m7b5", "m△7", "7b5", "△7#5", "dim7", "maj7", "maj7"] },
@@ -60,8 +62,20 @@ const escalas_modos = {
 
 const acordes = {
     "Mayor Séptima (maj7)": { "intervalos": [0, 4, 7, 11], "grados": ["1", "3", "5", "7"], "notacion": "maj7" },
+    "Novena Mayor (maj9)": { "intervalos": [0, 4, 7, 11, 2], "grados": ["1", "3", "5", "7", "9"], "notacion": "maj9" },
+    "Trecena Mayor (maj13)": { "intervalos": [0, 4, 7, 11, 2, 9], "grados": ["1", "3", "5", "7", "9", "13"], "notacion": "maj13" },
+    "Mayor Siete #11 (maj7#11)": { "intervalos": [0, 4, 7, 11, 6], "grados": ["1", "3", "5", "7", "#11"], "notacion": "maj7#11" },
     "Menor Séptima (m7)": { "intervalos": [0, 3, 7, 10], "grados": ["1", "b3", "5", "b7"], "notacion": "m7" },
+    "Novena Menor (m9)": { "intervalos": [0, 3, 7, 10, 2], "grados": ["1", "b3", "5", "b7", "9"], "notacion": "m9" },
+    "Trecena Menor (m13)": { "intervalos": [0, 3, 7, 10, 2, 9], "grados": ["1", "b3", "5", "b7", "9", "13"], "notacion": "m13" },
+    "Menor Siete b9 (m7b9)": { "intervalos": [0, 3, 7, 10, 1], "grados": ["1", "b3", "5", "b7", "b9"], "notacion": "m7b9" },
+    "Menor Siete #11 (m7#11)": { "intervalos": [0, 3, 7, 10, 6], "grados": ["1", "b3", "5", "b7", "#11"], "notacion": "m7#11" },
     "Séptima de Dominante (7)": { "intervalos": [0, 4, 7, 10], "grados": ["1", "3", "5", "b7"], "notacion": "7" },
+    "Novena Dominante (9)": { "intervalos": [0, 4, 7, 10, 2], "grados": ["1", "3", "5", "b7", "9"], "notacion": "9" },
+    "Trecena Dominante (13)": { "intervalos": [0, 4, 7, 10, 2, 9], "grados": ["1", "3", "5", "b7", "9", "13"], "notacion": "13" },
+    "Siete b9 (7b9)": { "intervalos": [0, 4, 7, 10, 1], "grados": ["1", "3", "5", "b7", "b9"], "notacion": "7b9" },
+    "Siete #9 (7#9)": { "intervalos": [0, 4, 7, 10, 3], "grados": ["1", "3", "5", "b7", "#9"], "notacion": "7#9" },
+    "Siete #11 (7#11)": { "intervalos": [0, 4, 7, 10, 6], "grados": ["1", "3", "5", "b7", "#11"], "notacion": "7#11" },
     "Sexta (6)": { "intervalos": [0, 4, 7, 9], "grados": ["1", "3", "5", "6"], "notacion": "6" },
     "Menor Sexta (m6)": { "intervalos": [0, 3, 7, 9], "grados": ["1", "b3", "5", "6"], "notacion": "m6" },
     "Menor Séptima con Quinta Disminuida (m7b5)": { "intervalos": [0, 3, 6, 10], "grados": ["1", "b3", "b5", "b7"], "notacion": "m7b5" },
@@ -70,6 +84,7 @@ const acordes = {
     "Aumentado Séptima Mayor (△7#5)": { "intervalos": [0, 4, 8, 11], "grados": ["1", "3", "#5", "7"], "notacion": "△7#5" },
     "Séptima con Quinta Aumentada (7#5)": { "intervalos": [0, 4, 8, 10], "grados": ["1", "3", "#5", "b7"], "notacion": "7#5" },
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
+    "Add 9 (add9)": { "intervalos": [0, 4, 7, 2], "grados": ["1", "3", "5", "9"], "notacion": "add9" },
     "Cuarta Suspendida (sus4)": { "intervalos": [0, 5, 7], "grados": ["1", "4", "5"], "notacion": "sus4" },
     "Segunda Suspendida (sus2)": { "intervalos": [0, 2, 7], "grados": ["1", "2", "5"], "notacion": "sus2" },
     "Mayor (Triada)": { "intervalos": [0, 4, 7], "grados": ["1", "3", "5"], "notacion": "maj" },
@@ -104,9 +119,12 @@ let drumVolumeValue;
 
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
-    "dim7": "dim7", "m△7": "m-maj7"
-  , "△7#5": "aug-maj7", "△7": "maj7", "7#5": "7aug5", "7b5": "7b5",
-    "7#9": "7", "7b9": "7",
+    "dim7": "dim7", "m△7": "m-maj7",
+    "△7#5": "aug-maj7", "△7": "maj7", "7#5": "7aug5", "7b5": "7b5",
+    "7b9": "7b9", "7#9": "7#9", "maj7#11": "maj7#11", "7#11": "7#11", "m7b9": "m7b9", "m7#11": "m7#11",
+    "6": "maj6", "m6": "m6",
+    "maj9": "maj9", "m9": "m9", "9": "9", "add9": "add9",
+    "maj13": "maj13", "m13": "m13", "13": "13",
     "sus4": "sus4",
     "sus2": "sus2",
     "maj": "maj",
@@ -306,6 +324,7 @@ async function loadAudioFiles() {
                 'E2': 'snare_rim.wav', 
                 'F#2': 'closed_hihat.wav', 
                 'A#2': 'half_hihat.wav',
+                'D#3': 'ride.wav',
             },
             baseUrl: "assets/audios/drum_sample/",
         }).connect(drumVolume);
@@ -688,6 +707,36 @@ function formatChordDisplay(acorde, forOnClick = false) {
         formattedSuffix = 'aug';
     } else if (acorde === 'dim') {
         formattedSuffix = 'dim'; // O '°' si se prefiere
+    } else if (acorde === '6') {
+        formattedSuffix = '6';
+    } else if (acorde === 'm6') {
+        formattedSuffix = 'm6';
+    } else if (acorde === 'maj9') {
+        formattedSuffix = 'maj9';
+    } else if (acorde === 'm9') {
+        formattedSuffix = 'm9';
+    } else if (acorde === '9') {
+        formattedSuffix = '9';
+    } else if (acorde === 'add9') {
+        formattedSuffix = 'add9';
+    } else if (acorde === 'maj13') {
+        formattedSuffix = 'maj13';
+    } else if (acorde === 'm13') {
+        formattedSuffix = 'm13';
+    } else if (acorde === '13') {
+        formattedSuffix = '13';
+    } else if (acorde === '7b9') {
+        formattedSuffix = '7b9';
+    } else if (acorde === '7#9') {
+        formattedSuffix = '7#9';
+    } else if (acorde === 'maj7#11') {
+        formattedSuffix = 'maj7#11';
+    } else if (acorde === '7#11') {
+        formattedSuffix = '7#11';
+    } else if (acorde === 'm7b9') {
+        formattedSuffix = 'm7b9';
+    } else if (acorde === 'm7#11') {
+        formattedSuffix = 'm7#11';
     } else {
         // Existing logic for 7th chords
         formattedSuffix = acorde.replace('maj7', '△7').replace('m7b5', 'ø7').replace('dim7', '°');
@@ -1253,23 +1302,13 @@ const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
 
 async function togglePlay() {
-    // stopAllNotes(); // This function is removed
-
     const toggleBtn = document.getElementById('toggle-progression-btn');
     const floatingBtn = document.getElementById('floating-play-stop-button');
 
     if (isPlaying) {
-        // Store current volumes before silencing
-        pianoVolumeValue = pianoVolume.volume.value;
-        arpeggioVolumeValue = arpeggioVolume.volume.value;
-        stringVolumeValue = stringVolume.volume.value;
-        drumVolumeValue = drumVolume.volume.value;
-
-        // Immediately silence all volumes
-        pianoVolume.volume.value = -100; // Effectively mute
-        arpeggioVolume.volume.value = -100;
-        stringVolume.volume.value = -100;
-        drumVolume.volume.value = -100;
+        // Stop all sound immediately and definitively
+        Tone.Transport.stop();
+        Tone.Transport.cancel();
 
         if (chordLoop) {
             chordLoop.stop(0).dispose();
@@ -1278,39 +1317,27 @@ async function togglePlay() {
             currentMidiPart.stop(0).dispose();
             currentMidiPart = null;
         }
-        Tone.Transport.stop();
-        Tone.Transport.cancel(); // Cancel all scheduled events, including MIDI
 
-        // Release any lingering notes (though volumes are already down)
-        if (chordSampler) {
-            chordSampler.releaseAll();
-        }
-        if (arpeggioSampler) {
-            arpeggioSampler.releaseAll();
-        }
-        if (stringSampler) {
-            stringSampler.releaseAll();
-        }
-        if (drumSampler) {
-            drumSampler.releaseAll();
-        }
+        // Mute all samplers by disconnecting them
+        if (chordSampler) chordSampler.releaseAll().disconnect();
+        if (arpeggioSampler) arpeggioSampler.releaseAll().disconnect();
+        if (stringSampler) stringSampler.releaseAll().disconnect();
+        if (drumSampler) drumSampler.releaseAll().disconnect();
+
+        // Re-initialize all audio components to ensure a clean state
+        await loadAudioFiles();
 
         isPlaying = false;
         toggleBtn.classList.remove('playing');
         toggleBtn.classList.add('stopped');
-
-        // Actualizar botón flotante
         floatingBtn.innerHTML = playIconSVG;
         floatingBtn.classList.remove('playing');
         floatingBtn.classList.add('stopped');
-
         document.querySelectorAll('.progression-chord').forEach(el => el.classList.remove('playing-chord'));
 
     } else {
         if (currentProgression.length > 0) {
-            // Re-initialize samplers to clear any lingering state and apply current slider volumes
-            await loadAudioFiles();
-
+            await loadAudioFiles(); // Ensure everything is ready before playing
             await startChordLoop();
         }
     }

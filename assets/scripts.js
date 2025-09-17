@@ -68,6 +68,8 @@ const acordes = {
     "Aumentado Séptima Mayor (△7#5)": { "intervalos": [0, 4, 8, 11], "grados": ["1", "3", "#5", "7"], "notacion": "△7#5" },
     "Séptima con Quinta Aumentada (7#5)": { "intervalos": [0, 4, 8, 10], "grados": ["1", "3", "#5", "b7"], "notacion": "7#5" },
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
+    "Cuarta Suspendida (sus4)": { "intervalos": [0, 5, 7], "grados": ["1", "4", "5"], "notacion": "sus4" },
+    "Segunda Suspendida (sus2)": { "intervalos": [0, 2, 7], "grados": ["1", "2", "5"], "notacion": "sus2" },
 };
 
 const todasLasOpciones = { ...escalas_modos, ...acordes };
@@ -93,7 +95,9 @@ const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
     "dim7": "dim7", "m△7": "m-maj7"
   , "△7#5": "aug-maj7", "△7": "maj7", "7#5": "7aug5", "7b5": "7b5",
-    "7#9": "7", "7b9": "7"
+    "7#9": "7", "7b9": "7",
+    "sus4": "sus4",
+    "sus2": "sus2"
 };
 const notaAudioMap = {
     "Do": "c", "Do#": "c-sharp", "Reb": "c-sharp", "Re": "d", "Re#": "d-sharp", "Mib": "d-sharp", "Mi": "e",
@@ -207,7 +211,8 @@ function getIntervaloSemitonos(nota1, nota2) {
 
 function getTipoAcorde(intervalos) {
     const acordesTriada = {
-        "0,4,7": "maj", "0,3,7": "m", "0,4,8": "aug", "0,3,6": "dim"
+        "0,4,7": "maj", "0,3,7": "m", "0,4,8": "aug", "0,3,6": "dim",
+        "0,5,7": "sus4", "0,2,7": "sus2"
     };
     const acordesSeptima = {
         "0,4,7,11": "maj7", "0,3,7,10": "m7", "0,4,7,10": "7", "0,3,6,10": "m7b5",
@@ -637,6 +642,9 @@ function renderSelectors() {
 
 function formatChordDisplay(acorde) {
     if (!acorde) return '';
+    if (acorde === 'sus4' || acorde === 'sus2') {
+        return `<span>${acorde}</span>`;
+    }
     let formatted = acorde.replace('maj7', '△7').replace('m7b5', 'ø7').replace('dim7', '°').replace('maj', '');
     if (formatted == 'aug') {
         return `<span class="acorde-subscript">${formatted}</span>`;
@@ -931,7 +939,7 @@ function generateRandomProgression() {
 
     currentProgression = [];
     const notasPosibles = semitonos_display;
-    const tiposDeAcordePosibles = Object.keys(acordes).filter(key => key.includes("Séptima"));
+    const tiposDeAcordePosibles = Object.keys(acordes);
 
     for (let i = 0; i < 4; i++) {
         const randomNotaIndex = Math.floor(Math.random() * notasPosibles.length);
@@ -1575,7 +1583,9 @@ function addChordFromInput() {
         "m-maj7": "Menor Séptima Mayor (m△7)", "mmaj7": "Menor Séptima Mayor (m△7)", "m△7": "Menor Séptima Mayor (m△7)",
         "aug-maj7": "Aumentado Séptima Mayor (△7#5)", "augmaj7": "Aumentado Séptima Mayor (△7#5)", "△7#5": "Aumentado Séptima Mayor (△7#5)",
         "7#5": "Séptima con Quinta Aumentada (7#5)", "7aug5": "Séptima con Quinta Aumentada (7#5)",
-        "7b5": "Séptima con Quinta Disminuida (7b5)"
+        "7b5": "Séptima con Quinta Disminuida (7b5)",
+        "sus4": "Cuarta Suspendida (sus4)", "cuartasuspendida": "Cuarta Suspendida (sus4)",
+        "sus2": "Segunda Suspendida (sus2)", "segundasuspendida": "Segunda Suspendida (sus2)"
     };
 
     const lowerCaseChordTypeInput = chordTypeInput.toLowerCase();

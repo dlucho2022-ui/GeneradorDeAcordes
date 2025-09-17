@@ -8,14 +8,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="assets/images/iconapp.png" type="image/x-icon">
-
     <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body class="body-sheet-music">
 
     <div class="wrapper">
        <header>
-      
         <nav>
             <ul>
                 <li><a href="index.html">Generador de progresiones</a></li>
@@ -24,12 +23,20 @@
                 <li><a href="index4.html">Círculo de quintas</a></li>
                 <li><a href="index5.html">Generador de cifrados</a></li>
             </ul>
-            </ul>
         </nav>
     </header>
 
         <div id="osmd-container"></div>
-
+        <div id="pdf-viewer-container" style="display: none;">
+            <div class="pdf-controls">
+                <button id="prev-page" class="button">&lt; Ant</button>
+                <span>Página: <span id="page-num">0</span> / <span id="page-count">0</span></span>
+                <button id="next-page" class="button">Sig &gt;</button>
+            </div>
+            <div id="pdf-canvas-container">
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+        </div>
     </div>
     
     <div id="modal-overlay" class="modal-overlay"></div>
@@ -227,6 +234,11 @@
             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6zm-2 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
         </svg>
     </button>
+    <button id="open-pdf-button" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/>
+        </svg>
+    </button>
     <button id="floating-profiles-button" class="button">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
             <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
@@ -235,6 +247,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="assets/pdf_viewer.js"></script>
     
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
@@ -443,34 +456,6 @@
                     }
                 }
 
-                function saveLastUsedProfileName(name) {
-                    try {
-                        localStorage.setItem('lastUsedSheetMusicProfile', name);
-                    } catch (error) {
-                        console.error('Error al guardar el nombre del último perfil usado en localStorage:', error);
-                    }
-                }
-
-                async function loadLastUsedProfile() {
-                    try {
-                        const lastProfileName = localStorage.getItem('lastUsedSheetMusicProfile');
-                        if (lastProfileName) {
-                            const response = await fetch(`${API_URL}/${lastProfileName}`);
-                            if (!response.ok) {
-                                console.warn(`No se pudo cargar el perfil '${lastProfileName}' desde el servidor. Puede que haya sido eliminado.`);
-                                localStorage.removeItem('lastUsedSheetMusicProfile'); // Clear invalid profile
-                                return;
-                            }
-                            const settings = await response.json();
-                            applySettings(settings);
-                            document.getElementById('profile-selector').value = lastProfileName; // Select in dropdown
-                            console.log(`Perfil '${lastProfileName}' cargado automáticamente.`);
-                        }
-                    } catch (error) {
-                        console.error('Error al cargar el último perfil usado desde localStorage o el servidor:', error);
-                    }
-                }
-
             // --- Fin Profile Management ---
 
             function loadChords(key) {
@@ -570,6 +555,9 @@
             }
 
             function generateAndRenderMeasure() {
+                document.getElementById('osmd-container').style.display = 'block';
+                document.getElementById('pdf-viewer-container').style.display = 'none';
+
                 if (Tone.Transport.state === 'started') { stopPlayback(); }
                 const activeTab = document.querySelector('.tab-button.active').dataset.tab;
                 const numMeasures = parseInt(document.getElementById('measure-selector').value, 10);
@@ -1118,6 +1106,5 @@
             generateAndRenderMeasure();
         });
     </script>
-
 </body>
 </html>

@@ -1998,195 +1998,94 @@ document.addEventListener("DOMContentLoaded", function() {
 'sheets/I Predict A Riot.pdf',
 'sheets/I Really Didnt Mean It.pdf',
 'sheets/I Saw Her Standing.pdf',
-'sheets/I Saw Mommy.pdf',
-'sheets/I Say A Little Prayer.pdf',
-'sheets/I Shot The Sheriff.pdf',
-'sheets/I Still Havent Found.pdf',
-'sheets/I Wanna Be Like.pdf',
-'sheets/I Wanna Be The.pdf',
-'sheets/I Wanna Be Where You.pdf',
-'sheets/I Wanna Be Your Lover.pdf',
-'sheets/I Wanna Dance With Somebody.pdf',
-'sheets/I Wanna Hold.pdf',
-'sheets/I Want Candy.pdf',
-'sheets/I Want It All.pdf',
-'sheets/I Want That Man.pdf',
-'sheets/I Want To Break Free.pdf',
-'sheets/I Want You Back.pdf',
-'sheets/I Who Have Nothing.pdf',
-'sheets/I Will Drink The Wine.pdf',
-'sheets/I Will Survive Its.pdf',
-'sheets/I Will Survive To.pdf',
-'sheets/I Will Survive.pdf',
-'sheets/I Will Wait.pdf',
-'sheets/I Wish It Could.pdf',
-'sheets/I Wish It Would Rain.pdf',
-'sheets/I Wish It Would.pdf',
-'sheets/I Wish.pdf',
-'sheets/I Would Do Anything.pdf',
-'sheets/I Write The Songs.pdf',
-'sheets/Ian Thomas - Painted Ladies.pdf',
-'sheets/Id Rather Drink Muddy.pdf',
-'sheets/Id Rather Go Blind.pdf',
-'sheets/If I Aint Got You.pdf',
-'sheets/If I Cant Have You.pdf',
-'sheets/If I Ever Lose This.pdf',
-'sheets/If I Loved You.pdf',
-'sheets/If There Is No.pdf',
-'sheets/If You Be My.pdf',
-'sheets/If You Go Away.pdf',
-'sheets/If You Love Me.pdf',
-'sheets/Ill Be Home.pdf',
-'sheets/Ill Be There.pdf',
-'sheets/Ill Never Love This Way.pdf',
-'sheets/Im A Believer Monkees.pdf',
-'sheets/Im A Believer Smash.pdf',
-'sheets/Im Gonna Be  Miles.pdf',
-'sheets/Im In Love With The.pdf',
-'sheets/Im In Love With.pdf',
-'sheets/Im In The Mood.pdf',
-'sheets/Im Not Anyone.pdf',
-'sheets/Im So Excited.pdf',
-'sheets/Im Still Here Dont Rain.pdf',
-'sheets/Im Still Standing.pdf',
-'sheets/Im Still Waiting.pdf',
-'sheets/Im Too Sexy.pdf',
-'sheets/Im Yours.pdf',
-'sheets/In Any Tongue.pdf',
-'sheets/In My Place.pdf',
-'sheets/In My Pocket To.pdf',
-'sheets/In The Air Tonight.pdf',
-'sheets/In The Flesh DIRECTED.pdf',
-'sheets/In The Flesh.pdf',
-'sheets/In The Lap Of(1).pdf',
-'sheets/In The Lap Of.pdf',
-'sheets/In The Still Of.pdf',
-'sheets/Incognito - A Shade Of Blue (1).pdf',
-'sheets/Incognito - A Shade Of Blue.pdf',
-'sheets/Incognito - After The Fall.pdf',
-'sheets/Incognito - Cant Get You Out Of My Head.pdf',
-'sheets/Incognito - Closer To The Feeling.pdf',
-'sheets/Incognito - Colibri.pdf',
-'sheets/Incognito - Fountain Of Life.pdf',
-'sheets/Incognito - Hold On To Me.pdf',
-'sheets/Incognito - Labour Of Love.pdf',
-'sheets/Incognito - Magnetic Ocean.pdf',
-'sheets/Incognito - Need To Know.pdf',
-'sheets/Incognito - Smiling Faces.pdf',
-'sheets/Incognito - Still A Friend Of Mine.pdf',
-'sheets/Incognito - Summers Ended.pdf',
-'sheets/Incognito - Talkin Loud.pdf',
-'sheets/Incognito - Who Needs Love.pdf',
-'sheets/interstate-love-song.pdf',
-'sheets/Invisible To.pdf',
-'sheets/Invisible Touch.pdf',
-'sheets/Iron Sky DRUMS IN.pdf',
-'sheets/Ironic.pdf',
-'sheets/It Dont Come Eas.pdf',
-'sheets/It Feels So Good.pdf',
-'sheets/It Must Be Love.pdf',
-'sheets/It Takes Two.pdf',
-'sheets/Its A Hard Life.pdf',
-'sheets/Its All Coming Back.pdf',
-'sheets/Its Alright To.pdf',
-'sheets/Its Beginning To Look.pdf',
-'sheets/Its Late.pdf',
-'sheets/Its On To.pdf',
-'sheets/Its Raining Men.pdf',
-'sheets/Its Still Rock Roll To.pdf',
-'sheets/Its Too Late To.pdf',
-'sheets/Its Your Thing REPEAT.pdf',
-'sheets/Ive Been Waiting You.pdf',
-'sheets/Ive Been Waiting.pdf',
-'sheets/Ive Got My Love To.pdf',
-'sheets/Ive Got To Use.pdf',
-'sheets/Ive Got You Under.pdf',
-'sheets/Ive Had The Time.pdf',
-'sheets/J J Cale - Pack My Jack.pdf',
-'sheets/Jackson-5-Santa-Claus-is-Coming-to-Town.pdf',
-'sheets/Jackson-5-Up-On-The-House-Top-V3.pdf',
-'sheets/Jailhouse Rock.pdf',
-'sheets/james-brown-bass-grooves-1.pdf',
-'sheets/james-brown-bass-grooves-2.pdf',
-'sheets/Jamiroquai - (Dont) Give Hate A Chance.pdf',
-'sheets/Jamiroquai - Drifting Along.pdf',
-'sheets/Jamiroquai - Dynamite.pdf',
-'sheets/Jamiroquai - Feel So Good.pdf',
-'sheets/Jamiroquai - Nights Out In The Jungle.pdf',
-'sheets/Jamiroquai - Runaway.pdf',
-'sheets/Jamiroquai - Seven Days In Sunny June.pdf',
-'sheets/Jamiroquai - Shes A Fast Persuader.pdf',
-'sheets/Jamiroquai - Starchild.pdf',
-'sheets/Jamiroquai - Talullah.pdf',
-'sheets/Jamiroquai - When You Gonna Learn.pdf',
-'sheets/Jazz Walkin Splanky.pdf',
-'sheets/jean-knight-mr-big-stuff.pdf',
-'sheets/Jellyfish - The Ghost At Number One.pdf',
-'sheets/Jill Scott - The Way.pdf',
-'sheets/Jim Croce - I Got A Name.pdf',
-'sheets/Jimmy Mack.pdf',
-'sheets/Jingle Bell Rock To.pdf',
-'sheets/Jingle Bell Rock.pdf',
-'sheets/Jocelyn Brown - Somebody Elses Guy.pdf',
-'sheets/Joe Longthorne As I Love.pdf',
-'sheets/Joe Longthorne As If We.pdf',
-'sheets/Joe Longthorne How Do.pdf',
-'sheets/Joe Longthorne I Can.pdf',
-'sheets/Joe Longthorne If I.pdf',
-'sheets/Joe Longthorne Overture II.pdf',
-'sheets/John The Revelator.pdf',
-'sheets/john-clayton-east-of-the-sun.pdf',
-'sheets/john-scofield-over-big-top.pdf',
-'sheets/Johnny B Goode.pdf',
-'sheets/Josie.pdf',
-'sheets/Joss Stone - L-O-V-E.pdf',
-'sheets/Juice X.pdf',
-'sheets/Jumpin Jack Flash.pdf',
-'sheets/Just Cant Get Enough.pdf',
-
     ];
 
-    let currentPdfIframe = null; // Variable para guardar la referencia al iframe del PDF
-    const floatingRandomPdfButton = document.getElementById('floating-random-pdf-button'); // Changed ID
-    const pdfViewerContainer = document.getElementById('pdf-viewer-container'); // Changed ID
+    const openPdfButton = document.getElementById('open-pdf-button');
     const osmdContainer = document.getElementById('osmd-container');
+    const pdfViewerContainer = document.getElementById('pdf-viewer-container');
 
-    window.closePdfViewer = function() {
-        if (currentPdfIframe) {
-            pdfViewerContainer.innerHTML = '';
-            pdfViewerContainer.style.display = 'none';
-            currentPdfIframe = null;
-            osmdContainer.style.display = ''; // Mostrar el contenedor OSMD de nuevo
-        }
-    };
+    let pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null,
+        scale = 1.5,
+        canvas = document.getElementById('pdf-canvas'),
+        ctx = canvas.getContext('2d');
 
-    function loadRandomPdf() {
-        stopPlayback(); // Detener la reproducción de OSMD
-        if (currentPdfIframe) { // Si ya hay un PDF abierto, lo cerramos primero
-            closePdfViewer();
-        }
-        // Siempre cargamos un nuevo PDF después de cerrar el anterior (si lo había)
-        const randomIndex = Math.floor(Math.random() * pdfFiles.length);
-        const selectedPdf = pdfFiles[randomIndex];
-        
-        // Ocultar el contenedor de OSMD para que no se superponga
-        osmdContainer.style.display = 'none'; 
-
-        pdfViewerContainer.innerHTML = ''; // Limpiar por si acaso
-        const pdfIframe = document.createElement('iframe');
-        pdfIframe.src = selectedPdf;
-        pdfIframe.style.width = '100%';
-        pdfIframe.style.height = '100%';
-        pdfIframe.style.border = 'none';
-        pdfIframe.style.overflow = 'auto'; // Permitir scroll si el PDF es más grande
-        pdfIframe.style.backgroundColor = 'white'; // Fondo blanco para el PDF
-
-        pdfViewerContainer.appendChild(pdfIframe);
-        pdfViewerContainer.style.display = 'flex'; // Mostrar el contenedor a pantalla completa
-        currentPdfIframe = pdfIframe; // Guardar la referencia
+    function renderPage(num) {
+        pageRendering = true;
+        pdfDoc.getPage(num).then(function(page) {
+            const viewport = page.getViewport({scale: scale});
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            const renderTask = page.render(renderContext);
+            renderTask.promise.then(function() {
+                pageRendering = false;
+                if (pageNumPending !== null) {
+                    renderPage(pageNumPending);
+                    pageNumPending = null;
+                }
+            });
+        });
+        document.getElementById('page-num').textContent = num;
     }
 
-    if (floatingRandomPdfButton) { // Changed ID
-        floatingRandomPdfButton.addEventListener('click', loadRandomPdf);
+    function queueRenderPage(num) {
+        if (pageRendering) {
+            pageNumPending = num;
+        } else {
+            renderPage(num);
+        }
+    }
+
+    function onPrevPage() {
+        if (pageNum <= 1) return;
+        pageNum--;
+        queueRenderPage(pageNum);
+    }
+
+    function onNextPage() {
+        if (pageNum >= pdfDoc.numPages) return;
+        pageNum++;
+        queueRenderPage(pageNum);
+    }
+
+    function loadPdf(url) {
+        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page-count').textContent = pdfDoc.numPages;
+            pageNum = 1;
+            renderPage(pageNum);
+        }).catch(function(error) {
+            console.error('Error loading PDF:', error);
+            alert('Error al cargar el PDF. Verifique la ruta del archivo.');
+        });
+    }
+
+    if (openPdfButton) {
+        openPdfButton.addEventListener('click', () => {
+            if (pdfFiles && pdfFiles.length > 0) {
+                const randomIndex = Math.floor(Math.random() * pdfFiles.length);
+                const randomPdfUrl = pdfFiles[randomIndex];
+                loadPdf(randomPdfUrl);
+                if (osmdContainer) osmdContainer.style.display = 'none';
+                if (pdfViewerContainer) pdfViewerContainer.style.display = 'block';
+            } else {
+                alert("No se encontró la lista de PDFs.");
+            }
+        });
+    }
+
+    const prevPageButton = document.getElementById('prev-page');
+    const nextPageButton = document.getElementById('next-page');
+    if (prevPageButton) {
+        prevPageButton.addEventListener('click', onPrevPage);
+    }
+    if (nextPageButton) {
+        nextPageButton.addEventListener('click', onNextPage);
     }
 });

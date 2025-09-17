@@ -734,6 +734,33 @@ body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-pl
 }
 #floating-notes-button:hover { background-color: #e66a00; }
 
+#open-pdf-button {
+    position: fixed; top: 365px; left: 15px; z-index: 1000;
+    background-color: #20c997; /* A distinct green color */
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+#open-pdf-button:hover { background-color: #17a2b8; } /* A slightly different hover color */
+
+#floating-profiles-button {
+    position: fixed;
+    top: 435px; /* Positioned below other buttons */
+    left: 15px;
+    z-index: 1000;
+    background-color: #ffc107; /* A distinct yellow/gold color */
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    flex-grow: 0;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0; left: 0;

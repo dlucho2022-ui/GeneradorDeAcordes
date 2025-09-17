@@ -95,6 +95,11 @@ let arpeggioVolume;
 let stringVolume; // For user's string samples
 let drumSampler;
 
+let pianoVolumeValue;
+let arpeggioVolumeValue;
+let stringVolumeValue;
+let drumVolumeValue;
+
 const acorde_audio_map = {
     "maj7": "maj7", "m7": "m7", "7": "7", "m7b5": "m7b5",
     "dim7": "dim7", "m△7": "m-maj7"
@@ -238,11 +243,23 @@ async function loadAudioFiles() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // Initialize volumes
-    pianoVolume = new Tone.Volume(-6).toDestination();
-    arpeggioVolume = new Tone.Volume(-12).toDestination();
-    stringVolume = new Tone.Volume(-6).toDestination();
-    drumVolume = new Tone.Volume(-6).toDestination();
+    // Get current slider values
+    const pianoSliderValue = document.getElementById('piano-volume') ? parseFloat(document.getElementById('piano-volume').value) : -6;
+    const arpeggioSliderValue = document.getElementById('arpeggio-volume') ? parseFloat(document.getElementById('arpeggio-volume').value) : -12;
+    const stringSliderValue = document.getElementById('string-volume') ? parseFloat(document.getElementById('string-volume').value) : -6;
+    const drumSliderValue = document.getElementById('drum-volume') ? parseFloat(document.getElementById('drum-volume').value) : -6;
+
+    // Initialize volumes with current slider values
+    pianoVolume = new Tone.Volume(pianoSliderValue).toDestination();
+    arpeggioVolume = new Tone.Volume(arpeggioSliderValue).toDestination();
+    stringVolume = new Tone.Volume(stringSliderValue).toDestination();
+    drumVolume = new Tone.Volume(drumSliderValue).toDestination();
+
+    // Store current volumes (now directly from sliders)
+    pianoVolumeValue = pianoVolume.volume.value;
+    arpeggioVolumeValue = arpeggioVolume.volume.value;
+    stringVolumeValue = stringVolume.volume.value;
+    drumVolumeValue = drumVolume.volume.value;
 
     // --- Generate URLs for user's custom string samples ---
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -1240,6 +1257,18 @@ async function togglePlay() {
     const floatingBtn = document.getElementById('floating-play-stop-button');
 
     if (isPlaying) {
+        // Store current volumes before silencing
+        pianoVolumeValue = pianoVolume.volume.value;
+        arpeggioVolumeValue = arpeggioVolume.volume.value;
+        stringVolumeValue = stringVolume.volume.value;
+        drumVolumeValue = drumVolume.volume.value;
+
+        // Immediately silence all volumes
+        pianoVolume.volume.value = -100; // Effectively mute
+        arpeggioVolume.volume.value = -100;
+        stringVolume.volume.value = -100;
+        drumVolume.volume.value = -100;
+
         if (chordLoop) {
             chordLoop.stop(0).dispose();
         }
@@ -1249,6 +1278,8 @@ async function togglePlay() {
         }
         Tone.Transport.stop();
         Tone.Transport.cancel(); // Cancel all scheduled events, including MIDI
+
+        // Release any lingering notes (though volumes are already down)
         if (chordSampler) {
             chordSampler.releaseAll();
         }
@@ -1257,6 +1288,9 @@ async function togglePlay() {
         }
         if (stringSampler) {
             stringSampler.releaseAll();
+        }
+        if (drumSampler) {
+            drumSampler.releaseAll();
         }
 
         isPlaying = false;
@@ -1272,6 +1306,9 @@ async function togglePlay() {
 
     } else {
         if (currentProgression.length > 0) {
+            // Re-initialize samplers to clear any lingering state and apply current slider volumes
+            await loadAudioFiles();
+
             await startChordLoop();
         }
     }

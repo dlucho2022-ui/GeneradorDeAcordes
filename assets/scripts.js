@@ -76,36 +76,68 @@ const escalas_modos = {
 
 const acordesAgrupados = {
     "Triadas": [
-        "Mayor (Triada)", "Menor (Triada)", "Aumentado (Triada)", "Disminuido (Triada)",
-        "Cuarta Suspendida (sus4)", "Segunda Suspendida (sus2)", "TEST_CHORD"
+        "Mayor (Triada)",
+        "Menor (Triada)",
+        "Aumentado (Triada)",
+        "Disminuido (Triada)",
+        "Segunda Suspendida (sus2)",
+        "Cuarta Suspendida (sus4)",
+        "TEST_CHORD"
     ],
     "Séptima": [
-        "Mayor Séptima (maj7)", "Menor Séptima (m7)", "Séptima de Dominante (7)",
-        "Menor Séptima con Quinta Disminuida (m7b5)", "Disminuido Séptima (dim7)",
-        "Menor Séptima Mayor (m△7)"
+        "Mayor Séptima (maj7)",
+        "Séptima de Dominante (7)",
+        "Menor Séptima (m7)",
+        "Menor Séptima Mayor (m△7)",
+        "Menor Séptima con Quinta Disminuida (m7b5)",
+        "Disminuido Séptima (dim7)"
     ],
     "Extensiones y Alteraciones Mayores": [
-        "Novena Mayor (maj9)", "Trecena Mayor (maj13)", "Mayor Siete #11 (maj7#11)",
-        "Mayor Séptima b5 (maj7b5)", "Aumentado Séptima Mayor (△7#5)", "Mayor Siete #9 (maj7#9)",
-        "Mayor Séptima b9 (maj7b9)",
-        "Sexta (6)", "Sexta/Novena (6/9)", "Add 9 (add9)"
+        "Sexta (6)",
+        "Add 9 (add9)",
+        "Sexta/Novena (6/9)",
+        "Novena Mayor (maj9)",
+        "Trecena Mayor (maj13)",
+        "Mayor Siete #11 (maj7#11)",
+        "Mayor Siete #9 (maj7#9)",
+        "Mayor Séptima b5 (maj7b5)",
+        "Mayor Séptima b9 (maj7b9)"
     ],
     "Extensiones y Alteraciones Menores": [
-        "Novena Menor (m9)", "Trecena Menor (m13)", "Menor Siete b9 (m7b9)",
-        "Menor Siete #11 (m7#11)", "Menor Sexta (m6)", "Menor Sexta/Novena (m6/9)"
+        "Menor Sexta (m6)",
+        "Menor Sexta/Novena (m6/9)",
+        "Novena Menor (m9)",
+        "Trecena Menor (m13)",
+        "Menor Siete b9 (m7b9)",
+        "Menor Siete #11 (m7#11)"
     ],
     "Extensiones y Alteraciones Dominantes": [
-        "Novena Dominante (9)", "Trecena Dominante (13)", "Siete b9 (7b9)", "Siete #9 (7#9)",
-        "Siete #11 (7#11)", "Séptima con Quinta Aumentada (7#5)", "Séptima con Quinta Disminuida (7b5)",
-        "Siete b9 #11 (7b9#11)", "Siete #9 b13 (7#9b13)", "Siete b5 #9 (7b5#9)",
-        "Siete #5 #9 (7#5#9)", "Siete #5 b9 (7#5b9)"
+        "Novena Dominante (9)",
+        "Trecena Dominante (13)",
+        "Siete b9 (7b9)",
+        "Siete #9 (7#9)",
+        "Siete #11 (7#11)",
+        "Séptima con Quinta Aumentada (7#5)",
+        "Séptima con Quinta Disminuida (7b5)",
+        "Siete b9 #11 (7b9#11)",
+        "Siete #9 b13 (7#9b13)",
+        "Siete b5 #9 (7b5#9)",
+        "Siete #5 #9 (7#5#9)",
+        "Siete #5 b9 (7#5b9)"
     ],
     "Suspendidos con Extensiones": [
-        "Novena Suspendida 4 (9sus4)", "Trecena Suspendida 4 (13sus4)",
-        "Séptima Suspendida 2 (7sus2)", "Suspendida 4 b5 (sus4b5)", "Suspendida 4 #5 (sus4#5)", "Suspendida 2 b5 (sus2b5)",
-        "Suspendida 2 #5 (sus2#5)", "Siete Suspendido 4 (7sus4)",
-        "Séptima Suspendida 4 b5 (7sus4b5)", "Séptima Suspendida 4 #5 (7sus4#5)",
-        "Séptima Suspendida 2 b5 (7sus2b5)", "Séptima Suspendida 2 #5 (7sus2#5)"
+        "Siete Suspendido 4 (7sus4)",
+        "Séptima Suspendida 2 (7sus2)",
+        "Novena Suspendida 4 (9sus4)",
+        "Trecena Suspendida 4 (13sus4)",
+        "Suspendida 4 b5 (sus4b5)",
+        "Suspendida 4 #5 (sus4#5)",
+        "Suspendida 2 b5 (sus2b5)",
+        "Suspendida 2 #5 (sus2#5)",
+        "Séptima Suspendida 4 b5 (7sus4b5)",
+        "Séptima Suspendida 4 #5 (7sus4#5)",
+        "Séptima Suspendida 2 b5 (7sus2b5)",
+        "Séptima Suspendida 2 #5 (7sus2#5)"
     ]
 };
 
@@ -491,6 +523,9 @@ function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
         pitch: mapNotaToSemitone(simplifyEnharmonic(name))
     })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
 
+    // Ordenar las notas por su tono para asegurar una asignación de octavas correcta
+    notesWithPitch.sort((a, b) => a.pitch - b.pitch);
+
     // 3. Assign octaves to ensure ascending order based on original sequence
     let lastPitch = -1; // Use -1 to ensure the first note doesn't trigger an octave jump
     let currentOctave = startOctave;
@@ -855,7 +890,7 @@ function renderSelectors() {
             if (acordes[opcion]) { // Check if chord exists
                 const option = document.createElement('div');
                 option.className = 'card-option';
-                option.textContent = opcion.replace("Menor Séptima con Quinta Disminuida", "Semidisminuido").replace("Disminuido Séptima", "Disminuido");
+                option.textContent = acordes[opcion].notacion;
                 option.dataset.value = opcion;
                 option.addEventListener('click', () => {
                     selectedAcorde = opcion;

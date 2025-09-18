@@ -15,6 +15,15 @@ const enarmonicos_map = {
 
 const notasBase = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
 
+const escalasAgrupadas = {
+    "Modos Griegos": ["Jónico", "Dórico", "Frigio", "Lidio", "Mixolidio", "Eólico", "Locrio"],
+    "Menor Armónica y Modos": ["Menor Armónica", "Locrio ♮6", "Jónico Aumentado", "Dórico ♯4", "Frigio Dominante", "Lidio ♯2", "Superlocrio 𝄫7"],
+    "Menor Melódica y Modos": ["Menor Melódica", "Dórico b2", "Lidio Aumentado", "Lidio b7", "Mixolidio b13", "Locrio #2", "Superlocria"],
+    "Pentatónicas": ["Pentatónica Mayor", "Pentatónica Menor", "Blues", "Hirajōshi", "Pentatónica Egipcia", "Pentatónica Kumoi"],
+    "Simétricas y Bebop": ["Hexatonal (Tonos Enteros)", "Disminuida Tono-Semitono", "Disminuida Semitono-Tono", "Menor Armónica Bebop", "Bebop Dominante", "Bebop Mayor"],
+    "Exóticas": ["Menor Húngara", "Elefante", "Árabe", "Doble Armónica", "Ultrafrigio", "Gitana Mayor", "Oriental", "Jónico Aumentado ♯2", "Escala de Prometeo", "Escala de Tritono", "Escala Enigmática"]
+};
+
 const escalas_modos = {
     "Jónico": { "intervalos": [0, 2, 4, 5, 7, 9, 11], "grados": ["1", "2", "3", "4", "5", "6", "7"], "acordes": ["maj7", "m7", "m7", "maj7", "7", "m7", "m7b5"] },
     "Dórico": { "intervalos": [0, 2, 3, 5, 7, 9, 10], "grados": ["1", "2", "b3", "4", "5", "6", "b7"], "acordes": ["m7", "m7", "maj7", "7", "m7", "m7b5", "maj7"] },
@@ -64,6 +73,36 @@ const escalas_modos = {
 
 };
 
+
+const acordesAgrupados = {
+    "Triadas": [
+        "Mayor (Triada)", "Menor (Triada)", "Aumentado (Triada)", "Disminuido (Triada)",
+        "Cuarta Suspendida (sus4)", "Segunda Suspendida (sus2)"
+    ],
+    "Séptima": [
+        "Mayor Séptima (maj7)", "Menor Séptima (m7)", "Séptima de Dominante (7)",
+        "Menor Séptima con Quinta Disminuida (m7b5)", "Disminuido Séptima (dim7)",
+        "Menor Séptima Mayor (m△7)"
+    ],
+    "Extensiones y Alteraciones Mayores": [
+        "Novena Mayor (maj9)", "Trecena Mayor (maj13)", "Mayor Siete #11 (maj7#11)",
+        "Mayor Séptima b5 (maj7b5)", "Aumentado Séptima Mayor (△7#5)", "Mayor Siete #9 (maj7#9)",
+        "Sexta (6)", "Sexta/Novena (6/9)", "Add 9 (add9)"
+    ],
+    "Extensiones y Alteraciones Menores": [
+        "Novena Menor (m9)", "Trecena Menor (m13)", "Menor Siete b9 (m7b9)",
+        "Menor Siete #11 (m7#11)", "Menor Sexta (m6)", "Menor Sexta/Novena (m6/9)"
+    ],
+    "Extensiones y Alteraciones Dominantes": [
+        "Novena Dominante (9)", "Trecena Dominante (13)", "Siete b9 (7b9)", "Siete #9 (7#9)",
+        "Siete #11 (7#11)", "Séptima con Quinta Aumentada (7#5)", "Séptima con Quinta Disminuida (7b5)",
+        "Siete b9 #11 (7b9#11)", "Siete #9 b13 (7#9b13)", "Siete b5 #9 (7b5#9)",
+        "Siete #5 #9 (7#5#9)", "Siete #5 b9 (7#5b9)"
+    ],
+    "Suspendidos con Extensiones": [
+        "Novena Suspendida 4 (9sus4)", "Trecena Suspendida 4 (13sus4)"
+    ]
+};
 
 const acordes = {
     "Mayor Séptima (maj7)": { "intervalos": [0, 4, 7, 11], "grados": ["1", "3", "5", "7"], "notacion": "maj7" },
@@ -690,11 +729,8 @@ function renderSelectors() {
             document.querySelectorAll('#tonalidad-options .card-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
             calcularEscala();
-
-            // Actualizar preview y patrón de batería si hay una progresión seleccionada
             const select = document.getElementById('predefined-progressions-select');
             if (select.value !== '') {
-                const progression = predefinedProgressions[parseInt(select.value)];
                 const event = new Event('change');
                 select.dispatchEvent(event);
             }
@@ -702,85 +738,109 @@ function renderSelectors() {
         tonalidadOptionsContainer.appendChild(option);
     });
 
-    const escalaOptionsContainer = document.getElementById('escala-options');
+    const escalaOptionsContainer = document.getElementById('escala-options-modal');
     escalaOptionsContainer.innerHTML = '';
+
+    // Add default option
     const escalaDefaultOption = document.createElement('div');
     escalaDefaultOption.className = 'card-option';
     escalaDefaultOption.textContent = 'Ninguna';
     escalaDefaultOption.dataset.value = '';
-    if (selectedEscala === '') {
-        escalaDefaultOption.classList.add('selected');
-    }
     escalaDefaultOption.addEventListener('click', () => {
         selectedEscala = '';
         selectedAcorde = '';
-        document.querySelectorAll('#escala-options .card-option').forEach(opt => opt.classList.remove('selected'));
-        escalaDefaultOption.classList.add('selected');
-        document.querySelectorAll('#acorde-options .card-option').forEach(opt => opt.classList.remove('selected'));
-        document.querySelector('#acorde-options .card-option[data-value=""]').classList.add('selected');
+        document.getElementById('open-escala-modal-btn').textContent = 'Seleccionar Escala';
+        document.getElementById('open-acorde-modal-btn').textContent = 'Seleccionar Acorde';
+        document.getElementById('escala-modal').style.display = "none";
         calcularEscala();
     });
     escalaOptionsContainer.appendChild(escalaDefaultOption);
 
-    Object.keys(escalas_modos).forEach(opcion => {
-        const option = document.createElement('div');
-        option.className = 'card-option';
-        option.textContent = opcion;
-        option.dataset.value = opcion;
-        if (opcion === selectedEscala) {
-            option.classList.add('selected');
-        }
-        option.addEventListener('click', () => {
-            selectedEscala = opcion;
-            selectedAcorde = '';
-            document.querySelectorAll('#escala-options .card-option').forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
-            document.querySelectorAll('#acorde-options .card-option').forEach(opt => opt.classList.remove('selected'));
-            document.querySelector('#acorde-options .card-option[data-value=""]').classList.add('selected');
-            calcularEscala();
-        });
-        escalaOptionsContainer.appendChild(option);
-    });
+    // Render grouped scales
+    const escalasGrid = document.createElement('div');
+    escalasGrid.className = 'escalas-grid';
 
-    const acordeOptionsContainer = document.getElementById('acorde-options');
+    for (const grupo in escalasAgrupadas) {
+        const grupoContainer = document.createElement('div');
+        grupoContainer.className = 'escala-group';
+        
+        const grupoTitle = document.createElement('h3');
+        grupoTitle.className = 'escala-group-title';
+        grupoTitle.textContent = grupo;
+        grupoContainer.appendChild(grupoTitle);
+
+        escalasAgrupadas[grupo].forEach(opcion => {
+            if (escalas_modos[opcion]) { // Check if scale exists
+                const option = document.createElement('div');
+                option.className = 'card-option';
+                option.textContent = opcion;
+                option.dataset.value = opcion;
+                option.addEventListener('click', () => {
+                    selectedEscala = opcion;
+                    selectedAcorde = '';
+                    document.getElementById('open-escala-modal-btn').textContent = `Escala: ${opcion}`;
+                    document.getElementById('open-acorde-modal-btn').textContent = 'Seleccionar Acorde';
+                    document.getElementById('escala-modal').style.display = "none";
+                    calcularEscala();
+                });
+                grupoContainer.appendChild(option);
+            }
+        });
+        escalasGrid.appendChild(grupoContainer);
+    }
+    escalaOptionsContainer.appendChild(escalasGrid);
+
+    const acordeOptionsContainer = document.getElementById('acorde-options-modal');
     acordeOptionsContainer.innerHTML = '';
+
+    // Add default option
     const acordeDefaultOption = document.createElement('div');
     acordeDefaultOption.className = 'card-option';
     acordeDefaultOption.textContent = 'Ninguno';
     acordeDefaultOption.dataset.value = '';
-    if (selectedAcorde === '') {
-        acordeDefaultOption.classList.add('selected');
-    }
     acordeDefaultOption.addEventListener('click', () => {
         selectedAcorde = '';
         selectedEscala = '';
-        document.querySelectorAll('#acorde-options .card-option').forEach(opt => opt.classList.remove('selected'));
-        acordeDefaultOption.classList.add('selected');
-        document.querySelectorAll('#escala-options .card-option').forEach(opt => opt.classList.remove('selected'));
-        document.querySelector('#escala-options .card-option[data-value=""]').classList.add('selected');
+        document.getElementById('open-acorde-modal-btn').textContent = 'Seleccionar Acorde';
+        document.getElementById('open-escala-modal-btn').textContent = 'Seleccionar Escala';
+        document.getElementById('acorde-modal').style.display = "none";
         calcularEscala();
     });
     acordeOptionsContainer.appendChild(acordeDefaultOption);
 
-    Object.keys(acordes).forEach(opcion => {
-        const option = document.createElement('div');
-        option.className = 'card-option';
-        option.textContent = opcion.replace("Menor Séptima con Quinta Disminuida", "Semidisminuido").replace("Disminuido Séptima", "Disminuido");
-        option.dataset.value = opcion;
-        if (opcion === selectedAcorde) {
-            option.classList.add('selected');
-        }
-        option.addEventListener('click', () => {
-            selectedAcorde = opcion;
-            selectedEscala = '';
-            document.querySelectorAll('#acorde-options .card-option').forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
-            document.querySelectorAll('#escala-options .card-option').forEach(opt => opt.classList.remove('selected'));
-            document.querySelector('#escala-options .card-option[data-value=""]').classList.add('selected');
-            calcularEscala();
+    // Render grouped chords
+    const acordesGrid = document.createElement('div');
+    acordesGrid.className = 'acordes-grid';
+    
+    for (const grupo in acordesAgrupados) {
+        const grupoContainer = document.createElement('div');
+        grupoContainer.className = 'acorde-group';
+        
+        const grupoTitle = document.createElement('h3');
+        grupoTitle.className = 'acorde-group-title';
+        grupoTitle.textContent = grupo;
+        grupoContainer.appendChild(grupoTitle);
+
+        acordesAgrupados[grupo].forEach(opcion => {
+            if (acordes[opcion]) { // Check if chord exists
+                const option = document.createElement('div');
+                option.className = 'card-option';
+                option.textContent = opcion.replace("Menor Séptima con Quinta Disminuida", "Semidisminuido").replace("Disminuido Séptima", "Disminuido");
+                option.dataset.value = opcion;
+                option.addEventListener('click', () => {
+                    selectedAcorde = opcion;
+                    selectedEscala = '';
+                    document.getElementById('open-acorde-modal-btn').textContent = `Acorde: ${opcion}`;
+                    document.getElementById('open-escala-modal-btn').textContent = 'Seleccionar Escala';
+                    document.getElementById('acorde-modal').style.display = "none";
+                    calcularEscala();
+                });
+                grupoContainer.appendChild(option);
+            }
         });
-        acordeOptionsContainer.appendChild(option);
-    });
+        acordesGrid.appendChild(grupoContainer);
+    }
+    acordeOptionsContainer.appendChild(acordesGrid);
 }
 
 function formatChordDisplay(acorde, forOnClick = false) {
@@ -1551,6 +1611,58 @@ window.onload = () => {
     }, { once: true });
 
     renderSelectors();
+
+    // Modal Logic
+    const escalaModal = document.getElementById('escala-modal');
+    const acordeModal = document.getElementById('acorde-modal');
+
+    const openEscalaBtn = document.getElementById('open-escala-modal-btn');
+    const openAcordeBtn = document.getElementById('open-acorde-modal-btn');
+
+    const closeEscalaBtn = document.getElementById('close-escala-modal-btn');
+    const closeAcordeBtn = document.getElementById('close-acorde-modal-btn');
+
+    openEscalaBtn.onclick = () => escalaModal.style.display = "block";
+    openAcordeBtn.onclick = () => acordeModal.style.display = "block";
+
+    closeEscalaBtn.onclick = () => escalaModal.style.display = "none";
+    closeAcordeBtn.onclick = () => acordeModal.style.display = "none";
+
+    window.onclick = function(event) {
+        if (event.target == escalaModal) {
+            escalaModal.style.display = "none";
+        }
+        if (event.target == acordeModal) {
+            acordeModal.style.display = "none";
+        }
+    }
+
+    // Search Logic
+    document.getElementById('escala-search').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let options = document.getElementById('escala-options-modal').getElementsByClassName('card-option');
+        for (let i = 0; i < options.length; i++) {
+            let txtValue = options[i].textContent || options[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    });
+
+    document.getElementById('acorde-search').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let options = document.getElementById('acorde-options-modal').getElementsByClassName('card-option');
+        for (let i = 0; i < options.length; i++) {
+            let txtValue = options[i].textContent || options[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    });
     renderPredefinedProgressionsSelector();
     initializeSamplersAndVolumes(); // Call the new function to create samplers and volumes
     loadAudioFiles(); // Still call this to load the audio buffers into the samplers

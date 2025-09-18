@@ -87,6 +87,7 @@ const acordesAgrupados = {
     "Extensiones y Alteraciones Mayores": [
         "Novena Mayor (maj9)", "Trecena Mayor (maj13)", "Mayor Siete #11 (maj7#11)",
         "Mayor Séptima b5 (maj7b5)", "Aumentado Séptima Mayor (△7#5)", "Mayor Siete #9 (maj7#9)",
+        "Mayor Séptima b9 (maj7b9)",
         "Sexta (6)", "Sexta/Novena (6/9)", "Add 9 (add9)"
     ],
     "Extensiones y Alteraciones Menores": [
@@ -102,7 +103,9 @@ const acordesAgrupados = {
     "Suspendidos con Extensiones": [
         "Novena Suspendida 4 (9sus4)", "Trecena Suspendida 4 (13sus4)",
         "Séptima Suspendida 2 (7sus2)", "Suspendida 4 b5 (sus4b5)", "Suspendida 4 #5 (sus4#5)", "Suspendida 2 b5 (sus2b5)",
-        "Siete Suspendido 4 (7sus4)"
+        "Suspendida 2 #5 (sus2#5)", "Siete Suspendido 4 (7sus4)",
+        "Séptima Suspendida 4 b5 (7sus4b5)", "Séptima Suspendida 4 #5 (7sus4#5)",
+        "Séptima Suspendida 2 b5 (7sus2b5)", "Séptima Suspendida 2 #5 (7sus2#5)"
     ]
 };
 
@@ -132,6 +135,7 @@ const acordes = {
     "Séptima con Quinta Aumentada (7#5)": { "intervalos": [0, 4, 8, 10], "grados": ["1", "3", "#5", "b7"], "notacion": "7#5" },
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
     "Mayor Siete #9 (maj7#9)": { "intervalos": [0, 4, 7, 11, 3], "grados": ["1", "3", "5", "7", "#9"], "notacion": "maj7#9" },
+    "Mayor Séptima b9 (maj7b9)": { "intervalos": [0, 4, 7, 11, 1], "grados": ["1", "3", "5", "7", "b9"], "notacion": "maj7b9" },
     "Sexta/Novena (6/9)": { "intervalos": [0, 4, 7, 9, 2], "grados": ["1", "3", "5", "6", "9"], "notacion": "6/9" },
     "Menor Sexta/Novena (m6/9)": { "intervalos": [0, 3, 7, 9, 2], "grados": ["1", "b3", "5", "6", "9"], "notacion": "m6/9" },
     "Siete b9 #11 (7b9#11)": { "intervalos": [0, 4, 7, 10, 1, 6], "grados": ["1", "3", "5", "b7", "b9", "#11"], "notacion": "7b9#11" },
@@ -148,7 +152,11 @@ const acordes = {
     "Menor (Triada)": { "intervalos": [0, 3, 7], "grados": ["1", "b3", "5"], "notacion": "m" },
     "Aumentado (Triada)": { "intervalos": [0, 4, 8], "grados": ["1", "3", "#5"], "notacion": "aug" },
     "Disminuido (Triada)": { "intervalos": [0, 3, 6], "grados": ["1", "b3", "b5"], "notacion": "dim" },
-    "7sus4": { "intervalos": [0, 5, 7, 10], "grados": ["1", "4", "5", "b7"], "notacion": "7sus4" }
+    "7sus4": { "intervalos": [0, 5, 7, 10], "grados": ["1", "4", "5", "b7"], "notacion": "7sus4" },
+    "Séptima Suspendida 4 b5 (7sus4b5)": { "intervalos": [0, 5, 6, 10], "grados": ["1", "4", "b5", "b7"], "notacion": "7sus4b5" },
+    "Séptima Suspendida 4 #5 (7sus4#5)": { "intervalos": [0, 5, 8, 10], "grados": ["1", "4", "#5", "b7"], "notacion": "7sus4#5" },
+    "Séptima Suspendida 2 b5 (7sus2b5)": { "intervalos": [0, 2, 6, 10], "grados": ["1", "2", "b5", "b7"], "notacion": "7sus2b5" },
+    "Séptima Suspendida 2 #5 (7sus2#5)": { "intervalos": [0, 2, 8, 10], "grados": ["1", "2", "#5", "b7"], "notacion": "7sus2#5" }
 };
 
 const todasLasOpciones = { ...escalas_modos, ...acordes };
@@ -252,8 +260,10 @@ const acorde_audio_map = {
     "6": "maj6", "m6": "m6",
     "maj9": "maj9", "m9": "m9", "9": "9", "add9": "add9",
     "maj13": "maj13", "m13": "m13", "13": "13",
+    "maj7b9": "maj7b9",
     "sus4": "sus4",
     "sus2": "sus2",
+    "7sus4b5": "7sus4b5", "7sus4#5": "7sus4#5", "7sus2b5": "7sus2b5", "7sus2#5": "7sus2#5",
     "maj": "maj",
     "m": "m",
     "aug": "aug",
@@ -909,6 +919,16 @@ function formatChordDisplay(acorde, forOnClick = false) {
         formattedSuffix = 'm7b9';
     } else if (acorde === 'm7#11') {
         formattedSuffix = 'm7#11';
+    } else if (acorde === 'maj7b9') {
+        formattedSuffix = 'maj7b9';
+    } else if (acorde === '7sus4b5') {
+        formattedSuffix = '7sus4b5';
+    } else if (acorde === '7sus4#5') {
+        formattedSuffix = '7sus4#5';
+    } else if (acorde === '7sus2b5') {
+        formattedSuffix = '7sus2b5';
+    } else if (acorde === '7sus2#5') {
+        formattedSuffix = '7sus2#5';
     } else {
         // Existing logic for 7th chords
         formattedSuffix = acorde.replace('maj7', '△7').replace('m7b5', 'ø7').replace('dim7', '°');

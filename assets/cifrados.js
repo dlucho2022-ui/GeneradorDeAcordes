@@ -65,6 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
         "Novena Suspendida 4 (9sus4)": { "intervalos": [0, 5, 7, 10, 2], "grados": ["1", "4", "5", "b7", "9"], "notacion": "9sus4" },
         "Trecena Suspendida 4 (13sus4)": { "intervalos": [0, 5, 7, 10, 2, 9], "grados": ["1", "4", "5", "b7", "9", "13"], "notacion": "13sus4" },
         "Séptima Suspendida 2 (7sus2)": { "intervalos": [0, 2, 7, 10], "grados": ["1", "2", "5", "b7"], "notacion": "7sus2" },
+        "Séptima Suspendida 4 b5 (7sus4b5)": { "intervalos": [0, 5, 6, 10], "grados": ["1", "4", "b5", "b7"], "notacion": "7sus4b5" },
+        "Séptima Suspendida 4 #5 (7sus4#5)": { "intervalos": [0, 5, 8, 10], "grados": ["1", "4", "#5", "b7"], "notacion": "7sus4#5" },
+        "Séptima Suspendida 2 b5 (7sus2b5)": { "intervalos": [0, 2, 6, 10], "grados": ["1", "2", "b5", "b7"], "notacion": "7sus2b5" },
+        "Séptima Suspendida 2 #5 (7sus2#5)": { "intervalos": [0, 2, 8, 10], "grados": ["1", "2", "#5", "b7"], "notacion": "7sus2#5" },
         "Suspendida 4 b5 (sus4b5)": { "intervalos": [0, 5, 6], "grados": ["1", "4", "b5"], "notacion": "sus4b5" },
         "Suspendida 4 #5 (sus4#5)": { "intervalos": [0, 5, 8], "grados": ["1", "4", "#5"], "notacion": "sus4#5" },
         "Suspendida 2 b5 (sus2b5)": { "intervalos": [0, 2, 6], "grados": ["1", "2", "b5"], "notacion": "sus2b5" },
@@ -202,6 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (qualityLower === 'maj7b5') quality = 'maj7b5';
         else if (qualityLower === 'maj7b9') quality = 'maj7b9';
         else if (qualityLower === '7sus4') quality = '7sus4';
+        else if (qualityLower === '7sus4b5') quality = '7sus4b5';
+        else if (qualityLower === '7sus4#5') quality = '7sus4#5';
+        else if (qualityLower === '7sus2b5') quality = '7sus2b5';
+        else if (qualityLower === '7sus2#5') quality = '7sus2#5';
         else if (qualityLower === 'm9b5') quality = 'm9b5';
         else if (quality === '') quality = 'maj';
         else if (quality === 'm') quality = 'm';

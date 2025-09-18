@@ -536,6 +536,14 @@ document.addEventListener('DOMContentLoaded', () => {
     Tone.loaded().then(() => {
         console.log("Piano sampler y metrónomo listos.");
 
+        // Iniciar el AudioContext con la primera interacción del usuario
+        document.documentElement.addEventListener('click', () => {
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+                console.log("AudioContext iniciado.");
+            }
+        }, { once: true });
+
         // --- Lógica de Selección (Click y Arrastre) ---
         chartContainer.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('measure')) {
@@ -585,19 +593,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         volumeSlider.addEventListener('input', (e) => {
-            metronomeVolume.volume.value = e.target.value;
+            const sliderValue = parseFloat(e.target.value);
+            const minDb = parseFloat(e.target.min);
+            const maxDb = parseFloat(e.target.max);
+
+            // Normalizar el valor del slider a un rango de 0 a 1
+            const normalizedValue = (sliderValue - minDb) / (maxDb - minDb);
+
+            // Aplicar una curva de potencia (0.5 para una mayor sensibilidad en volúmenes bajos)
+            const curvedNormalizedValue = Math.pow(normalizedValue, 0.5);
+
+            // Escalar de nuevo al rango de decibelios
+            const newDbValue = minDb + (maxDb - minDb) * curvedNormalizedValue;
+
+            console.log("Slider value:", sliderValue, "Normalized:", normalizedValue, "Curved Normalized:", curvedNormalizedValue, "New dB value:", newDbValue);
+            metronomeVolume.volume.value = newDbValue;
         });
 
         // --- Acordes y Progresión ---
         chartContainer.addEventListener('keydown', function(event) {
             if (event.target.classList.contains('measure')) {
-                if (event.key === 'Enter' || event.key === 'Tab') {
-                    const chordName = event.target.textContent;
-                    playChord(chordName);
+                if (event.key === 'Enter' || event.key === 'Tab' || event.key === ' ') {
+                    const fullMeasureText = event.target.textContent.trim();
+                    const chordsInMeasure = fullMeasureText.split(/\s+/).filter(Boolean);
+                    const lastChord = chordsInMeasure[chordsInMeasure.length - 1];
 
-                    if (event.key === 'Enter') {
+                    if (lastChord) {
+                        playChord(lastChord);
+                    }
+
+                    if (event.key === 'Enter') { // Prevent default for Enter only
                         event.preventDefault();
-                        event.target.blur();
+                        event.target.blur(); // Blur only on Enter
                     }
                 }
             }
@@ -606,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const playProgressionBtn = document.getElementById('play-progression-btn');
         const loopCheckbox = document.getElementById('loop-progression-checkbox');
 
-        playProgressionBtn.addEventListener('click', function() {
+        playProgressionBtn.addEventListener('click', async function() {
             const playIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>`;
             const stopIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-fill" viewBox="0 0 16 16"><path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/></svg>`;
 
@@ -636,7 +663,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (playbackEvents.length === 0) return;
-                if (Tone.context.state !== 'running') { Tone.start(); }
+                
+                // Asegurarse de que los samplers estén cargados antes de empezar
+                await sampler.loaded;
+                await metronomePlayer.loaded;
+
                 if (progressionSequence) { progressionSequence.dispose(); }
 
                 progressionSequence = new Tone.Part((time, value) => {

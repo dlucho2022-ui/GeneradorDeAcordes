@@ -66,10 +66,10 @@ const escalas_modos = {
     "Jónico Aumentado ♯2": { "intervalos": [0, 3, 4, 5, 8, 9, 11], "grados": ["1", "#2", "3", "4", "#5", "6", "7"], "acordes": ["△7#5", "dim7", "maj7", "maj7", "m7b5", "m△7", "7b5"] },
     "Locrio ♭♭7": { "intervalos": [0, 1, 2, 5, 6, 8, 9], "grados": ["1", "b2", "bb3", "4", "b5", "b6", "bb7"], "acordes": ["dim7", "maj7", "maj7", "m7b5", "m△7", "7b5", "△7#5"] },
     "Pentatónica Egipcia": { "intervalos": [0, 2, 5, 7, 10], "grados": ["1", "2", "4", "5", "b7"], "acordes": [] },
-    "Pentatónica Kumoi": { "intervalos": [0, 2, 3, 7, 9], "grados": ["1", "2", "b3", "5", "6"], "acordes": [] },
-    "Escala de Prometeo": { "intervalos": [0, 2, 4, 6, 9, 10], "grados": ["1", "2", "3", "#4", "6", "b7"], "acordes": [] },
-    "Escala de Tritono": { "intervalos": [0, 1, 4, 6, 7, 10], "grados": ["1", "b2", "3", "#4", "5", "b7"], "acordes": [] },
-    "Escala Enigmática": { "intervalos": [0, 1, 4, 6, 8, 10, 11], "grados": ["1", "b2", "3", "#4", "#5", "#6", "7"], "acordes": [] }
+    "Pentatónica Kumoi": { "intervalos": [0, 2, 3, 7, 9], "grados": ["1", "2", "b3", "5", "6"], "acordes": ["m", "m6", "m7"] },
+    "Escala de Prometeo": { "intervalos": [0, 2, 4, 6, 9, 10], "grados": ["1", "2", "3", "#4", "6", "b7"], "acordes": ["7b5", "7", ] },
+    "Escala de Tritono": { "intervalos": [0, 1, 4, 6, 7, 10], "grados": ["1", "b2", "3", "#4", "5", "b7"], "acordes": ["7b5", "7#11", "dim7"] },
+    "Escala Enigmática": { "intervalos": [0, 1, 4, 6, 8, 10, 11], "grados": ["1", "b2", "3", "#4", "#5", "#6", "7"], "acordes": ["maj7#5", "dim7", "7#5"] }
 
 };
 
@@ -77,7 +77,7 @@ const escalas_modos = {
 const acordesAgrupados = {
     "Triadas": [
         "Mayor (Triada)", "Menor (Triada)", "Aumentado (Triada)", "Disminuido (Triada)",
-        "Cuarta Suspendida (sus4)", "Segunda Suspendida (sus2)"
+        "Cuarta Suspendida (sus4)", "Segunda Suspendida (sus2)", "TEST_CHORD"
     ],
     "Séptima": [
         "Mayor Séptima (maj7)", "Menor Séptima (m7)", "Séptima de Dominante (7)",
@@ -100,7 +100,9 @@ const acordesAgrupados = {
         "Siete #5 #9 (7#5#9)", "Siete #5 b9 (7#5b9)"
     ],
     "Suspendidos con Extensiones": [
-        "Novena Suspendida 4 (9sus4)", "Trecena Suspendida 4 (13sus4)"
+        "Novena Suspendida 4 (9sus4)", "Trecena Suspendida 4 (13sus4)",
+        "Séptima Suspendida 2 (7sus2)", "Suspendida 4 b5 (sus4b5)", "Suspendida 4 #5 (sus4#5)", "Suspendida 2 b5 (sus2b5)",
+        "Siete Suspendido 4 (7sus4)"
     ]
 };
 
@@ -145,7 +147,8 @@ const acordes = {
     "Mayor (Triada)": { "intervalos": [0, 4, 7], "grados": ["1", "3", "5"], "notacion": "maj" },
     "Menor (Triada)": { "intervalos": [0, 3, 7], "grados": ["1", "b3", "5"], "notacion": "m" },
     "Aumentado (Triada)": { "intervalos": [0, 4, 8], "grados": ["1", "3", "#5"], "notacion": "aug" },
-    "Disminuido (Triada)": { "intervalos": [0, 3, 6], "grados": ["1", "b3", "b5"], "notacion": "dim" }
+    "Disminuido (Triada)": { "intervalos": [0, 3, 6], "grados": ["1", "b3", "b5"], "notacion": "dim" },
+    "7sus4": { "intervalos": [0, 5, 7, 10], "grados": ["1", "4", "5", "b7"], "notacion": "7sus4" }
 };
 
 const todasLasOpciones = { ...escalas_modos, ...acordes };
@@ -822,6 +825,23 @@ function renderSelectors() {
         grupoContainer.appendChild(grupoTitle);
 
         acordesAgrupados[grupo].forEach(opcion => {
+            // TEMPORARY DEBUGGING: Force 7sus4 to appear
+            if (grupo === "Suspendidos con Extensiones" && opcion === "Novena Suspendida 4 (9sus4)") { // Find a known first element in the group
+                const tempOption = document.createElement('div');
+                tempOption.className = 'card-option';
+                tempOption.textContent = "7sus4"; // Hardcoded text
+                tempOption.dataset.value = "7sus4";
+                tempOption.addEventListener('click', () => {
+                    selectedAcorde = "7sus4";
+                    selectedEscala = '';
+                    document.getElementById('open-acorde-modal-btn').textContent = `Acorde: 7sus4`;
+                    document.getElementById('open-escala-modal-btn').textContent = 'Seleccionar Escala';
+                    document.getElementById('acorde-modal').style.display = "none";
+                    calcularEscala();
+                });
+                grupoContainer.appendChild(tempOption);
+            }
+            // END TEMPORARY DEBUGGING
             if (acordes[opcion]) { // Check if chord exists
                 const option = document.createElement('div');
                 option.className = 'card-option';
@@ -1996,3 +2016,5 @@ async function playMidiBeat() {
         alert("Hubo un error al cargar o reproducir el archivo MIDI. Revisa la consola para más detalles.");
     }
 }
+    
+    

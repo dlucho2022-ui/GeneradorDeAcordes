@@ -82,6 +82,7 @@ const acordes = {
     "Disminuido Séptima (dim7)": { "intervalos": [0, 3, 6, 9], "grados": ["1", "b3", "b5", "bb7"], "notacion": "dim7" },
     "Menor Séptima Mayor (m△7)": { "intervalos": [0, 3, 7, 11], "grados": ["1", "b3", "5", "7"], "notacion": "m△7" },
     "Aumentado Séptima Mayor (△7#5)": { "intervalos": [0, 4, 8, 11], "grados": ["1", "3", "#5", "7"], "notacion": "△7#5" },
+    "Mayor Séptima b5 (maj7b5)": { "intervalos": [0, 4, 6, 11], "grados": ["1", "3", "b5", "7"], "notacion": "maj7b5" },
     "Séptima con Quinta Aumentada (7#5)": { "intervalos": [0, 4, 8, 10], "grados": ["1", "3", "#5", "b7"], "notacion": "7#5" },
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
     "Add 9 (add9)": { "intervalos": [0, 4, 7, 2], "grados": ["1", "3", "5", "9"], "notacion": "add9" },
@@ -1779,6 +1780,8 @@ function addChordFromInput() {
     let chordDisplay = null;
 
     const chordAliasMap = {
+        "maj7#5": "Aumentado Séptima Mayor (△7#5)",
+        "maj7b5": "Mayor Séptima b5 (maj7b5)",
         "maj7": "Mayor Séptima (maj7)", "major7": "Mayor Séptima (maj7)", "M7": "Mayor Séptima (maj7)", "△7": "Mayor Séptima (maj7)",
         "m7": "Menor Séptima (m7)", "minor7": "Menor Séptima (m7)",
         "7": "Séptima de Dominante (7)", "dom7": "Séptima de Dominante (7)",

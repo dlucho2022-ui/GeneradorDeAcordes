@@ -22,75 +22,224 @@ document.addEventListener('DOMContentLoaded', () => {
         metronomePlayer.start(time);
     }, "4n");
 
-    const spanishToEnglishMap = {
-        'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'si': 'B',
-        'do#': 'C#', 'reb': 'Db',
-        're#': 'D#', 'mib': 'Eb',
-        'fa#': 'F#', 'solb': 'Gb',
-        'sol#': 'G#', 'lab': 'Ab',
-        'la#': 'A#', 'sib': 'Bb'
+    // --- NUEVA LÓGICA DE ACORDES (DE SCRIPTS.JS) ---
+
+    const notasBase = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
+
+    const acordes = {
+        "Mayor Séptima (maj7)": { "intervalos": [0, 4, 7, 11], "grados": ["1", "3", "5", "7"], "notacion": "maj7" },
+        "Mayor Siete b9 (maj7b9)": { "intervalos": [0, 4, 7, 11, 1], "grados": ["1", "3", "5", "7", "b9"], "notacion": "maj7b9" },
+        "Novena Mayor (maj9)": { "intervalos": [0, 4, 7, 11, 2], "grados": ["1", "3", "5", "7", "9"], "notacion": "maj9" },
+        "Trecena Mayor (maj13)": { "intervalos": [0, 4, 7, 11, 2, 9], "grados": ["1", "3", "5", "7", "9", "13"], "notacion": "maj13" },
+        "Mayor Siete #11 (maj7#11)": { "intervalos": [0, 4, 7, 11, 6], "grados": ["1", "3", "5", "7", "#11"], "notacion": "maj7#11" },
+        "Menor Séptima (m7)": { "intervalos": [0, 3, 7, 10], "grados": ["1", "b3", "5", "b7"], "notacion": "m7" },
+        "Novena Menor (m9)": { "intervalos": [0, 3, 7, 10, 2], "grados": ["1", "b3", "5", "b7", "9"], "notacion": "m9" },
+        "Menor Novena b5 (m9b5)": { "intervalos": [0, 3, 6, 10, 2], "grados": ["1", "b3", "b5", "b7", "9"], "notacion": "m9b5" },
+        "Trecena Menor (m13)": { "intervalos": [0, 3, 7, 10, 2, 9], "grados": ["1", "b3", "5", "b7", "9", "13"], "notacion": "m13" },
+        "Menor Siete b9 (m7b9)": { "intervalos": [0, 3, 7, 10, 1], "grados": ["1", "b3", "5", "b7", "b9"], "notacion": "m7b9" },
+        "Menor Siete #11 (m7#11)": { "intervalos": [0, 3, 7, 10, 6], "grados": ["1", "b3", "5", "b7", "#11"], "notacion": "m7#11" },
+        "Séptima de Dominante (7)": { "intervalos": [0, 4, 7, 10], "grados": ["1", "3", "5", "b7"], "notacion": "7" },
+        "Siete Suspendido 4 (7sus4)": { "intervalos": [0, 5, 7, 10], "grados": ["1", "4", "5", "b7"], "notacion": "7sus4" },
+        "Novena Dominante (9)": { "intervalos": [0, 4, 7, 10, 2], "grados": ["1", "3", "5", "b7", "9"], "notacion": "9" },
+        "Trecena Dominante (13)": { "intervalos": [0, 4, 7, 10, 2, 9], "grados": ["1", "3", "5", "b7", "9", "13"], "notacion": "13" },
+        "Siete b9 (7b9)": { "intervalos": [0, 4, 7, 10, 1], "grados": ["1", "3", "5", "b7", "b9"], "notacion": "7b9" },
+        "Siete #9 (7#9)": { "intervalos": [0, 4, 7, 10, 3], "grados": ["1", "3", "5", "b7", "#9"], "notacion": "7#9" },
+        "Siete #11 (7#11)": { "intervalos": [0, 4, 7, 10, 6], "grados": ["1", "3", "5", "b7", "#11"], "notacion": "7#11" },
+        "Sexta (6)": { "intervalos": [0, 4, 7, 9], "grados": ["1", "3", "5", "6"], "notacion": "6" },
+        "Menor Sexta (m6)": { "intervalos": [0, 3, 7, 9], "grados": ["1", "b3", "5", "6"], "notacion": "m6" },
+        "Menor Séptima con Quinta Disminuida (m7b5)": { "intervalos": [0, 3, 6, 10], "grados": ["1", "b3", "b5", "b7"], "notacion": "m7b5" },
+        "Disminuido Séptima (dim7)": { "intervalos": [0, 3, 6, 9], "grados": ["1", "b3", "b5", "bb7"], "notacion": "dim7" },
+        "Menor Séptima Mayor (m△7)": { "intervalos": [0, 3, 7, 11], "grados": ["1", "b3", "5", "7"], "notacion": "m△7" },
+        "Aumentado Séptima Mayor (△7#5)": { "intervalos": [0, 4, 8, 11], "grados": ["1", "3", "#5", "7"], "notacion": "△7#5" },
+        "Mayor Séptima b5 (maj7b5)": { "intervalos": [0, 4, 6, 11], "grados": ["1", "3", "b5", "7"], "notacion": "maj7b5" },
+        "Séptima con Quinta Aumentada (7#5)": { "intervalos": [0, 4, 8, 10], "grados": ["1", "3", "#5", "b7"], "notacion": "7#5" },
+        "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
+        "Add 9 (add9)": { "intervalos": [0, 4, 7, 2], "grados": ["1", "3", "5", "9"], "notacion": "add9" },
+        "Cuarta Suspendida (sus4)": { "intervalos": [0, 5, 7], "grados": ["1", "4", "5"], "notacion": "sus4" },
+        "Segunda Suspendida (sus2)": { "intervalos": [0, 2, 7], "grados": ["1", "2", "5"], "notacion": "sus2" },
+        "Mayor (Triada)": { "intervalos": [0, 4, 7], "grados": ["1", "3", "5"], "notacion": "maj" },
+        "Menor (Triada)": { "intervalos": [0, 3, 7], "grados": ["1", "b3", "5"], "notacion": "m" },
+        "Aumentado (Triada)": { "intervalos": [0, 4, 8], "grados": ["1", "3", "#5"], "notacion": "aug" },
+        "Disminuido (Triada)": { "intervalos": [0, 3, 6], "grados": ["1", "b3", "b5"], "notacion": "dim" }
     };
+    
+    const semitonos_display = ["Do", "Do#", "Reb", "Re", "Re#", "Mib", "Mi", "Fa", "Fa#", "Solb", "Sol", "Sol#", "Lab", "La", "La#", "Sib", "Si"];
+
+    function mapNotaToSemitone(nota) {
+        const semitonoMap = {
+            "Do": 0, "Do#": 1, "Reb": 1, "Re": 2, "Re#": 3, "Mib": 3, "Mi": 4,
+            "Fa": 5, "Fa#": 6, "Solb": 6, "Sol": 7, "Sol#": 8, "Lab": 8,
+            "La": 9, "La#": 10, "Sib": 10, "Si": 11,
+            "C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3, "E": 4,
+            "F": 5, "F#": 6, "Gb": 6, "G": 7, "G#": 8, "Ab": 8,
+            "A": 9, "A#": 10, "Bb": 10, "B": 11,
+            "Mi#": 5, "Si#": 0, "Fab": 4, "Dob": 11, "E#": 5, "B#": 0, "Fb": 4, "Cb": 11,
+            "Dox": 2, "Fax": 7, "Solx": 9, "Lax": 11, "Six": 1, "Rex": 4, "Mix": 6,
+            "Rebb": 0, "Mibb": 2, "Fabb": 3, "Solbb": 5, "Labb": 7, "Sibb": 9, "Dobb": 10, "Sibbb": 8
+        };
+        return semitonoMap[nota] !== undefined ? semitonoMap[nota] : -1;
+    }
+
+    function getDiatonicIndexFromGrade(grado) {
+        const gradoMap = { "1": 0, "b2": 1, "2": 1, "#2": 2, "b3": 2, "3": 2, "b4": 3, "4": 3, "#4": 4, "b5": 4, "5": 4, "b6": 5, "6": 5, "bb7": 6, "b7": 6, "7": 6, "b9": 1, "9": 1, "#9": 2, "b11": 3, "11": 3, "#11": 4, "b13": 5, "13": 5 };
+        const baseGrado = grado.replace(/[#b]/g, '');
+        return gradoMap[baseGrado] || 0;
+    }
+
+    function getProperNoteNameForScale(rootNote, intervalIndex, semitoneInterval) {
+        const rootBaseNote = rootNote.replace(/[#b]/g, '').slice(0,1).toUpperCase() + rootNote.slice(1);
+        const rootBaseIndex = notasBase.indexOf(rootBaseNote.slice(0,1).toUpperCase() + rootBaseNote.slice(1).replace(/[#b]/g, ''));
+        const targetBaseNote = notasBase[(rootBaseIndex + intervalIndex) % 7];
+        const rootSemitone = mapNotaToSemitone(rootNote);
+        const targetNoteSemitone = (rootSemitone + semitoneInterval + 12) % 12;
+        const targetBaseSemitone = mapNotaToSemitone(targetBaseNote);
+        let diff = (targetNoteSemitone - targetBaseSemitone + 12) % 12;
+        let accidental = "";
+        if (diff === 1) accidental = "#";
+        else if (diff === 2) accidental = "x";
+        else if (diff === 11) accidental = "b";
+        else if (diff === 10) accidental = "bb";
+        else if (diff !== 0) {
+             const enharmonic = semitonos_display.find(n => mapNotaToSemitone(n) === targetNoteSemitone);
+             return enharmonic || targetBaseNote + ' (?)';
+        }
+        return targetBaseNote + accidental;
+    }
+
+    function getChordNotes(rootNote, chordType) {
+        let internalChordType = chordType;
+        if (internalChordType === '△7') internalChordType = 'maj7';
+        if (internalChordType === 'ø7') internalChordType = 'm7b5';
+        if (internalChordType === '°') internalChordType = 'dim';
+        if (internalChordType === '') internalChordType = 'maj';
+
+
+        const matchingChord = Object.values(acordes).find(c => c.notacion === internalChordType);
+        if (!matchingChord) return [];
+
+        let notes = [];
+        for (let i = 0; i < matchingChord.intervalos.length; i++) {
+            const interval = matchingChord.intervalos[i];
+            const grade = matchingChord.grados[i];
+            const diatonicIndex = getDiatonicIndexFromGrade(grade);
+            const noteName = getProperNoteNameForScale(rootNote, diatonicIndex, interval);
+            notes.push(noteName);
+        }
+        return notes;
+    }
+    
+    const toneNoteMap = { "Do": "C", "Do#": "C#", "Reb": "Db", "Re": "D", "Re#": "D#", "Mib": "Eb", "Mi": "E", "Fa": "F", "Fa#": "F#", "Solb": "Gb", "Sol": "G", "Sol#": "G#", "Lab": "Ab", "La": "A", "La#": "A#", "Sib": "Bb", "Si": "B" };
+
+    function simplifyEnharmonic(note) {
+        const simplificationMap = { "Mi#": "Fa", "Si#": "Do", "Fab": "Mi", "Dob": "Si", "Dox": "Re", "Rex": "Mi", "Mix": "Fa#", "Fax": "Sol", "Solx": "La", "Lax": "Si", "Six": "Do#", "Rebb": "Do", "Mibb": "Re", "Solbb": "Fa", "Labb": "Sol", "Sibb": "La", "Dobb": "Sib", "Fabb": "Mib" };
+        return simplificationMap[note] || note;
+    }
+
+    function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
+        const notesWithPitch = chordNoteNames.map(name => ({ name: simplifyEnharmonic(name), pitch: mapNotaToSemitone(simplifyEnharmonic(name)) })).filter(n => n.pitch !== -1);
+        let lastPitch = -1;
+        let currentOctave = startOctave;
+        const playableNotes = notesWithPitch.map(note => {
+            if (lastPitch !== -1 && note.pitch < lastPitch) {
+                currentOctave++;
+            }
+            lastPitch = note.pitch;
+            const mappedNote = toneNoteMap[note.name.charAt(0).toUpperCase() + note.name.slice(1)];
+            return mappedNote ? mappedNote + currentOctave : null;
+        }).filter(n => n);
+        return playableNotes;
+    }
+
+    const spanishToEnglishMap = { 'do': 'C', 're': 'D', 'mi': 'E', 'fa': 'F', 'sol': 'G', 'la': 'A', 'si': 'B', 'do#': 'C#', 'reb': 'Db', 're#': 'D#', 'mib': 'Eb', 'fa#': 'F#', 'solb': 'Gb', 'sol#': 'G#', 'lab': 'Ab', 'la#': 'A#', 'sib': 'Bb' };
     const sortedSpanishNotes = Object.keys(spanishToEnglishMap).sort((a, b) => b.length - a.length);
+    
+    function parseChordName(chordName) {
+        chordName = chordName.trim();
+        let rootNote = '';
+        let quality = '';
 
-    const chordMappings = {
-        'C': ['C4', 'E4', 'G4'], 'C#': ['C#4', 'F4', 'G#4'], 'Db': ['Db4', 'F4', 'Ab4'], 'D': ['D4', 'F#4', 'A4'], 'D#': ['D#4', 'G4', 'A#4'], 'Eb': ['Eb4', 'G4', 'Bb4'], 'E': ['E4', 'G#4', 'B4'], 'F': ['F4', 'A4', 'C5'], 'F#': ['F#4', 'A#4', 'C#5'], 'Gb': ['Gb4', 'Bb4', 'Db5'], 'G': ['G4', 'B4', 'D5'], 'G#': ['G#4', 'C5', 'D#5'], 'Ab': ['Ab4', 'C5', 'Eb5'], 'A': ['A4', 'C#5', 'E5'], 'A#': ['A#4', 'D5', 'F5'], 'Bb': ['Bb4', 'D5', 'F5'], 'B': ['B4', 'D#5', 'F#5'],
-        'Cm': ['C4', 'Eb4', 'G4'], 'C#m': ['C#4', 'E4', 'G#4'], 'Dbm': ['Db4', 'E4', 'Ab4'], 'Dm': ['D4', 'F4', 'A4'], 'D#m': ['D#4', 'F#4', 'A#4'], 'Ebm': ['Eb4', 'Gb4', 'Bb4'], 'Em': ['E4', 'G4', 'B4'], 'Fm': ['F4', 'Ab4', 'C5'], 'F#m': ['F#4', 'A4', 'C#5'], 'Gbm': ['Gb4', 'A4', 'Db5'], 'Gm': ['G4', 'Bb4', 'D5'], 'G#m': ['G#4', 'B4', 'D#5'], 'Abm': ['Ab4', 'B4', 'Eb5'], 'Am': ['A4', 'C5', 'E5'], 'A#m': ['A#4', 'C#5', 'F5'], 'Bbm': ['Bb4', 'Db5', 'F5'], 'Bm': ['B4', 'D5', 'F#5'],
-        'C7': ['C4', 'E4', 'G4', 'Bb4'], 'C#7': ['C#4', 'F4', 'G#4', 'B4'], 'Db7': ['Db4', 'F4', 'Ab4', 'B4'], 'D7': ['D4', 'F#4', 'A4', 'C5'], 'D#7': ['D#4', 'G4', 'A#4', 'C#5'], 'Eb7': ['Eb4', 'G4', 'Bb4', 'Db5'], 'E7': ['E4', 'G#4', 'B4', 'D5'], 'F7': ['F4', 'A4', 'C5', 'Eb5'], 'F#7': ['F#4', 'A#4', 'C#5', 'E5'], 'Gb7': ['Gb4', 'Bb4', 'Db5', 'Fb5'], 'G7': ['G4', 'B4', 'D5', 'F5'], 'G#7': ['G#4', 'C5', 'D#5', 'F#5'], 'Ab7': ['Ab4', 'C5', 'Eb5', 'Gb5'], 'A7': ['A4', 'C#5', 'E5', 'G5'], 'A#7': ['A#4', 'D5', 'F5', 'G#5'], 'Bb7': ['Bb4', 'D5', 'F5', 'Ab5'], 'B7': ['B4', 'D#5', 'F#5', 'A5'],
-        'Cm7': ['C4', 'Eb4', 'G4', 'Bb4'], 'C#m7': ['C#4', 'E4', 'G#4', 'B4'], 'Dbm7': ['Db4', 'E4', 'Ab4', 'B4'], 'Dm7': ['D4', 'F4', 'A4', 'C5'], 'D#m7': ['D#4', 'F#4', 'A#4', 'C#5'], 'Ebm7': ['Eb4', 'Gb4', 'Bb4', 'Db5'], 'Em7': ['E4', 'G4', 'B4', 'D5'], 'Fm7': ['F4', 'Ab4', 'C5', 'Eb5'], 'F#m7': ['F#4', 'A4', 'C#5', 'E5'], 'Gbm7': ['Gb4', 'A4', 'Db5', 'Fb5'], 'Gm7': ['G4', 'Bb4', 'D5', 'F5'], 'G#m7': ['G#4', 'B4', 'D#5', 'F#5'], 'Abm7': ['Ab4', 'B4', 'Eb5', 'Gb5'], 'Am7': ['A4', 'C5', 'E5', 'G5'], 'A#m7': ['A#4', 'C#5', 'F5', 'G#5'], 'Bbm7': ['Bb4', 'Db5', 'F5', 'Ab5'], 'Bm7': ['B4', 'D5', 'F#5', 'A5'],
-        'Cmaj7': ['C4', 'E4', 'G4', 'B4'], 'C#maj7': ['C#4', 'F4', 'G#4', 'C5'], 'Dbmaj7': ['Db4', 'F4', 'Ab4', 'C5'], 'Dmaj7': ['D4', 'F#4', 'A4', 'C#5'], 'D#maj7': ['D#4', 'G4', 'A#4', 'D5'], 'Ebmaj7': ['Eb4', 'G4', 'Bb4', 'D5'], 'Emaj7': ['E4', 'G#4', 'B4', 'D#5'], 'Fmaj7': ['F4', 'A4', 'C5', 'E5'], 'F#maj7': ['F#4', 'A#4', 'C#5', 'F5'], 'Gbmaj7': ['Gb4', 'Bb4', 'Db5', 'F5'], 'Gmaj7': ['G4', 'B4', 'D5', 'F#5'], 'G#maj7': ['G#4', 'C5', 'D#5', 'G5'], 'Abmaj7': ['Ab4', 'C5', 'Eb5', 'G5'], 'Amaj7': ['A4', 'C#5', 'E5', 'G#5'], 'A#maj7': ['A#4', 'D5', 'F5', 'A5'], 'Bbmaj7': ['Bb4', 'D5', 'F5', 'A5'], 'Bmaj7': ['B4', 'D#5', 'F#5', 'A#5'],
-        'Cdim': ['C4', 'Eb4', 'Gb4'], 'C#dim': ['C#4', 'E4', 'G4'], 'Dbdim': ['Db4', 'E4', 'G4'], 'Ddim': ['D4', 'F4', 'Ab4'], 'D#dim': ['D#4', 'F#4', 'A4'], 'Ebdim': ['Eb4', 'Gb4', 'A4'], 'Edim': ['E4', 'G4', 'Bb4'], 'Fdim': ['F4', 'Ab4', 'B4'], 'F#dim': ['F#4', 'A4', 'C5'], 'Gbdim': ['Gb4', 'A4', 'C5'], 'Gdim': ['G4', 'Bb4', 'Db5'], 'G#dim': ['G#4', 'B4', 'D5'], 'Abdim': ['Ab4', 'B4', 'D5'], 'Adim': ['A4', 'C5', 'Eb5'], 'A#dim': ['A#4', 'C#5', 'E5'], 'Bbdim': ['Bb4', 'Db5', 'E5'], 'Bdim': ['B4', 'D5', 'F5'],
-        'Cdim7': ['C4', 'Eb4', 'Gb4', 'A4'], 'C#dim7': ['C#4', 'E4', 'G4', 'Bb4'], 'Dbdim7': ['Db4', 'E4', 'G4', 'Bb4'], 'Ddim7': ['D4', 'F4', 'Ab4', 'B4'], 'D#dim7': ['D#4', 'F#4', 'A4', 'C5'], 'Ebdim7': ['Eb4', 'Gb4', 'A4', 'C5'], 'Edim7': ['E4', 'G4', 'Bb4', 'Db5'], 'Fdim7': ['F4', 'Ab4', 'B4', 'D5'], 'F#dim7': ['F#4', 'A4', 'C5', 'Eb5'], 'Gbdim7': ['Gb4', 'A4', 'C5', 'Eb5'], 'Gdim7': ['G4', 'Bb4', 'Db5', 'E5'], 'G#dim7': ['G#4', 'B4', 'D5', 'F5'], 'Abdim7': ['Ab4', 'B4', 'D5', 'F5'], 'Adim7': ['A4', 'C5', 'Eb5', 'Gb5'], 'A#dim7': ['A#4', 'C#5', 'E5', 'G5'], 'Bbdim7': ['Bb4', 'Db5', 'E5', 'G5'], 'Bdim7': ['B4', 'D5', 'F5', 'Ab5'],
-        // Suspended 2nd
-        'Csus2': ['C4', 'D4', 'G4'], 'C#sus2': ['C#4', 'D#4', 'G#4'], 'Dbsus2': ['Db4', 'Eb4', 'Ab4'], 'Dsus2': ['D4', 'E4', 'A4'], 'D#sus2': ['D#4', 'F4', 'A#4'], 'Ebsus2': ['Eb4', 'F4', 'Bb4'], 'Esus2': ['E4', 'F#4', 'B4'], 'Fsus2': ['F4', 'G4', 'C5'], 'F#sus2': ['F#4', 'G#4', 'C#5'], 'Gbsus2': ['Gb4', 'Ab4', 'Db5'], 'Gsus2': ['G4', 'A4', 'D5'], 'G#sus2': ['G#4', 'A#4', 'D#5'], 'Absus2': ['Ab4', 'Bb4', 'Eb5'], 'Asus2': ['A4', 'B4', 'E5'], 'A#sus2': ['A#4', 'C5', 'F5'], 'Bbsus2': ['Bb4', 'C5', 'F5'], 'Bsus2': ['B4', 'C#5', 'F#5'],
-        // Suspended 4th
-        'Csus4': ['C4', 'F4', 'G4'], 'C#sus4': ['C#4', 'F#4', 'G#4'], 'Dbsus4': ['Db4', 'Gb4', 'Ab4'], 'Dsus4': ['D4', 'G4', 'A4'], 'D#sus4': ['D#4', 'G#4', 'A#4'], 'Ebsus4': ['Eb4', 'Ab4', 'Bb4'], 'Esus4': ['E4', 'A4', 'B4'], 'Fsus4': ['F4', 'Bb4', 'C5'], 'F#sus4': ['F#4', 'B4', 'C#5'], 'Gbsus4': ['Gb4', 'B4', 'Db5'], 'Gsus4': ['G4', 'C5', 'D5'], 'G#sus4': ['G#4', 'C#5', 'D#5'], 'Absus4': ['Ab4', 'Db5', 'Eb5'], 'Asus4': ['A4', 'D5', 'E5'], 'A#sus4': ['A#4', 'D#5', 'F5'], 'Bbsus4': ['Bb4', 'Eb5', 'F5'], 'Bsus4': ['B4', 'E5', 'F#5'],
-    };
-
-    function translateChord(spanishChord) {
-        const lowerChord = spanishChord.toLowerCase().trim();
+        // Handle Spanish note names first
+        const lowerChord = chordName.toLowerCase();
+        let foundSpanish = false;
         for (const spanishNote of sortedSpanishNotes) {
             if (lowerChord.startsWith(spanishNote)) {
                 const englishNote = spanishToEnglishMap[spanishNote];
-                const suffix = spanishChord.substring(spanishNote.length);
-                return englishNote + suffix;
+                rootNote = englishNote;
+                quality = chordName.substring(spanishNote.length);
+                foundSpanish = true;
+                break;
             }
         }
-        return spanishChord;
+
+        if (!foundSpanish) {
+            // Standard English parsing
+            const match = chordName.match(/^([A-G](?:#|b|x|bb)?)/);
+            if (match) {
+                rootNote = match[1];
+                quality = chordName.substring(rootNote.length);
+            } else {
+                return null; // Could not parse
+            }
+        }
+        
+        // Handle special cases for quality
+        const qualityLower = quality.toLowerCase();
+        if (qualityLower === 'maj7#5') quality = '△7#5';
+        else if (qualityLower === 'maj7b5') quality = 'maj7b5';
+        else if (qualityLower === 'maj7b9') quality = 'maj7b9';
+        else if (qualityLower === '7sus4') quality = '7sus4';
+        else if (qualityLower === 'm9b5') quality = 'm9b5';
+        else if (quality === '') quality = 'maj';
+        else if (quality === 'm') quality = 'm';
+        else if (quality === '°' || qualityLower === 'dim') quality = 'dim';
+        else if (quality === 'ø' || qualityLower === 'm7b5') quality = 'm7b5';
+        else if (quality === '°7' || qualityLower === 'dim7') quality = 'dim7';
+        else if (quality === 'M7' || qualityLower === 'maj7' || quality === '△7' || quality === '△') quality = 'maj7';
+
+        return { rootNote, quality };
     }
 
-    function playChord(chordName) {
+    function playChord(fullChordName) {
         if (Tone.context.state !== 'running') { Tone.start(); }
+        
+        let chordPart = fullChordName;
+        let bassPart = null;
 
-        if (chordName.includes('/')) {
-            const parts = chordName.split('/');
-            const chordPart = parts[0].trim();
-            const bassPart = parts[1].trim();
+        if (fullChordName.includes('/')) {
+            const parts = fullChordName.split('/');
+            chordPart = parts[0].trim();
+            bassPart = parts[1].trim();
+        }
 
-            const englishChord = translateChord(chordPart);
-            const chordNotes = chordMappings[englishChord];
+        const parsed = parseChordName(chordPart);
+        if (!parsed) {
+            console.warn(`No se pudo interpretar el acorde: ${chordPart}`);
+            return;
+        }
 
-            if (chordNotes) {
-                // Translate the bass note part and assume octave 3
-                const englishBass = translateChord(bassPart);
-                const bassNote = englishBass + '3';
-                
-                // The final notes are the bass note plus the original chord notes
-                const finalNotes = [bassNote, ...chordNotes];
-                
-                sampler.triggerAttackRelease(finalNotes, '1n');
-            } else {
-                console.warn(`Acorde no encontrado (parte del acorde con bajo cambiado): ${chordPart}`);
+        const { rootNote, quality } = parsed;
+        const chordNotes = getChordNotes(rootNote, quality);
+        
+        if (chordNotes && chordNotes.length > 0) {
+            let finalNotes = getPlayablePianoNotes(chordNotes);
+            
+            if (bassPart) {
+                const parsedBass = parseChordName(bassPart);
+                if(parsedBass) {
+                    const bassNoteName = parsedBass.rootNote;
+                    const bassNote = bassNoteName + '3'; // Assume octave 3 for bass
+                    finalNotes.unshift(bassNote);
+                }
             }
+            
+            sampler.triggerAttackRelease(finalNotes, '1n');
         } else {
-            const englishChord = translateChord(chordName);
-            const notes = chordMappings[englishChord.trim()];
-            if (notes) {
-                sampler.triggerAttackRelease(notes, '1n');
-            } else {
-                console.warn(`Acorde no encontrado: ${chordName} (traducido a ${englishChord})`);
-            }
+            console.warn(`Acorde no encontrado o sin notas: ${fullChordName}`);
         }
     }
+
+    // --- FIN DE LA NUEVA LÓGICA ---
+
 
     function makeDraggable(element) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -368,10 +517,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Lógica de Selección (Click y Arrastre) ---
         chartContainer.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('measure')) {
-                // e.preventDefault(); // BUG FIX: Esto prevenía la edición.
                 isSelecting = true;
                 selectionStartMeasure = e.target;
-
                 document.querySelectorAll('.selected-measure').forEach(m => m.classList.remove('selected-measure'));
                 selectionStartMeasure.classList.add('selected-measure');
             }
@@ -382,10 +529,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const allMeasures = Array.from(document.querySelectorAll('.measure'));
                 const startIndex = allMeasures.indexOf(selectionStartMeasure);
                 const currentIndex = allMeasures.indexOf(e.target);
-
                 const minIndex = Math.min(startIndex, currentIndex);
                 const maxIndex = Math.max(startIndex, currentIndex);
-
                 allMeasures.forEach((measure, index) => {
                     if (index >= minIndex && index <= maxIndex) {
                         measure.classList.add('selected-measure');
@@ -450,89 +595,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 metronomeLoop.stop();
                 playProgressionBtn.innerHTML = playIcon;
-                playProgressionBtn.classList.remove('playing'); // Remove playing class
+                playProgressionBtn.classList.remove('playing');
             } else {
                 const selectedMeasures = document.querySelectorAll('.selected-measure');
-                let measuresToPlay;
-
-                if (selectedMeasures.length > 0) {
-                    measuresToPlay = Array.from(selectedMeasures);
-                } else {
-                    measuresToPlay = Array.from(document.querySelectorAll('.measure'));
-                }
-
+                let measuresToPlay = selectedMeasures.length > 0 ? Array.from(selectedMeasures) : Array.from(document.querySelectorAll('.measure'));
+                
                 const playbackEvents = [];
                 measuresToPlay.forEach((measure, measureIndex) => {
-                    const parts = measure.textContent.trim().split(/(\s+)/).filter(Boolean);
-                    const chords = parts.filter((_, i) => i % 2 === 0);
-                    const spacings = parts.filter((_, i) => i % 2 !== 0);
-
+                    const chords = measure.textContent.trim().split(/\s+/).filter(Boolean);
                     if (chords.length === 1 && chords[0]) {
                         playbackEvents.push([`${measureIndex}:0`, { chord: chords[0], duration: '1n' }]);
-                    } else if (chords.length === 2) {
-                        playbackEvents.push([`${measureIndex}:0`, { chord: chords[0], duration: '2n' }]);
-                        playbackEvents.push([`${measureIndex}:2`, { chord: chords[1], duration: '2n' }]);
-                    } else if (chords.length === 4) {
-                        playbackEvents.push([`${measureIndex}:0`, { chord: chords[0], duration: '4n' }]);
-                        playbackEvents.push([`${measureIndex}:1`, { chord: chords[1], duration: '4n' }]);
-                        playbackEvents.push([`${measureIndex}:2`, { chord: chords[2], duration: '4n' }]);
-                        playbackEvents.push([`${measureIndex}:3`, { chord: chords[3], duration: '4n' }]);
-                    } else if (chords.length === 3) {
-                        let beats = [1, 1, 1, 1]; // 4 beats total
-                        if (spacings.length === 2) {
-                            if (spacings[0].length > 1 && spacings[1].length === 1) { // La  Re Do
-                                beats = [2, 1, 1];
-                            } else if (spacings[0].length === 1 && spacings[1].length > 1) { // La Re  Do
-                                beats = [1, 2, 1];
-                            } else { // La Re Do
-                                beats = [1, 1, 2];
-                            }
-                        } else { // Default for 3 chords
-                            beats = [1, 1, 2];
-                        }
-                        let currentTime = 0;
+                    } else if (chords.length > 1) {
+                        const duration = `${chords.length}n`;
                         chords.forEach((chord, i) => {
-                            playbackEvents.push([`${measureIndex}:${currentTime}`, { chord: chord, duration: `${beats[i]}n` }]);
-                            currentTime += beats[i];
+                             playbackEvents.push([`${measureIndex}:${i * (4 / chords.length)}`, { chord: chord, duration: duration }]);
                         });
                     }
                 });
 
                 if (playbackEvents.length === 0) return;
                 if (Tone.context.state !== 'running') { Tone.start(); }
-
-                if (progressionSequence) {
-                    progressionSequence.dispose();
-                }
+                if (progressionSequence) { progressionSequence.dispose(); }
 
                 progressionSequence = new Tone.Part((time, value) => {
-                    let notesToPlay;
-                    if (value.chord.includes('/')) {
-                        const parts = value.chord.split('/');
-                        const chordPart = parts[0].trim();
-                        const bassPart = parts[1].trim();
-
-                        const englishChord = translateChord(chordPart);
-                        const chordNotes = chordMappings[englishChord];
-
-                        if (chordNotes) {
-                            const englishBass = translateChord(bassPart);
-                            const bassNote = englishBass + '3';
-                            notesToPlay = [bassNote, ...chordNotes];
-                        } else {
-                            console.warn(`Acorde no encontrado (parte del acorde con bajo cambiado en progresión): ${chordPart}`);
-                            return; // Skip playing if chord part is not found
-                        }
-                    } else {
-                        const englishChord = translateChord(value.chord);
-                        notesToPlay = chordMappings[englishChord];
-                    }
-
-                    if (notesToPlay) {
-                        sampler.triggerAttackRelease(notesToPlay, value.duration, time);
-                    } else {
-                        console.warn(`Acorde no encontrado en progresión: ${value.chord}`);
-                    }
+                    playChord(value.chord); // Usa la nueva función playChord
                 }, playbackEvents);
 
                 const lastEvent = playbackEvents[playbackEvents.length - 1];
@@ -544,7 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 progressionSequence.start(0);
                 Tone.Transport.start();
                 playProgressionBtn.innerHTML = stopIcon;
-                playProgressionBtn.classList.add('playing'); // Add playing class
+                playProgressionBtn.classList.add('playing');
             }
         });
     });

@@ -55,7 +55,12 @@ const escalas_modos = {
     "Gitana Mayor": { "intervalos": [0, 2, 3, 5, 6, 9, 10], "grados": ["1", "2", "b3", "4", "b5", "6", "b7"], "acordes": ["m△7", "7b5", "△7#5", "dim7", "maj7", "maj7", "m7b5"] },
     "Oriental": { "intervalos": [0, 1, 4, 5, 7, 8, 10], "grados": ["1", "b2", "3", "4", "5", "b6", "b7"], "acordes": ["7b5", "△7#5", "dim7", "maj7", "maj7", "m7b5", "m△7"] },
     "Jónico Aumentado ♯2": { "intervalos": [0, 3, 4, 5, 8, 9, 11], "grados": ["1", "#2", "3", "4", "#5", "6", "7"], "acordes": ["△7#5", "dim7", "maj7", "maj7", "m7b5", "m△7", "7b5"] },
-    "Locrio ♭♭7": { "intervalos": [0, 1, 2, 5, 6, 8, 9], "grados": ["1", "b2", "bb3", "4", "b5", "b6", "bb7"], "acordes": ["dim7", "maj7", "maj7", "m7b5", "m△7", "7b5", "△7#5"] }
+    "Locrio ♭♭7": { "intervalos": [0, 1, 2, 5, 6, 8, 9], "grados": ["1", "b2", "bb3", "4", "b5", "b6", "bb7"], "acordes": ["dim7", "maj7", "maj7", "m7b5", "m△7", "7b5", "△7#5"] },
+    "Pentatónica Egipcia": { "intervalos": [0, 2, 5, 7, 10], "grados": ["1", "2", "4", "5", "b7"], "acordes": [] },
+    "Pentatónica Kumoi": { "intervalos": [0, 2, 3, 7, 9], "grados": ["1", "2", "b3", "5", "6"], "acordes": [] },
+    "Escala de Prometeo": { "intervalos": [0, 2, 4, 6, 9, 10], "grados": ["1", "2", "3", "#4", "6", "b7"], "acordes": [] },
+    "Escala de Tritono": { "intervalos": [0, 1, 4, 6, 7, 10], "grados": ["1", "b2", "3", "#4", "5", "b7"], "acordes": [] },
+    "Escala Enigmática": { "intervalos": [0, 1, 4, 6, 8, 10, 11], "grados": ["1", "b2", "3", "#4", "#5", "#6", "7"], "acordes": [] }
 
 };
 
@@ -85,6 +90,16 @@ const acordes = {
     "Mayor Séptima b5 (maj7b5)": { "intervalos": [0, 4, 6, 11], "grados": ["1", "3", "b5", "7"], "notacion": "maj7b5" },
     "Séptima con Quinta Aumentada (7#5)": { "intervalos": [0, 4, 8, 10], "grados": ["1", "3", "#5", "b7"], "notacion": "7#5" },
     "Séptima con Quinta Disminuida (7b5)": { "intervalos": [0, 4, 6, 10], "grados": ["1", "3", "b5", "b7"], "notacion": "7b5" },
+    "Mayor Siete #9 (maj7#9)": { "intervalos": [0, 4, 7, 11, 3], "grados": ["1", "3", "5", "7", "#9"], "notacion": "maj7#9" },
+    "Sexta/Novena (6/9)": { "intervalos": [0, 4, 7, 9, 2], "grados": ["1", "3", "5", "6", "9"], "notacion": "6/9" },
+    "Menor Sexta/Novena (m6/9)": { "intervalos": [0, 3, 7, 9, 2], "grados": ["1", "b3", "5", "6", "9"], "notacion": "m6/9" },
+    "Siete b9 #11 (7b9#11)": { "intervalos": [0, 4, 7, 10, 1, 6], "grados": ["1", "3", "5", "b7", "b9", "#11"], "notacion": "7b9#11" },
+    "Siete #9 b13 (7#9b13)": { "intervalos": [0, 4, 7, 10, 3, 8], "grados": ["1", "3", "5", "b7", "#9", "b13"], "notacion": "7#9b13" },
+    "Siete b5 #9 (7b5#9)": { "intervalos": [0, 4, 6, 10, 3], "grados": ["1", "3", "b5", "b7", "#9"], "notacion": "7b5#9" },
+    "Siete #5 #9 (7#5#9)": { "intervalos": [0, 4, 8, 10, 3], "grados": ["1", "3", "#5", "b7", "#9"], "notacion": "7#5#9" },
+    "Siete #5 b9 (7#5b9)": { "intervalos": [0, 4, 8, 10, 1], "grados": ["1", "3", "#5", "b7", "b9"], "notacion": "7#5b9" },
+    "Novena Suspendida 4 (9sus4)": { "intervalos": [0, 5, 7, 10, 2], "grados": ["1", "4", "5", "b7", "9"], "notacion": "9sus4" },
+    "Trecena Suspendida 4 (13sus4)": { "intervalos": [0, 5, 7, 10, 2, 9], "grados": ["1", "4", "5", "b7", "9", "13"], "notacion": "13sus4" },
     "Add 9 (add9)": { "intervalos": [0, 4, 7, 2], "grados": ["1", "3", "5", "9"], "notacion": "add9" },
     "Cuarta Suspendida (sus4)": { "intervalos": [0, 5, 7], "grados": ["1", "4", "5"], "notacion": "sus4" },
     "Segunda Suspendida (sus2)": { "intervalos": [0, 2, 7], "grados": ["1", "2", "5"], "notacion": "sus2" },

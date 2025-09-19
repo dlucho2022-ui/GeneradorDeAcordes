@@ -330,7 +330,7 @@ async function loadMetronomeSound() {
         metronomeSound = await audioContext.decodeAudioData(arrayBuffer);
 
         metronomeGainNode = audioContext.createGain();
-        const metronomeVolume = document.getElementById('metronome-volume');
+        const metronomeVolume = document.getElementById('metronome-volume-slider');
         // Convert initial dB value from slider to linear gain
         metronomeGainNode.gain.value = Math.pow(10, metronomeVolume.value / 20);
         metronomeGainNode.connect(audioContext.destination);
@@ -516,29 +516,42 @@ async function loadAudioFiles() {
 }
 
 function getPlayablePianoNotes(chordNoteNames, startOctave = 4) {
-    // 1. Map notes to objects with their pitch value (0-11)
-    //    Do NOT sort here. Assume chordNoteNames is already in musical order.
+    if (chordNoteNames.length === 0) return [];
+
     const notesWithPitch = chordNoteNames.map(name => ({
         name: simplifyEnharmonic(name),
         pitch: mapNotaToSemitone(simplifyEnharmonic(name))
-    })).filter(n => n.pitch !== -1); // Filter out any notes that couldn't be mapped
+    })).filter(n => n.pitch !== -1);
 
-    // Ordenar las notas por su tono para asegurar una asignación de octavas correcta
-    notesWithPitch.sort((a, b) => a.pitch - b.pitch);
+    const playableNotes = [];
+    let lastAbsolutePitch = -Infinity; // Tracks the MIDI number of the last note added
 
-    // 3. Assign octaves to ensure ascending order based on original sequence
-    let lastPitch = -1; // Use -1 to ensure the first note doesn't trigger an octave jump
-    let currentOctave = startOctave;
-    const playableNotes = notesWithPitch.map(note => {
-        // If the current note's pitch is lower than the previous one, it means we've crossed an octave boundary
-        // For example, B (11) to C (0)
-        if (lastPitch !== -1 && note.pitch < lastPitch) { // Only increment if it's not the very first note
-            currentOctave++;
+    for (let i = 0; i < notesWithPitch.length; i++) { // Loop through original order
+        const note = notesWithPitch[i];
+        let basePitch = note.pitch;
+
+        let targetAbsolutePitch;
+
+        if (i === 0) { // Root note
+            targetAbsolutePitch = basePitch + startOctave * 12;
+        } else {
+            // Start by assuming it's in the same octave as the previous note's octave
+            let assumedOctave = Math.floor(lastAbsolutePitch / 12);
+            targetAbsolutePitch = basePitch + assumedOctave * 12;
+
+            // Ensure current note is strictly higher than the last played note
+            while (targetAbsolutePitch <= lastAbsolutePitch) {
+                targetAbsolutePitch += 12; // Move up an octave
+            }
         }
-        lastPitch = note.pitch;
-        const mappedNote = toneNoteMap[note.name]; // Convert "Do" to "C"
-        return mappedNote ? mappedNote + currentOctave : null;
-    }).filter(n => n);
+
+        const toneNote = toneNoteMap[note.name];
+        if (toneNote) {
+            const finalNote = toneNote + Math.floor(targetAbsolutePitch / 12);
+            playableNotes.push(finalNote);
+            lastAbsolutePitch = targetAbsolutePitch;
+        }
+    }
 
     return playableNotes;
 }
@@ -601,13 +614,6 @@ async function playScaleOrArpeggio(notes, octave = 4, duration = '8n') { // Keep
     }
 
     let fullAscendingSequence = [...basePlayableNotes];
-
-    // Add the root note an octave higher to complete the scale/arpeggio
-    const rootNoteTone = toneNoteMap[notes[0]]; // Get the Tone.js name for the original root note
-    if (rootNoteTone) {
-        // The octave of the root note in basePlayableNotes should be 'octave'
-        fullAscendingSequence.push(`${rootNoteTone}${octave + 1}`);
-    }
 
     const allNotesToPlay = [...fullAscendingSequence, ...fullAscendingSequence.slice(0, -1).reverse()];
 
@@ -1232,6 +1238,7 @@ function addChordToProgression(nota, tipo, display) {
         const simplifiedNotes = notes.map(n => simplifyEnharmonic(n));
         const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
         if (pianoNotes.length > 0) {
+            console.log("Reproduciendo notas de piano:", pianoNotes);
             chordSampler.triggerAttackRelease(pianoNotes, '1s');
         }
     }
@@ -1874,24 +1881,30 @@ window.onload = () => {
         }
     });
 
-    metronomeVolume.addEventListener('input', (event) => {
-        if (metronomeGainNode) {
-            // Convert dB to linear gain
-            metronomeGainNode.gain.value = Math.pow(10, event.target.value / 20);
-        }
-    });
+    const metronomeVolumeSlider = document.getElementById('metronome-volume-slider');
+    if (metronomeVolumeSlider) {
+        metronomeVolumeSlider.addEventListener('input', (event) => {
+            if (metronomeGainNode) {
+                // Convert dB to linear gain
+                metronomeGainNode.gain.value = Math.pow(10, event.target.value / 20);
+            }
+        });
+    }
     // Ensure metronome stops if page is closed or refreshed
     window.addEventListener('beforeunload', stopMetronome);
     // --- FIN DE LOS EVENTOS DEL METRÓNOMO INTEGRADO ---
 
     
 
-    document.getElementById('floating-text-input').addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Evita el salto de línea en el textarea
-            addChordFromInput();
-        }
-    });
+    const floatingTextInput = document.getElementById('floating-text-input');
+    if (floatingTextInput) {
+        floatingTextInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Evita el salto de línea en el textarea
+                addChordFromInput();
+            }
+        });
+    }
 
     document.getElementById('play-midi-btn').addEventListener('click', playMidiBeat);
 

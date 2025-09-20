@@ -3,113 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circulo de Quintas</title>
+    <title>Entrenador de Tonalidades</title>
     <link rel="shortcut icon" href="assets/images/iconapp.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/cards.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <style>
+        body {
+            touch-action: manipulation;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            padding-top: 50px;
+        }
         .circle-container {
-            position: relative; width: 750px; height: 750px; margin: 50px auto;
-            display: flex; justify-content: center; align-items: center;
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .key-base {
-            position: absolute; border-radius: 50%; display: flex; justify-content: center;
-            align-items: center; cursor: pointer; user-select: none; background-color: #2c2c2c;
-            border: 2px solid #444;
-            transition: transform 0.7s cubic-bezier(0.645, 0.045, 0.355, 1), 
-                        border-color 0.3s, box-shadow 0.3s;
-            z-index: 10; /* Asegura que los botones estén sobre las líneas */
-        }
-        .key-base:hover {
-            border-color: #bb86fc;
-            transform: var(--transform-pos) scale(1.1);
-        }
-        .key-base.diatonic {
-            border: 3px solid #bb86fc;
-            box-shadow: 0 0 20px 3px rgba(187, 134, 252, 0.5);
-        }
-        .key-major { width: 130px; height: 130px; font-size: 2em; color: #f0f0f0; }
-        .key-minor { width: 100px; height: 100px; font-size: 1.6em; color: #e0e0e0; }
-        .key-diminished { width: 75px; height: 75px; font-size: 1.2em; color: #b0b0b0; }
-
-        .key-major.active { background-color: #6a0dad; color: #f0f0f0; }
-        .key-minor.active { background-color: #9370db; color: #f0f0f0; }
-        .key-diminished.active { background-color: #ff6347; color: #f0f0f0; }
-
-        .center-controls { z-index: 20; text-align: center; position: relative; }
-        .center-controls label { font-size: 1.2em; margin-bottom: 10px; display: block; color: #e0e0e0; }
-        .center-controls select {
-            font-size: 1.2em; padding: 5px; border-radius: 5px; background-color: #212121;
-            color: #f0f0f0; border: 1px solid #444;
-        }
-        #progression-svg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* Permite hacer clic a través del SVG */
-            z-index: 15;
-        }
-        #progression-path {
-            stroke: #ff6347; /* Color tomate, bien visible */
-            stroke-width: 4px;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: 0.7;
-            transition: d 0.5s ease-in-out;
-        }
-        #floating-play-stop-button-circle {
-            position: fixed;
-            top: 15px;   /* Ajustado a 15px */
-            left: 15px;  /* Ajustado a 15px */
-            width: 60px; height: 60px;
-            background-color: #198754; /* Color verde para stopped */
+        .tonality {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-color: #333;
             color: white;
             border-radius: 50%;
-            border: none;
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            z-index: 1001; /* Asegura que esté por encima de otros elementos */
-            transition: all 0.3s ease; /* Transición para hover y active */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            border: 3px solid #555;
+            transition: all 0.3s ease;
         }
-        #floating-play-stop-button-circle:hover {
+        .tonality.active {
+            background-color: #bb86fc;
+            border-color: #fff;
             transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 20px rgba(187, 134, 252, 0.7);
         }
-        #floating-play-stop-button-circle.playing {
-            background-color: #dc3545; /* Color rojo para playing */
-            animation: pulse 1.5s infinite; /* Animación de pulso */
-        }
-        /* Definir la animación pulse si no está ya definida en index4.html */
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            }
-        }
-        .completed-progression-chord {
-            opacity: 0.7;
-            background-color: #3a3a3a; /* Un color de fondo diferente */
-            border: 1px solid #555;
-            cursor: default; /* Para indicar que no se pueden clickear */
-        }
-        .progression-separator {
-            margin: 10px 0;
+        .center-display {
+            position: absolute;
             text-align: center;
-            color: #888;
-            font-size: 0.9em;
+        }
+        #current-tonality-display {
+            font-size: 6em;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        }
+        #timer-display {
+            font-size: 2em;
+            color: #aaa;
+            margin-top: 10px;
+        }
+        .controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .control-button {
+            background-color: #3a3a3a;
+            color: #f0f0f0;
+            border: 2px solid #555;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 5px;
+        }
+        .control-button:hover {
+            background-color: #4a4a4a;
+        }
+        .control-button.selected {
+            background-color: #bb86fc;
+            border-color: #f0f0f0;
+        }
+        #startStopButton {
+            background-color: #198754; /* Verde para Iniciar */
+            margin-left: 20px;
+        }
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); color: white; display: none;
+            justify-content: center; align-items: center; font-size: 2em; z-index: 1000;
         }
     </style>
 </head>
 <body>
+<div id="loading-overlay">Cargando audios...</div>
 <div class="wrapper">
     <header>
         <nav>
@@ -117,398 +114,261 @@
                 <li><a href="index.html">Generador de progresiones</a></li>
                 <li><a href="Index2.html">Generador de partituras</a></li>
                 <li><a href="Index3.html">Generador de ondas</a></li>
-                <li><a href="#" class="active-nav-link">Círculo de quintas</a></li>
+                <li><a href="#" class="active-nav-link">Entrenador de Tonalidades</a></li>
                 <li><a href="index5.html">Generador de cifrados</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <div class="circle-container" id="circle-of-fifths">
-            <svg id="progression-svg"><path id="progression-path"></path></svg>
-        </div>
-        <div id="progression-container" class="progression-section">
-            <h2>Progresión de Acordes</h2>
-            <div id="progression-builder" class="progression-builder"></div>
-            <div class="progression-controls">
-                <button id="clear-progression-btn" class="control-button">Limpiar</button>
+        <div class="main-container">
+            <div class="circle-container" id="tonality-circle">
+                <div class="center-display">
+                    <div id="current-tonality-display">C</div>
+                    <div id="timer-display">00:30</div>
+                </div>
+            </div>
+            <div class="controls-wrapper">
+                <div class="timer-controls">
+                    <button class="control-button" data-duration="10">10s</button>
+                    <button class="control-button selected" data-duration="30">30s</button>
+                    <button class="control-button" data-duration="60">1m</button>
+                    <button id="startStopButton" class="control-button">Iniciar</button>
+                </div>
             </div>
         </div>
     </main>
 </div>
-<button id="floating-play-stop-button-circle" class="button">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>
-</button>
 <footer><p> </p></footer>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Script de index4.html cargado y DOM listo."); // <--- AGREGAR ESTA LÍNEA
-    document.body.addEventListener('click', () => { if (Tone.context.state !== 'running') Tone.start(); }, { once: true });
+    const circle = document.getElementById('tonality-circle');
+    const currentTonalityDisplay = document.getElementById('current-tonality-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const timerButtons = document.querySelectorAll('.timer-controls .control-button[data-duration]');
+    const startStopButton = document.getElementById('startStopButton');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
-    const sampler = new Tone.Sampler({
-        urls: { 'C4':'C4.mp3','D#4':'Ds4.mp3','F#4':'Fs4.mp3','A4':'A4.mp3' },
-        release: 0.5, baseUrl: "https://tonejs.github.io/audio/salamander/",
-    }).toDestination();
-
-    const circleContainer = document.getElementById('circle-of-fifths');
-    const progressionBuilder = document.getElementById('progression-builder');
-    const clearProgressionBtn = document.getElementById('clear-progression-btn');
-    const playStopBtn = document.getElementById('floating-play-stop-button-circle');
-    const progressionPath = document.getElementById('progression-path');
-    const playIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>`;
-    const stopIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 6h12v12H6z"/></svg>`;
-
-    const keysData = [
-        { pitch: 0, sharp: { major: 'C', minor: 'Am', diminished: 'B' }, flat: { major: 'C', minor: 'Am', diminished: 'B' } },
-        { pitch: 7, sharp: { major: 'G', minor: 'Em', diminished: 'F#' }, flat: { major: 'G', minor: 'Em', diminished: 'F#' } },
-        { pitch: 2, sharp: { major: 'D', minor: 'Bm', diminished: 'C#' }, flat: { major: 'D', minor: 'Bm', diminished: 'C#' } },
-        { pitch: 9, sharp: { major: 'A', minor: 'F#m', diminished: 'G#' }, flat: { major: 'A', minor: 'F#m', diminished: 'G#' } },
-        { pitch: 4, sharp: { major: 'E', minor: 'C#m', diminished: 'D#' }, flat: { major: 'E', minor: 'C#m', diminished: 'D#' } },
-        { pitch: 11, sharp: { major: 'B', minor: 'G#m', diminished: 'A#' }, flat: { major: 'Cb', minor: 'Abm', diminished: 'Bb' } },
-        { pitch: 6, sharp: { major: 'F#', minor: 'D#m', diminished: 'E#' }, flat: { major: 'Gb', minor: 'Ebm', diminished: 'F' } },
-        { pitch: 1, sharp: { major: 'C#', minor: 'A#m', diminished: 'B#' }, flat: { major: 'Db', minor: 'Bbm', diminished: 'C' } },
-        { pitch: 8, sharp: { major: 'G#', minor: 'Fm', diminished: 'G' }, flat: { major: 'Ab', minor: 'Fm', diminished: 'G' } },
-        { pitch: 3, sharp: { major: 'D#', minor: 'Cm', diminished: 'D' }, flat: { major: 'Eb', minor: 'Cm', diminished: 'D' } },
-        { pitch: 10, sharp: { major: 'A#', minor: 'Gm', diminished: 'A' }, flat: { major: 'Bb', minor: 'Gm', diminished: 'A' } },
-        { pitch: 5, sharp: { major: 'F', minor: 'Dm', diminished: 'E' }, flat: { major: 'F', minor: 'Dm', diminished: 'E' } }
-    ];
-    const diatonicChordsMap = {
-        'C': {majors: ['C', 'F', 'G'], minors: ['Dm', 'Em', 'Am'], diminished: 'B'},
-        'G': {majors: ['G', 'C', 'D'], minors: ['Am', 'Bm', 'Em'], diminished: 'F#'},
-        'D': {majors: ['D', 'G', 'A'], minors: ['Em', 'F#m', 'Bm'], diminished: 'C#'},
-        'A': {majors: ['A', 'D', 'E'], minors: ['Bm', 'C#m', 'F#m'], diminished: 'G#'},
-        'E': {majors: ['E', 'A', 'B'], minors: ['F#m', 'G#m', 'C#m'], diminished: 'D#'},
-        'B': {majors: ['B', 'E', 'F#'], minors: ['C#m', 'D#m', 'G#m'], diminished: 'A#'},
-        'F#': {majors: ['F#', 'B', 'C#'], minors: ['G#m', 'A#m', 'D#m'], diminished: 'E#'},
-        'Gb': {majors: ['Gb', 'Cb', 'Db'], minors: ['Abm', 'Bbm', 'Ebm'], diminished: 'F'},
-        'Db': {majors: ['Db', 'Gb', 'Ab'], minors: ['Ebm', 'Fm', 'Bbm'], diminished: 'C'},
-        'Ab': {majors: ['Ab', 'Db', 'Eb'], minors: ['Bbm', 'Cm', 'Fm'], diminished: 'G'},
-        'Eb': {majors: ['Eb', 'Ab', 'Bb'], minors: ['Fm', 'Gm', 'Cm'], diminished: 'D'},
-        'Bb': {majors: ['Bb', 'Eb', 'F'], minors: ['Cm', 'Dm', 'Gm'], diminished: 'A'},
-        'F': {majors: ['F', 'Bb', 'C'], minors: ['Gm', 'Am', 'Dm'], diminished: 'E'}
+    const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+    const acordes = {
+        'C': ['C4', 'E4', 'G4'], 'G': ['G4', 'B4', 'D5'], 'D': ['D4', 'F#4', 'A4'],
+        'A': ['A3', 'C#4', 'E4'], 'E': ['E3', 'G#3', 'B3'], 'B': ['B3', 'D#4', 'F#4'],
+        'F#': ['F#3', 'A#3', 'C#4'],'Db': ['Db4', 'F4', 'Ab4'],'Ab': ['Ab3', 'C4', 'Eb4'],
+        'Eb': ['Eb3', 'G3', 'Bb3'], 'Bb': ['Bb3', 'D4', 'F4'], 'F': ['F3', 'A3', 'C4']
     };
-    const sharpKeys = ['G', 'D', 'A', 'E', 'B', 'F#'];
-    const radii = { major: 310, minor: 230, diminished: 150 };
-    const keyElements = [];
-    const keyElementMap = new Map();
-    let currentProgression = [];
-    let allCompletedProgressions = []; // NUEVA VARIABLE
-    let transportLoop;
 
-    function getChordNotes(rootNote, type) {
-        const pureRootNote = rootNote.replace('m', '');
-        const rootPitch = Tone.Frequency(pureRootNote + "4").toMidi();
-        let intervals = (type === 'major') ? [0, 4, 7] : (type === 'minor') ? [0, 3, 7] : [0, 3, 6];
-        return intervals.map(i => Tone.Frequency(rootPitch + i, "midi").toNote());
+    let audioContext;
+    const audioBuffers = {};
+    let currentlyPlayingNodes = [];
+    const AUDIO_DURATION = 8.0;
+    const QUICK_FADE_OUT = 0.1;
+    const loopFadeOutTime = 4.0;
+    const loopFadeInTime = 4.0;
+    let previousTonality = null;
+
+    let loopTimeoutId = null;
+    let currentTonalityIndex = 0;
+    let duration = 30;
+    let countdown;
+    let mainTimerId = null;
+    let isTimerRunning = false;
+    let isAudioReady = false;
+
+    function formatNoteForFile(note) {
+        const noteName = note.slice(0, -1);
+        const octave = note.slice(-1);
+        const fileNoteMap = {
+            'C#': 'cs', 'Db': 'cs',
+            'D#': 'ds', 'Eb': 'ds',
+            'F#': 'fs', 'Gb': 'fs',
+            'G#': 'gs', 'Ab': 'gs',
+            'A#': 'as', 'Bb': 'as'
+        };
+        const fileNote = fileNoteMap[noteName] || noteName.toLowerCase();
+        return fileNote + octave;
     }
 
-    function addChordToProgression(rootNote, type) {
-        let display = rootNote.replace('b', '♭').replace('#', '♯');
-        if (type === 'diminished') display += '°';
-
-        const newChord = { root: rootNote, type: type, notes: getChordNotes(rootNote, type), display: display };
-
-        // Siempre añadir el nuevo acorde a la progresión actual primero
-        currentProgression.push(newChord);
-
-        // Verificar si el nuevo acorde cierra el ciclo de la progresión actual
-        // Solo si hay al menos dos acordes (el primero y el que acaba de cerrar el ciclo)
-        if (currentProgression.length > 1) {
-            const firstChordOfCurrent = currentProgression[0];
-            if (firstChordOfCurrent.root === newChord.root && firstChordOfCurrent.type === newChord.type) {
-                // Ciclo cerrado para la currentProgression
-                // Guardar una copia de la progresión actual (que ahora incluye el acorde que cierra el ciclo)
-                allCompletedProgressions.push([...currentProgression]);
-                console.log("Ciclo de progresión completado. Guardado:", allCompletedProgressions[allCompletedProgressions.length - 1]);
-                // Reiniciar currentProgression para la siguiente progresión
-                currentProgression = [];
-                console.log("Nueva progresión iniciada.");
-            }
-        }
-
-        updateProgressionDisplay();
-        drawAllProgressionLines(); // Llamar a la nueva función de dibujo
-    }
-
-    function updateProgressionDisplay() {
-        console.log("Actualizando display de progresión.");
-        progressionBuilder.innerHTML = ''; // Limpiar la caja de progresión
-
-        // Mostrar acordes de progresiones completadas
-        allCompletedProgressions.forEach((prog, progIndex) => {
-            prog.forEach((chord, chordIndex) => {
-                const chordEl = document.createElement('div');
-                chordEl.className = 'progression-chord completed-progression-chord'; // Nueva clase para acordes completados
-                chordEl.innerHTML = `<div class="chord-name-display">${chord.display}</div>`;
-                chordEl.onclick = () => {
-                    // Eliminar acorde de una progresión completada
-                    // Si es el único acorde en la progresión, eliminar la progresión completa
-                    if (allCompletedProgressions[progIndex].length === 1) {
-                        allCompletedProgressions.splice(progIndex, 1);
-                    } else {
-                        allCompletedProgressions[progIndex].splice(chordIndex, 1);
-                    }
-                    updateProgressionDisplay();
-                    drawAllProgressionLines(); // Redibujar líneas al eliminar
-                };
-                progressionBuilder.appendChild(chordEl);
-            });
-            // Opcional: agregar un separador visual entre progresiones completadas
-            if (progIndex < allCompletedProgressions.length - 1) {
-                const separator = document.createElement('div');
-                separator.className = 'progression-separator';
-                separator.textContent = '---'; // O un icono, o una línea
-                progressionBuilder.appendChild(separator);
-            }
-        });
-
-        // Mostrar acordes de la progresión actual
-        currentProgression.forEach((chord, index) => {
-            const chordEl = document.createElement('div');
-            chordEl.className = 'progression-chord'; // Clase normal para acordes actuales
-            chordEl.innerHTML = `<div class="chord-name-display">${chord.display}</div>`;
-            chordEl.onclick = () => {
-                // Permitir eliminar solo acordes de la progresión actual
-                currentProgression.splice(index, 1);
-                updateProgressionDisplay();
-                drawAllProgressionLines(); // Redibujar líneas al eliminar
-            };
-            progressionBuilder.appendChild(chordEl);
-        });
-
-        // drawAllProgressionLines(); // Esta llamada ya se hace en addChordToProgression y clearProgressionBtn
-    }
-
-    // Función auxiliar para dibujar un solo path de progresión
-    function _drawSingleProgressionPath(progression, pathElement) {
-        if (progression.length < 2) {
-            pathElement.setAttribute('d', '');
-            return;
-        }
-        const containerRect = circleContainer.getBoundingClientRect();
-        const containerCenter = { x: containerRect.width / 2, y: containerRect.height / 2 };
-
-        const points = progression.map(chord => {
-            const mapKey = chord.root + chord.type;
-            const element = keyElementMap.get(mapKey);
-            if (!element) {
-                console.warn(`Elemento no encontrado en keyElementMap para la clave: ${mapKey} en _drawSingleProgressionPath`);
-                return null;
-            }
-
-            const style = window.getComputedStyle(element);
-            const matrix = new DOMMatrix(style.transform);
-            return { x: matrix.e + containerCenter.x, y: matrix.f + containerCenter.y };
-        }).filter(p => p);
-
-        if (points.length < 2) {
-            pathElement.setAttribute('d', '');
-            return;
-        }
-
-        const pathData = points.map((p, i) => (i === 0 ? 'M' : 'L') + `${p.x} ${p.y}`).join(' ');
-        pathElement.setAttribute('d', pathData);
-    }
-
-    // Nueva función para dibujar todas las progresiones
-    function drawAllProgressionLines() {
-        const progressionSVG = document.getElementById('progression-svg');
-        // Limpiar todos los paths existentes excepto el que usaremos para la currentProgression
-        // (si es que lo vamos a reutilizar, sino, limpiar todo y crear uno nuevo para currentProgression)
-        // Por simplicidad, vamos a limpiar todos los paths y recrearlos.
-        progressionSVG.innerHTML = ''; // Limpiar todos los paths anteriores
-
-        // Dibujar cada progresión completada
-        allCompletedProgressions.forEach((prog, index) => {
-            const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            newPath.setAttribute('class', 'progression-path-completed'); // Puedes darle una clase diferente si quieres otro estilo
-            newPath.setAttribute('stroke', '#198620'); // CAMBIADO: Color verde
-            newPath.setAttribute('stroke-width', '3px');
-            newPath.setAttribute('fill', 'none');
-            newPath.setAttribute('stroke-linecap', 'round');
-            newPath.setAttribute('stroke-linejoin', 'round');
-            newPath.setAttribute('opacity', '0.8');
-            progressionSVG.appendChild(newPath);
-            _drawSingleProgressionPath(prog, newPath);
-        });
-
-        // Dibujar la progresión actual
-        const currentPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        currentPath.setAttribute('id', 'progression-path'); // Reutilizamos el ID para el path actual
-        currentPath.setAttribute('stroke', '#ff6347'); // Color para la progresión actual
-        currentPath.setAttribute('stroke-width', '4px');
-        currentPath.setAttribute('fill', 'none');
-        currentPath.setAttribute('stroke-linecap', 'round');
-        currentPath.setAttribute('stroke-linejoin', 'round');
-        currentPath.setAttribute('opacity', '0.7');
-        progressionSVG.appendChild(currentPath);
-        _drawSingleProgressionPath(currentProgression, currentPath);
-    }
-
-    function createKeyElement(keyInfo, type, radius, index) {
-        const keyElement = document.createElement('div');
-        keyElement.className = `key-base key-${type}`;
-        keyElement.dataset.pitch = keysData[index].pitch;
-        keyElement.dataset.type = type;
+    async function initAudio() {
+        if (audioContext) return;
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        const textElement = document.createElement('div');
-        textElement.className = 'key-text';
-        keyElement.appendChild(textElement);
-
-        keyElement.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sampler.releaseAll();
-            const clickedKeyName = keyElement.dataset.key;
-            const clickedKeyType = keyElement.dataset.type;
-            const notes = getChordNotes(clickedKeyName, clickedKeyType);
-            sampler.triggerAttackRelease(notes, '2n');
-            keyElement.classList.add('active');
-            setTimeout(() => keyElement.classList.remove('active'), 300);
-            addChordToProgression(clickedKeyName, clickedKeyType);
+        loadingOverlay.style.display = 'flex';
+        const allNotes = [...new Set(Object.values(acordes).flat())];
+        const promises = allNotes.map(note => {
+            const url = `assets/audios/${formatNoteForFile(note)}.wav`;
+            return fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(buffer => audioContext.decodeAudioData(buffer))
+                .then(decodedData => {
+                    audioBuffers[note] = decodedData;
+                });
         });
-        circleContainer.appendChild(keyElement);
-        keyElements.push({ element: keyElement, radius: radius, index: index });
+
+        await Promise.all(promises);
+        isAudioReady = true;
+        loadingOverlay.style.display = 'none';
     }
 
-    function rotateCircle(selectedKey = 'C') {
-        const selectedIndex = keysData.findIndex(k => k.sharp.major === selectedKey || k.flat.major === selectedKey);
-        const isSharpContext = sharpKeys.includes(selectedKey);
-        const diatonicData = diatonicChordsMap[selectedKey];
-        const diatonicRoots = diatonicData ? {
-            majors: diatonicData.majors,
-            minors: diatonicData.minors,
-            diminished: diatonicData.diminished
-        } : null;
+    function playChord(tonality) {
+        if (!isAudioReady || !audioContext) return;
 
-        keyElements.forEach(item => {
-            const keyElement = item.element;
-            const pitch = parseInt(keyElement.dataset.pitch);
-            const type = keyElement.dataset.type;
-            const keyDataForPitch = keysData.find(k => k.pitch === pitch);
-            if (!keyDataForPitch) return;
+        clearTimeout(loopTimeoutId);
+        const now = audioContext.currentTime;
 
-            const keyName = isSharpContext ? keyDataForPitch.sharp[type] : keyDataForPitch.flat[type];
-            keyElement.dataset.key = keyName;
-            let text = keyName.replace('b', '♭').replace('#', '♯');
-            if (type === 'diminished') text += '°';
-            keyElement.querySelector('.key-text').textContent = text;
-            keyElementMap.set(keyName + type, keyElement); // Update map with current key name
+        const isTonalityChange = (previousTonality !== tonality && previousTonality !== null);
+        const fadeOut = isTonalityChange ? QUICK_FADE_OUT : loopFadeOutTime;
 
-            let isDiatonic = false;
-            if (diatonicRoots) {
-                if (type === 'major' && diatonicRoots.majors.includes(keyName)) isDiatonic = true;
-                else if (type === 'minor' && diatonicRoots.minors.includes(keyName)) isDiatonic = true;
-                else if (type === 'diminished' && diatonicRoots.diminished === keyName) isDiatonic = true;
-            }
-
-            const angle = ((item.index - selectedIndex) / keysData.length) * 2 * Math.PI - (Math.PI / 2);
-            const x = item.radius * Math.cos(angle);
-            const y = item.radius * Math.sin(angle);
-            const posTransform = `translate(${x}px, ${y}px)`;
-            keyElement.style.setProperty('--transform-pos', posTransform);
-
-            if (isDiatonic) {
-                keyElement.classList.add('diatonic');
-                keyElement.style.transform = `${posTransform} scale(1.05)`;
-            } else {
-                keyElement.classList.remove('diatonic');
-                keyElement.style.transform = posTransform;
-            }
+        currentlyPlayingNodes.forEach(node => {
+            node.gainNode.gain.linearRampToValueAtTime(0, now + fadeOut);
+            node.source.stop(now + fadeOut);
         });
-        drawAllProgressionLines(); // Redraw lines after rotation
-    }
 
-    function initCircle() {
-        const centerControls = document.createElement('div');
-        centerControls.className = 'center-controls';
-        centerControls.innerHTML = `<label for="key-selector">Tonalidad</label><select id="key-selector"></select>`;
-        circleContainer.appendChild(centerControls);
-        const keySelector = document.getElementById('key-selector');
+        const newNodes = [];
+        const notes = acordes[tonality];
+        if (notes) {
+            notes.forEach(note => {
+                const buffer = audioBuffers[note];
+                if (!buffer) return;
 
-        keysData.forEach((data, i) => {
-            createKeyElement(data, 'major', radii.major, i);
-            createKeyElement(data, 'minor', radii.minor, i);
-            createKeyElement(data, 'diminished', radii.diminished, i);
-        });
-        const selectorKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
-        selectorKeys.forEach(key => {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = key.replace('b', '♭').replace('#', '♯');
-            keySelector.appendChild(option);
-        });
-        keySelector.addEventListener('change', (e) => rotateCircle(e.target.value));
-    }
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
 
-    function togglePlayback() {
-        if (Tone.Transport.state === 'started') {
-            Tone.Transport.stop();
-            if (transportLoop) transportLoop.dispose();
-            playStopBtn.innerHTML = playIconSVG;
-            playStopBtn.classList.remove('playing');
-        } else {
-            // Crear una lista plana de todos los acordes a reproducir
-            const allChordsToPlay = [];
-            allCompletedProgressions.forEach(prog => allChordsToPlay.push(...prog));
-            allChordsToPlay.push(...currentProgression);
+                const gainNode = audioContext.createGain();
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(1, now + loopFadeInTime);
 
-            if (allChordsToPlay.length === 0) return; // Si no hay acordes, no hacer nada
+                source.connect(gainNode).connect(audioContext.destination);
+                source.start(now);
+                newNodes.push({ source, gainNode });
+            });
+        }
+        currentlyPlayingNodes = newNodes;
+        previousTonality = tonality;
 
-            Tone.Transport.bpm.value = 120;
-            let chordIndex = 0;
-            transportLoop = new Tone.Loop(time => {
-                const chord = allChordsToPlay[chordIndex % allChordsToPlay.length];
-                sampler.triggerAttackRelease(chord.notes, '1n', time);
-
-                // Lógica para resaltar el acorde actual en la progresión visual
-                const allChordElements = progressionBuilder.querySelectorAll('.progression-chord');
-                allChordElements.forEach(el => el.classList.remove('playing-chord'));
-
-                // Calcular el índice global del acorde que se está reproduciendo
-                let globalChordIndex = chordIndex % allChordsToPlay.length;
-                let currentVisualIndex = 0;
-
-                // Encontrar el índice visual correcto para resaltar
-                for (let i = 0; i < allCompletedProgressions.length; i++) {
-                    if (globalChordIndex < allCompletedProgressions[i].length) {
-                        if (allChordElements[currentVisualIndex + globalChordIndex]) {
-                            allChordElements[currentVisualIndex + globalChordIndex].classList.add('playing-chord');
-                        }
-                        break;
-                    }
-                    currentVisualIndex += allCompletedProgressions[i].length;
-                    // Sumar 1 por cada separador si los hay
-                    if (i < allCompletedProgressions.length - 1) {
-                        currentVisualIndex += 1; // Asumiendo un separador por cada progresión completada
-                    }
-                    globalChordIndex -= allCompletedProgressions[i].length;
-                }
-
-                if (globalChordIndex >= 0 && globalChordIndex < currentProgression.length) {
-                    if (allChordElements[currentVisualIndex + globalChordIndex]) {
-                        allChordElements[currentVisualIndex + globalChordIndex].classList.add('playing-chord');
-                    }
-                }
-
-
-                chordIndex++;
-            }, "1n").start(0);
-            Tone.Transport.start();
-            playStopBtn.innerHTML = stopIconSVG;
-            playStopBtn.classList.add('playing');
+        const nextLoopTime = (AUDIO_DURATION - loopFadeOutTime) * 1000;
+        if (nextLoopTime > 0) {
+             loopTimeoutId = setTimeout(() => playChord(tonality), nextLoopTime);
         }
     }
 
-    clearProgressionBtn.addEventListener('click', () => {
-        if (Tone.Transport.state === 'started') togglePlayback();
-        currentProgression = [];
-        allCompletedProgressions = []; // Limpiar también las progresiones completadas
-        updateProgressionDisplay();
-        drawAllProgressionLines(); // Volver a dibujar para limpiar las líneas
-    });
-    playStopBtn.addEventListener('click', togglePlayback);
+    function stopAllSounds() {
+        if (!audioContext) return;
+        clearTimeout(loopTimeoutId);
+        const now = audioContext.currentTime;
+        currentlyPlayingNodes.forEach(node => {
+            node.gainNode.gain.linearRampToValueAtTime(0, now + QUICK_FADE_OUT);
+            node.source.stop(now + QUICK_FADE_OUT);
+        });
+        currentlyPlayingNodes = [];
+        previousTonality = null;
+    }
 
-    initCircle();
-    rotateCircle('C');
+    function renderCircle() {
+        const radius = 200;
+        tonalities.forEach((tonality, i) => {
+            const angle = (i / tonalities.length) * 2 * Math.PI - (Math.PI / 2);
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const el = document.createElement('div');
+            el.className = 'tonality';
+            el.textContent = tonality.replace('b', '♭').replace('#', '♯');
+            el.dataset.tonality = tonality;
+            el.style.transform = `translate(${x}px, ${y}px)`;
+            if (i === 0) el.classList.add('active');
+            circle.appendChild(el);
+        });
+    }
+
+    function updateDisplay() {
+        document.querySelectorAll('.tonality').forEach(el => {
+            el.classList.remove('active');
+            if (el.dataset.tonality === tonalities[currentTonalityIndex]) {
+                el.classList.add('active');
+            }
+        });
+        const currentTonality = tonalities[currentTonalityIndex];
+        currentTonalityDisplay.textContent = currentTonality.replace('b', '♭').replace('#', '♯');
+    }
+
+    function switchToNextTonality() {
+        currentTonalityIndex = (currentTonalityIndex + 1) % tonalities.length;
+        updateDisplay();
+        playChord(tonalities[currentTonalityIndex]);
+    }
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        return `${mins}:${secs}`;
+    }
+
+    async function startTimer() {
+        if (isTimerRunning) return;
+        if (!isAudioReady) {
+            await initAudio();
+        }
+
+        isTimerRunning = true;
+        startStopButton.textContent = 'Detener';
+        startStopButton.style.backgroundColor = '#dc3545';
+
+        playChord(tonalities[currentTonalityIndex]);
+
+        clearInterval(mainTimerId);
+        countdown = duration;
+        timerDisplay.textContent = formatTime(countdown);
+
+        mainTimerId = setInterval(() => {
+            countdown--;
+            timerDisplay.textContent = formatTime(countdown);
+            if (countdown <= 0) {
+                switchToNextTonality();
+                countdown = duration;
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (!isTimerRunning) return;
+        isTimerRunning = false;
+        clearInterval(mainTimerId);
+        stopAllSounds();
+        startStopButton.textContent = 'Iniciar';
+        startStopButton.style.backgroundColor = '#198754';
+    }
+
+    timerButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            duration = parseInt(button.dataset.duration, 10);
+            timerDisplay.textContent = formatTime(duration);
+            timerButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            if (isTimerRunning) {
+                clearInterval(mainTimerId);
+                countdown = duration;
+                timerDisplay.textContent = formatTime(duration);
+                mainTimerId = setInterval(() => {
+                    countdown--;
+                    timerDisplay.textContent = formatTime(countdown);
+                    if (countdown <= 0) {
+                        switchToNextTonality();
+                        countdown = duration;
+                    }
+                }, 1000);
+            }
+        });
+    });
+
+    startStopButton.addEventListener('click', () => {
+        if (isTimerRunning) {
+            stopTimer();
+        } else {
+            startTimer();
+        }
+    });
+
+    // Inicialización
+    renderCircle();
+    timerDisplay.textContent = formatTime(duration);
 });
 </script>
 </body>

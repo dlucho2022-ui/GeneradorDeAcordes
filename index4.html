@@ -21,8 +21,7 @@
         }
         .top-controls {
             display: flex;
-            flex-wrap: wrap; /* Para que se ajuste en pantallas pequeñas */
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
             align-items: center;
             margin-bottom: 15px;
@@ -128,7 +127,7 @@
             color: #ccc;
             font-size: 1.2em;
             margin-bottom: 15px;
-            height: 1.2em; /* Para evitar que salte el layout */
+            height: 1.2em;
         }
         .control-button {
             background-color: #3a3a3a;
@@ -168,11 +167,27 @@
         <div class="main-container">
             <div class="top-controls">
                 <div class="selector-container">
-                    <label for="key-selector">Tonalidad Inicial:</label>
+                    <label for="key-selector">Tonalidad:</label>
                     <select id="key-selector"></select>
                 </div>
                 <div class="selector-container">
-                    <label for="time-per-key-selector">Tiempo por Tonalidad:</label>
+                    <label for="mode-selector">Modo:</label>
+                    <select id="mode-selector">
+                        <option value="Mayor">Mayor</option>
+                        <option value="Menor">Menor</option>
+                        <option value="Maj7">Maj7</option>
+                        <option value="m7">m7</option>
+                        <option value="7">7</option>
+                        <option value="Dim">Dim</option>
+                        <option value="Aug">Aug</option>
+                        <option value="7#11">7#11</option>
+                        <option value="Sus4">Sus4</option>
+                        <option value="Sus2">Sus2</option>
+                        <option value="6/9">6/9</option>
+                    </select>
+                </div>
+                <div class="selector-container">
+                    <label for="time-per-key-selector">Tiempo/Tonalidad:</label>
                     <select id="time-per-key-selector">
                         <option value="-" disabled>-</option>
                         <option value="10">10s</option>
@@ -199,7 +214,7 @@
                 </div>
                 <div class="center-display">
                     <div id="scale-display-container">
-                        <!-- Las 7 notas de la escala se renderizan aquí -->
+                        <!-- Las notas se renderizan aquí -->
                     </div>
                     <div id="timer-display">00:30</div>
                 </div>
@@ -223,22 +238,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const timePerKeySelector = document.getElementById('time-per-key-selector');
     const totalTimeSelector = document.getElementById('total-time-selector');
     const totalTimeDisplay = document.getElementById('total-time-display');
+    const modeSelector = document.getElementById('mode-selector');
 
     const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
-    const acordes = {
-        'C': ['C4', 'E4', 'G4'], 'G': ['G4', 'B4', 'D5'], 'D': ['D4', 'F#4', 'A4'],
-        'A': ['A3', 'C#4', 'E4'], 'E': ['E3', 'G#3', 'B3'], 'B': ['B3', 'D#4', 'F#4'],
-        'F#': ['F#3', 'A#3', 'C#4'],'Db': ['Db4', 'F4', 'Ab4'],'Ab': ['Ab3', 'C4', 'Eb4'],
-        'Eb': ['Eb3', 'G3', 'Bb3'], 'Bb': ['Bb3', 'D4', 'F4'], 'F': ['F3', 'A3', 'C4']
-    };
     const escalas = {
-        'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'], 'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
-        'D': ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'], 'A': ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
-        'E': ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'], 'B': ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
-        'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'], 'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
-        'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'], 'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
-        'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'], 'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E']
+        'Mayor': {
+            'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'], 'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
+            'D': ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'], 'A': ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
+            'E': ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'], 'B': ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
+            'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'], 'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
+            'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'], 'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
+            'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'], 'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E']
+        },
+        'Menor': {
+            'C': ['C', 'D', 'Eb', 'F', 'G', 'Ab', 'Bb'], 'G': ['G', 'A', 'Bb', 'C', 'D', 'Eb', 'F'],
+            'D': ['D', 'E', 'F', 'G', 'A', 'Bb', 'C'], 'A': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+            'E': ['E', 'F#', 'G', 'A', 'B', 'C', 'D'], 'B': ['B', 'C#', 'D', 'E', 'F#', 'G', 'A'],
+            'F#': ['F#', 'G#', 'A', 'B', 'C#', 'D', 'E'], 'Db': ['Db', 'Eb', 'Fb', 'Gb', 'Ab', 'Bbb', 'Cb'],
+            'Ab': ['Ab', 'Bb', 'Cb', 'Db', 'Eb', 'Fb', 'Gb'], 'Eb': ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'Cb', 'Db'],
+            'Bb': ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'Ab'], 'F': ['F', 'G', 'Ab', 'Bb', 'C', 'Db', 'Eb']
+        }
     };
+    const chordFormulas = {
+        'Mayor': { steps: [1, 3, 5], intervals: [0, 4, 7] },
+        'Menor': { steps: [1, 3, 5], intervals: [0, 3, 7] },
+        'Maj7': { steps: [1, 3, 5, 7], intervals: [0, 4, 7, 11] },
+        'm7': { steps: [1, 3, 5, 7], intervals: [0, 3, 7, 10] },
+        '7': { steps: [1, 3, 5, 7], intervals: [0, 4, 7, 10] },
+        'Dim': { steps: [1, 3, 5], intervals: [0, 3, 6] },
+        'Aug': { steps: [1, 3, 5], intervals: [0, 4, 8] },
+        '7#11': { steps: [1, 3, 5, 7, 11], intervals: [0, 4, 7, 10, 18] },
+        'Sus4': { steps: [1, 4, 5], intervals: [0, 5, 7] },
+        'Sus2': { steps: [1, 2, 5], intervals: [0, 2, 7] },
+        '6/9': { steps: [1, 3, 5, 6, 9], intervals: [0, 4, 7, 9, 14] }
+    };
+    const noteToMidiBase = { 'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11 };
+    const diatonicSteps = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const flatToSharpMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
 
     let audioContext;
     const audioBuffers = {};
@@ -251,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let loopTimeoutId = null;
     let currentTonalityIndex = 0;
+    let currentMode = 'Mayor';
     let duration = 30;
     let countdown;
     let totalCountdown;
@@ -258,18 +295,67 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTimerRunning = false;
     let isAudioReady = false;
 
-    function formatNoteForFile(note) {
-        const noteName = note.slice(0, -1);
+    function getCanonicalNoteName(note) {
         const octave = note.slice(-1);
+        const pitch = note.slice(0, -1);
+        if (flatToSharpMap[pitch]) {
+            return flatToSharpMap[pitch] + octave;
+        }
+        return note;
+    }
+
+    function getChordNotes(rootNote, quality) {
+        const formula = chordFormulas[quality];
+        if (!formula) return [];
+
+        const rootNoteLetter = rootNote.replace(/[#b]/g, '');
+        const rootDiatonicIndex = diatonicSteps.indexOf(rootNoteLetter);
+        const rootMidi = noteToMidiBase[rootNote] + 60;
+
+        let lastMidiNum = -1;
+
+        const chordNotes = formula.steps.map((step, i) => {
+            const targetInterval = formula.intervals[i];
+            let targetMidi = rootMidi + targetInterval;
+
+            if (lastMidiNum !== -1 && targetMidi <= lastMidiNum) {
+                targetMidi += 12;
+            }
+            lastMidiNum = targetMidi;
+
+            const targetNoteLetter = diatonicSteps[(rootDiatonicIndex + step - 1) % 7];
+            const naturalMidiOfTarget = noteToMidiBase[targetNoteLetter];
+
+            let baseOctaveMidi = Math.floor(targetMidi / 12) * 12;
+            let correctedNaturalMidi = baseOctaveMidi + naturalMidiOfTarget;
+            
+            if (Math.abs(targetMidi - correctedNaturalMidi) > 6) {
+                if (targetMidi > correctedNaturalMidi) correctedNaturalMidi += 12;
+                else correctedNaturalMidi -= 12;
+            }
+
+            const diff = targetMidi - correctedNaturalMidi;
+            const accidental = {'-2':'bb', '-1':'b', '0':'', '1':'#', '2':'x'}[diff] || '';
+            
+            const finalNoteName = `${targetNoteLetter}${accidental}`;
+            const octave = Math.floor(targetMidi / 12) - 1;
+
+            return `${finalNoteName}${octave}`;
+        });
+
+        return chordNotes;
+    }
+
+    function formatNoteForFile(note) {
+        const noteName = note.replace(/[0-9]/g, '');
+        const octave = note.match(/[0-9]/g).join('');
         const fileNoteMap = {
-            'C#': 'cs', 'Db': 'cs',
-            'D#': 'ds', 'Eb': 'ds',
-            'F#': 'fs', 'Gb': 'fs',
-            'G#': 'gs', 'Ab': 'gs',
-            'A#': 'as', 'Bb': 'as'
+            'C#': 'cs', 'Db': 'cs', 'D#': 'ds', 'Eb': 'ds', 'F#': 'fs', 'Gb': 'fs',
+            'G#': 'gs', 'Ab': 'gs', 'A#': 'as', 'Bb': 'as', 'B#':'c', 'E#':'f',
+            'Cb': 'b', 'Fb': 'e'
         };
-        const fileNote = fileNoteMap[noteName] || noteName.toLowerCase();
-        return fileNote + octave;
+        if (fileNoteMap[noteName]) return fileNoteMap[noteName] + octave;
+        return noteName.toLowerCase().replace('#', 's') + octave;
     }
 
     async function initAudio() {
@@ -277,14 +363,27 @@ document.addEventListener('DOMContentLoaded', () => {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
         loadingOverlay.style.display = 'flex';
-        const allNotes = [...new Set(Object.values(acordes).flat())];
-        const promises = allNotes.map(note => {
+        const notesToLoad = [];
+        const midiToNoteName = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        for (let midi = 48; midi <= 84; midi++) { // C3 a C6
+            const noteName = midiToNoteName[midi % 12];
+            const octave = Math.floor(midi / 12) - 1;
+            notesToLoad.push(`${noteName}${octave}`);
+        }
+
+        const promises = notesToLoad.map(note => {
             const url = `assets/audios/${formatNoteForFile(note)}.wav`;
             return fetch(url)
-                .then(response => response.arrayBuffer())
-                .then(buffer => audioContext.decodeAudioData(buffer))
+                .then(response => {
+                    if (!response.ok) return null;
+                    return response.arrayBuffer();
+                })
+                .then(buffer => {
+                    if (!buffer) return null;
+                    return audioContext.decodeAudioData(buffer);
+                })
                 .then(decodedData => {
-                    audioBuffers[note] = decodedData;
+                    if (decodedData) audioBuffers[note] = decodedData;
                 });
         });
 
@@ -293,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingOverlay.style.display = 'none';
     }
 
-    function playChord(tonality) {
+    function playChord(tonality, quality) {
         if (!isAudioReady || !audioContext) return;
 
         clearTimeout(loopTimeoutId);
@@ -308,11 +407,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const newNodes = [];
-        const notes = acordes[tonality];
+        const notes = getChordNotes(tonality, quality);
+        console.log(`--- Acorde: ${tonality} ${quality} ---`);
+
         if (notes) {
             notes.forEach(note => {
-                const buffer = audioBuffers[note];
-                if (!buffer) return;
+                const canonicalNote = getCanonicalNoteName(note);
+                const audioFileName = `${formatNoteForFile(canonicalNote)}.wav`;
+                console.log(`Buscando: ${audioFileName} (original: ${note})`);
+
+                const buffer = audioBuffers[canonicalNote];
+                if (!buffer) {
+                    console.warn(`Audio para la nota ${canonicalNote} (${audioFileName}) no encontrado.`);
+                    return;
+                }
 
                 const source = audioContext.createBufferSource();
                 source.buffer = buffer;
@@ -331,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nextLoopTime = (AUDIO_DURATION - loopFadeOutTime) * 1000;
         if (nextLoopTime > 0) {
-             loopTimeoutId = setTimeout(() => playChord(tonality), nextLoopTime);
+             loopTimeoutId = setTimeout(() => playChord(tonality, quality), nextLoopTime);
         }
     }
 
@@ -368,14 +476,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderScaleDisplay(tonality) {
+    function renderCenterDisplay(tonality, mode) {
         scaleDisplayContainer.innerHTML = '';
-        const scaleNotes = escalas[tonality];
-        if (!scaleNotes) return;
+        let notesToDisplay;
+
+        if (mode === 'Mayor' || mode === 'Menor') {
+            notesToDisplay = escalas[mode][tonality];
+        } else {
+            notesToDisplay = getChordNotes(tonality, mode).map(note => note.replace(/[0-9]/g, ''));
+        }
+
+        if (!notesToDisplay) return;
 
         const radius = 90;
-        scaleNotes.forEach((note, i) => {
-            const angle = (i / scaleNotes.length) * 2 * Math.PI - (Math.PI / 2);
+        const numNotes = notesToDisplay.length;
+        notesToDisplay.forEach((note, i) => {
+            const angle = (i / numNotes) * 2 * Math.PI - (Math.PI / 2);
             const x = radius * Math.cos(angle);
             const y = radius * Math.sin(angle);
             const el = document.createElement('div');
@@ -403,13 +519,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const currentTonality = tonalities[currentTonalityIndex];
-        renderScaleDisplay(currentTonality);
+        renderCenterDisplay(currentTonality, currentMode);
     }
 
     function switchToNextTonality() {
         currentTonalityIndex = (currentTonalityIndex + 1) % tonalities.length;
         updateDisplay();
-        playChord(tonalities[currentTonalityIndex]);
+        playChord(tonalities[currentTonalityIndex], currentMode);
     }
 
     function formatTime(seconds) {
@@ -459,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startStopButton.textContent = 'Detener';
         startStopButton.style.backgroundColor = '#dc3545';
 
-        playChord(tonalities[currentTonalityIndex]);
+        playChord(tonalities[currentTonalityIndex], currentMode);
 
         clearInterval(mainTimerId);
         countdown = duration;
@@ -528,6 +644,14 @@ document.addEventListener('DOMContentLoaded', () => {
         timePerKeySelector.value = '-';
         const totalDuration = parseInt(e.target.value, 10);
         updateTimers(totalDuration / 12, totalDuration);
+    });
+
+    modeSelector.addEventListener('change', e => {
+        currentMode = e.target.value;
+        updateDisplay(); // Actualizar el display central para mostrar las nuevas notas
+        if (isTimerRunning) {
+            stopTimer(); // Detener el temporizador y el audio
+        }
     });
 
     startStopButton.addEventListener('click', () => {

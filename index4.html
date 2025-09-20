@@ -27,16 +27,17 @@
             margin-bottom: 15px;
         }
         .selector-container label {
-            margin-right: 10px;
+            margin-right: 5px;
             color: #ccc;
+            font-size: 0.9em;
         }
         .selector-container select {
-            font-size: 1em;
+            font-size: 0.9em;
             background-color: #2c2c2c;
             color: white;
             border: 1px solid #555;
             border-radius: 5px;
-            padding: 5px;
+            padding: 4px 2px;
         }
         .circle-area {
             position: relative;
@@ -373,23 +374,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const promises = notesToLoad.map(note => {
             const url = `assets/audios/${formatNoteForFile(note)}.wav`;
+            console.log(`[initAudio] Intentando cargar: ${url} para nota ${note}`);
             return fetch(url)
                 .then(response => {
+                    console.log(`[initAudio] ${url} - response.ok: ${response.ok}, status: ${response.status}`);
                     if (!response.ok) return null;
                     return response.arrayBuffer();
                 })
                 .then(buffer => {
-                    if (!buffer) return null;
+                    if (!buffer) {
+                        console.warn(`[initAudio] No se obtuvo buffer para ${url}`);
+                        return null;
+                    }
                     return audioContext.decodeAudioData(buffer);
                 })
                 .then(decodedData => {
-                    if (decodedData) audioBuffers[note] = decodedData;
+                    if (decodedData) {
+                        audioBuffers[note] = decodedData;
+                        console.log(`[initAudio] Audio cargado y almacenado: ${note}`);
+                    } else {
+                        console.warn(`[initAudio] No se pudo decodificar audio para ${url}`);
+                    }
+                })
+                .catch(error => {
+                    console.error(`[initAudio] Error al cargar ${url}:`, error);
                 });
         });
 
         await Promise.all(promises);
         isAudioReady = true;
         loadingOverlay.style.display = 'none';
+        console.log("[initAudio] Todos los audios intentados cargar. isAudioReady = true.");
     }
 
     function playChord(tonality, quality) {

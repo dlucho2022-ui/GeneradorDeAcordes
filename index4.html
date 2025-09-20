@@ -17,53 +17,86 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 90vh;
-            padding-top: 50px;
+            padding-top: 20px;
         }
-        .circle-container {
+        .circle-area {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 600px; /* Agrandado */
+            height: 600px; /* Agrandado */
             margin: 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
         }
+        .circle-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
         .tonality {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 120px; /* Agrandado */
+            height: 120px; /* Agrandado */
+            top: 50%;
+            left: 50%;
+            margin: -60px; /* Mitad del nuevo tamaño */
             background-color: #333;
-            color: white;
             border-radius: 50%;
+            border: 3px solid #555;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8em;
+        }
+        .tonality-text {
+            display: inline-block;
+            color: white;
+            font-size: 2.6em; /* Agrandado */
             font-weight: bold;
-            border: 3px solid #555;
-            transition: all 0.3s ease;
+            transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
         .tonality.active {
             background-color: #bb86fc;
             border-color: #fff;
-            transform: scale(1.1);
+            transform: translate(var(--x), var(--y)) scale(1.1);
             box-shadow: 0 0 20px rgba(187, 134, 252, 0.7);
         }
         .center-display {
-            position: absolute;
+            position: relative;
             text-align: center;
+            z-index: 10;
+            width: 240px; /* Agrandado */
+            height: 240px; /* Agrandado */
         }
-        #current-tonality-display {
-            font-size: 6em;
-            color: white;
-            font-weight: bold;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        #scale-display-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .scale-note {
+            position: absolute;
+            width: 60px; /* Agrandado */
+            height: 60px; /* Agrandado */
+            top: 50%;
+            left: 50%;
+            margin: -30px; /* Mitad del nuevo tamaño */
+            background-color: #2c2c2c;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em; /* Agrandado */
+            border: 2px solid #555;
         }
         #timer-display {
             font-size: 2em;
             color: #aaa;
             margin-top: 10px;
+            position: absolute;
+            bottom: -80px; /* Ajustado por el tamaño */
+            left: 50%;
+            transform: translateX(-50%);
         }
         .controls-wrapper {
             display: flex;
@@ -71,10 +104,26 @@
             align-items: center;
             margin-top: 10px;
         }
+        .key-selector-container {
+            margin-bottom: 15px;
+            position: relative;
+            left: -300px;
+        }
+        .key-selector-container label {
+            margin-right: 10px;
+            color: #ccc;
+        }
+        #key-selector {
+            font-size: 1em;
+            background-color: #2c2c2c;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 5px;
+        }
         .timer-controls {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
         }
         .control-button {
             background-color: #3a3a3a;
@@ -95,7 +144,7 @@
             border-color: #f0f0f0;
         }
         #startStopButton {
-            background-color: #198754; /* Verde para Iniciar */
+            background-color: #198754;
             margin-left: 20px;
         }
         #loading-overlay {
@@ -121,9 +170,18 @@
     </header>
     <main>
         <div class="main-container">
-            <div class="circle-container" id="tonality-circle">
+            <div class="key-selector-container">
+                <label for="key-selector">Tonalidad Inicial:</label>
+                <select id="key-selector"></select>
+            </div>
+            <div class="circle-area">
+                <div class="circle-container" id="tonality-circle">
+                    <!-- Las tonalidades se renderizan aquí con JS -->
+                </div>
                 <div class="center-display">
-                    <div id="current-tonality-display">C</div>
+                    <div id="scale-display-container">
+                        <!-- Las 7 notas de la escala se renderizan aquí -->
+                    </div>
                     <div id="timer-display">00:30</div>
                 </div>
             </div>
@@ -142,11 +200,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const circle = document.getElementById('tonality-circle');
-    const currentTonalityDisplay = document.getElementById('current-tonality-display');
+    const scaleDisplayContainer = document.getElementById('scale-display-container');
     const timerDisplay = document.getElementById('timer-display');
     const timerButtons = document.querySelectorAll('.timer-controls .control-button[data-duration]');
     const startStopButton = document.getElementById('startStopButton');
     const loadingOverlay = document.getElementById('loading-overlay');
+    const keySelector = document.getElementById('key-selector');
 
     const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
     const acordes = {
@@ -154,6 +213,14 @@ document.addEventListener('DOMContentLoaded', () => {
         'A': ['A3', 'C#4', 'E4'], 'E': ['E3', 'G#3', 'B3'], 'B': ['B3', 'D#4', 'F#4'],
         'F#': ['F#3', 'A#3', 'C#4'],'Db': ['Db4', 'F4', 'Ab4'],'Ab': ['Ab3', 'C4', 'Eb4'],
         'Eb': ['Eb3', 'G3', 'Bb3'], 'Bb': ['Bb3', 'D4', 'F4'], 'F': ['F3', 'A3', 'C4']
+    };
+    const escalas = {
+        'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'], 'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
+        'D': ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'], 'A': ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
+        'E': ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'], 'B': ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
+        'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'], 'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
+        'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'], 'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
+        'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'], 'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E']
     };
 
     let audioContext;
@@ -262,31 +329,63 @@ document.addEventListener('DOMContentLoaded', () => {
         previousTonality = null;
     }
 
-    function renderCircle() {
-        const radius = 200;
+    function renderOuterCircle() {
+        const radius = 240; // Agrandado
         tonalities.forEach((tonality, i) => {
             const angle = (i / tonalities.length) * 2 * Math.PI - (Math.PI / 2);
             const x = radius * Math.cos(angle);
             const y = radius * Math.sin(angle);
             const el = document.createElement('div');
             el.className = 'tonality';
-            el.textContent = tonality.replace('b', '♭').replace('#', '♯');
-            el.dataset.tonality = tonality;
-            el.style.transform = `translate(${x}px, ${y}px)`;
-            if (i === 0) el.classList.add('active');
+            el.style.setProperty('--x', `${x}px`);
+            el.style.setProperty('--y', `${y}px`);
+            el.style.transform = `translate(var(--x), var(--y))`;
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'tonality-text';
+            textSpan.textContent = tonality.replace('b', '♭').replace('#', '♯');
+            el.appendChild(textSpan);
+            
             circle.appendChild(el);
         });
     }
 
+    function renderScaleDisplay(tonality) {
+        scaleDisplayContainer.innerHTML = '';
+        const scaleNotes = escalas[tonality];
+        if (!scaleNotes) return;
+
+        const radius = 90; // Agrandado
+        scaleNotes.forEach((note, i) => {
+            const angle = (i / scaleNotes.length) * 2 * Math.PI - (Math.PI / 2);
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const el = document.createElement('div');
+            el.className = 'scale-note';
+            el.textContent = note.replace('b', '♭').replace('#', '♯');
+            el.style.transform = `translate(${x}px, ${y}px)`;
+            scaleDisplayContainer.appendChild(el);
+        });
+    }
+
     function updateDisplay() {
-        document.querySelectorAll('.tonality').forEach(el => {
-            el.classList.remove('active');
-            if (el.dataset.tonality === tonalities[currentTonalityIndex]) {
+        const rotation = -currentTonalityIndex * 30;
+        circle.style.transform = `rotate(${rotation}deg)`;
+
+        document.querySelectorAll('.tonality-text').forEach(span => {
+            span.style.transform = `rotate(${-rotation}deg)`;
+        });
+
+        document.querySelectorAll('.tonality').forEach((el, index) => {
+            if (index === currentTonalityIndex) {
                 el.classList.add('active');
+            } else {
+                el.classList.remove('active');
             }
         });
+
         const currentTonality = tonalities[currentTonalityIndex];
-        currentTonalityDisplay.textContent = currentTonality.replace('b', '♭').replace('#', '♯');
+        renderScaleDisplay(currentTonality);
     }
 
     function switchToNextTonality() {
@@ -336,6 +435,30 @@ document.addEventListener('DOMContentLoaded', () => {
         startStopButton.style.backgroundColor = '#198754';
     }
 
+    function populateKeySelector() {
+        tonalities.forEach(tonality => {
+            const option = document.createElement('option');
+            option.value = tonality;
+            option.textContent = tonality.replace('b', '♭').replace('#', '♯');
+            keySelector.appendChild(option);
+        });
+    }
+
+    // Event Listeners
+    keySelector.addEventListener('change', e => {
+        const selectedTonality = e.target.value;
+        const newIndex = tonalities.indexOf(selectedTonality);
+        if (newIndex === -1) return;
+
+        if (isTimerRunning) {
+            stopTimer();
+        }
+
+        currentTonalityIndex = newIndex;
+        updateDisplay();
+        timerDisplay.textContent = formatTime(duration);
+    });
+
     timerButtons.forEach(button => {
         button.addEventListener('click', () => {
             duration = parseInt(button.dataset.duration, 10);
@@ -367,7 +490,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Inicialización
-    renderCircle();
+    populateKeySelector();
+    renderOuterCircle();
+    updateDisplay();
     timerDisplay.textContent = formatTime(duration);
 });
 </script>

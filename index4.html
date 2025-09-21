@@ -163,10 +163,7 @@
     <main>
         <div class="main-container">
             <div class="top-controls">
-                <div class="selector-container">
-                    <label for="key-selector">Tonalidad:</label>
-                    <select id="key-selector"></select>
-                </div>
+                
                 <div class="selector-container">
                     <label for="mode-selector">Modo:</label>
                     <select id="mode-selector">
@@ -231,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const timerDisplay = document.getElementById('timer-display');
     const startStopButton = document.getElementById('startStopButton');
     const loadingOverlay = document.getElementById('loading-overlay');
-    const keySelector = document.getElementById('key-selector');
     const timePerKeySelector = document.getElementById('time-per-key-selector');
     const totalTimeSelector = document.getElementById('total-time-selector');
     const totalTimeDisplay = document.getElementById('total-time-display');
@@ -351,8 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const lowerRootNoteName = midiToNoteName[lowerRootMidi % 12];
         const lowerRootOctave = Math.floor(lowerRootMidi / 12) - 1;
         const lowerRootFullNote = `${lowerRootNoteName}${lowerRootOctave}`;
-
-        chordNotes.unshift(lowerRootFullNote); // Agregar al principio del array
 
         return chordNotes;
     }
@@ -508,6 +502,17 @@ document.addEventListener('DOMContentLoaded', () => {
             textSpan.className = 'tonality-text';
             textSpan.textContent = tonality.replace('b', '♭').replace('#', '♯');
             el.appendChild(textSpan);
+
+            // Add click event listener
+            el.addEventListener('click', () => {
+                if (isTimerRunning) {
+                    stopTimer();
+                }
+                currentTonalityIndex = i;
+                updateDisplay();
+                timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
+                updateTotalTimeDisplay(duration * 12);
+            });
             
             circle.appendChild(el);
         });
@@ -644,33 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startStopButton.textContent = 'Iniciar';
         startStopButton.style.backgroundColor = '#198754';
         updateTotalTimeDisplay(duration * 12);
-        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
-    }
-
-    function populateKeySelector() {
-        tonalities.forEach(tonality => {
-            const option = document.createElement('option');
-            option.value = tonality;
-            option.textContent = tonality.replace('b', '♭').replace('#', '♯');
-            keySelector.appendChild(option);
-        });
-    }
-
-    // Event Listeners
-    keySelector.addEventListener('change', e => {
-        const selectedTonality = e.target.value;
-        const newIndex = tonalities.indexOf(selectedTonality);
-        if (newIndex === -1) return;
-
-        if (isTimerRunning) {
-            stopTimer();
-        }
-
-        currentTonalityIndex = newIndex;
-        updateDisplay();
-        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
-        updateTotalTimeDisplay(duration * 12);
-    });
+        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);    }
 
     timePerKeySelector.addEventListener('change', e => {
         totalTimeSelector.value = '-';
@@ -701,7 +680,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Inicialización
-    populateKeySelector();
     renderOuterCircle();
     updateDisplay();
     updateTimers(duration, duration * 12);

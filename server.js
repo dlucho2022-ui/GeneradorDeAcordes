@@ -78,6 +78,45 @@ app.delete('/api/profiles/:name', (req, res) => {
     });
 });
 
+// POST to add study time to a profile
+// app.post('/api/profiles/:name/add-time', (req, res) => {
+//     const profileName = path.basename(req.params.name);
+//     const filePath = path.join(profilesDir, `${profileName}.json`);
+//     const { time } = req.body; // Expect time in minutes
+
+//     if (typeof time !== 'number' || time <= 0) {
+//         return res.status(400).json({ message: 'Se requiere un tiempo válido en minutos.' });
+//     }
+
+//     fs.readFile(filePath, 'utf8', (err, data) => {
+//         if (err) {
+//             if (err.code === 'ENOENT') {
+//                 return res.status(404).json({ message: 'El perfil no existe.' });
+//             }
+//             return res.status(500).json({ message: 'Error al leer el perfil.' });
+//         }
+
+//         let profileData;
+//         try {
+//             profileData = JSON.parse(data);
+//         } catch (parseErr) {
+//             return res.status(500).json({ message: 'Error al procesar los datos del perfil.' });
+//         }
+
+//         // Add study time (assuming time is in minutes)
+//         profileData.studyTime = (profileData.studyTime || 0) + time;
+
+//         const updatedData = JSON.stringify(profileData, null, 2);
+
+//         fs.writeFile(filePath, updatedData, 'utf8', (writeErr) => {
+//             if (writeErr) {
+//                 return res.status(500).json({ message: 'Error al guardar el tiempo de estudio.' });
+//             }
+//             res.json({ message: `Tiempo de estudio agregado a '${profileName}'.`, studyTime: profileData.studyTime });
+//         });
+//     });
+// });
+
 app.listen(port, () => {
     console.log(`Servidor de perfiles escuchando en http://localhost:${port}`);
 });

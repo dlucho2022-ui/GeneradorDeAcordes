@@ -750,14 +750,9 @@ body.body-sheet-music #floating-play-stop-button.playing { /* Changed from is-pl
     left: 15px;
     z-index: 1000;
     background-color: #ffc107; /* A distinct yellow/gold color */
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     flex-grow: 0;
 }
 
@@ -879,8 +874,8 @@ body:not(.body-sheet-music) .button {
     color: #e0e0e0;
     cursor: pointer;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
@@ -1104,10 +1099,10 @@ body:not(.body-sheet-music) .button.playing svg {
     cursor: pointer;
     font-size: 1em;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background-color 0.2s ease;
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 
 .metronome-popup .button-option:hover {
@@ -1605,12 +1600,8 @@ body:not(.body-sheet-music) .button.playing svg {
     left: 15px;
     z-index: 1000;
     background-color: #ffc107; /* A distinct yellow/gold color */
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 60px; height: 60px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     flex-grow: 0;
@@ -1826,4 +1817,91 @@ body:not(.body-sheet-music) .button.playing svg {
     border-bottom: 1px solid #ffc107;
     padding-bottom: 5px;
     margin-bottom: 5px;
+}
+
+/* Estilos para el botón flotante de reloj */
+.floating-clock-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+.floating-clock-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Time Tracker Modal Styles */
+#time-tracker-modal .modal-content {
+    width: 90%;
+    max-width: 400px;
+    height: auto; /* Auto height */
+}
+
+#time-tracker-modal .control-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#time-tracker-display {
+    font-size: 3em;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0;
+    color: #bb86fc;
+}
+
+.total-time-display {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.1em;
+}
+
+/* In-Page Notification */
+.in-page-notification {
+    position: fixed;
+    top: -100px; /* Start off-screen */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 25px;
+    background-color: #198754; /* Green */
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 2000;
+    transition: top 0.5s ease-in-out;
+    text-align: center;
+    font-size: 1.2em;
+}
+.in-page-notification.show {
+    top: 20px;
+}
+
+.in-page-notification .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: white;
+    cursor: pointer;
+}
+
+.in-page-notification .close-btn:hover {
+    color: #ccc;
 }

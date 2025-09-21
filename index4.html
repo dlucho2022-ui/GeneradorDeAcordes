@@ -109,6 +109,16 @@
             font-size: 1.8em;
             border: 2px solid #555;
         }
+        .key-signature-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5em;
+            color: #bb86fc; /* A distinct color */
+            font-weight: bold;
+            z-index: 1; /* Ensure it's above other notes if needed */
+        }
         #timer-display {
             font-size: 2em;
             color: #aaa;
@@ -155,7 +165,7 @@
                 <li><a href="index.html">Generador de progresiones</a></li>
                 <li><a href="Index2.html">Generador de partituras</a></li>
                 <li><a href="Index3.html">Generador de ondas</a></li>
-                <li><a href="#" class="active-nav-link">Entrenador de Tonalidades</a></li>
+                <li><a href="#" class="active-nav-link">Círculo de quintas</a></li>
                 <li><a href="index5.html">Generador de cifrados</a></li>
             </ul>
         </nav>
@@ -181,18 +191,18 @@
                     </select>
                 </div>
                 <div class="selector-container">
-                    <label for="time-per-key-selector">Tiempo/Tonalidad:</label>
+                    <label for="time-per-key-selector">Tonalidad:</label>
                     <select id="time-per-key-selector">
                         <option value="-" disabled>-</option>
                         <option value="10">10s</option>
-                        <option value="30" selected>30s</option>
-                        <option value="60">1m</option>
+                        <option value="30">30s</option>
+                        <option value="60" selected>1m</option>
                         <option value="120">2m</option>
                         <option value="180">3m</option>
                     </select>
                 </div>
                  <div class="selector-container">
-                    <label for="total-time-selector">Tiempo Total:</label>
+                    <label for="total-time-selector">Total:</label>
                     <select id="total-time-selector">
                         <option value="-" selected>-</option>
                         <option value="600">10m</option>
@@ -235,6 +245,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let masterGainNode;
 
     const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+    const keySignatures = {
+        'Mayor': {
+            'C': '0', 'G': '1#', 'D': '2#', 'A': '3#', 'E': '4#', 'B': '5#', 'F#': '6#',
+            'Db': '5b', 'Ab': '4b', 'Eb': '3b', 'Bb': '2b', 'F': '1b'
+        },
+        'Menor': {
+            'C': '3b', 'G': '2b', 'D': '1b', 'A': '0', 'E': '1#', 'B': '2#', 'F#': '3#',
+            'Db': '6b', 'Ab': '7b', 'Eb': '5b', 'Bb': '4b', 'F': '3b'
+        }
+    };
     const escalas = {
         'Mayor': {
             'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'], 'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
@@ -524,6 +544,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mode === 'Mayor' || mode === 'Menor') {
             notesToDisplay = escalas[mode][tonality];
+
+            // Add key signature display
+            const signature = keySignatures[mode][tonality];
+            if (signature) {
+                const signatureEl = document.createElement('div');
+                signatureEl.className = 'key-signature-display'; // New class for styling
+                signatureEl.textContent = signature.replace('#', '♯').replace('b', '♭');
+                scaleDisplayContainer.appendChild(signatureEl);
+            }
+
         } else {
             notesToDisplay = getChordNotes(tonality, mode).map(note => note.replace(/[0-9]/g, ''));
         }

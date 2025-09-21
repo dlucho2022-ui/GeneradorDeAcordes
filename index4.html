@@ -366,10 +366,19 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingOverlay.style.display = 'flex';
         const notesToLoad = [];
         const midiToNoteName = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const enharmonicMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' }; // Para cargar ambas versiones
         for (let midi = 48; midi <= 84; midi++) { // C3 a C6
             const noteName = midiToNoteName[midi % 12];
             const octave = Math.floor(midi / 12) - 1;
-            notesToLoad.push(`${noteName}${octave}`);
+            const fullNote = `${noteName}${octave}`;
+            notesToLoad.push(fullNote);
+
+            // Agregar enarmónicos si existen
+            for (const flatNote in enharmonicMap) {
+                if (enharmonicMap[flatNote] === noteName) {
+                    notesToLoad.push(`${flatNote}${octave}`);
+                }
+            }
         }
 
         const promises = notesToLoad.map(note => {
@@ -427,13 +436,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (notes) {
             notes.forEach(note => {
-                const canonicalNote = getCanonicalNoteName(note);
-                const audioFileName = `${formatNoteForFile(canonicalNote)}.wav`;
+                const audioFileName = `${formatNoteForFile(note)}.wav`;
                 console.log(`Buscando: ${audioFileName} (original: ${note})`);
 
-                const buffer = audioBuffers[canonicalNote];
+                const buffer = audioBuffers[note];
                 if (!buffer) {
-                    console.warn(`Audio para la nota ${canonicalNote} (${audioFileName}) no encontrado.`);
+                    console.warn(`Audio para la nota ${note} (${audioFileName}) no encontrado.`);
                     return;
                 }
 

@@ -26,6 +26,13 @@
             align-items: center;
             margin-bottom: 15px;
         }
+        .direction-controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px; /* Add some space to the right if needed */
+        }
         .selector-container label {
             margin-right: 5px;
             color: #ccc;
@@ -146,6 +153,22 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
         }
+        .arrow-button {
+            background-color: #3a3a3a;
+            color: #f0f0f0;
+            border: 2px solid #555;
+            padding: 5px 10px;
+            font-size: 1.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 0 5px;
+        }
+        .arrow-button.active-direction {
+            background-color: #bb86fc;
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(187, 134, 252, 0.7);
+        }
         #startStopButton {
             background-color: #198754;
         }
@@ -173,6 +196,10 @@
     <main>
         <div class="main-container">
             <div class="top-controls">
+                <div class="direction-controls">
+                    <button id="leftArrow" class="arrow-button"><</button>
+                    <button id="rightArrow" class="arrow-button active-direction">></button>
+                </div>
                 
                 <div class="selector-container">
                     <label for="mode-selector">Modo:</label>
@@ -242,6 +269,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalTimeSelector = document.getElementById('total-time-selector');
     const totalTimeDisplay = document.getElementById('total-time-display');
     const modeSelector = document.getElementById('mode-selector');
+    const leftArrow = document.getElementById('leftArrow');
+    const rightArrow = document.getElementById('rightArrow');
+    let rotationDirection = 'clockwise'; // 'clockwise' or 'counter-clockwise'
     let masterGainNode;
 
     const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
@@ -305,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let loopTimeoutId = null;
     let currentTonalityIndex = 0;
     let currentMode = 'Mayor';
-    let duration = 30;
+    let duration = parseInt(timePerKeySelector.value, 10);
     let countdown;
     let totalCountdown;
     let mainTimerId = null;
@@ -595,7 +625,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchToNextTonality() {
-        currentTonalityIndex = (currentTonalityIndex + 1) % tonalities.length;
+        if (rotationDirection === 'clockwise') {
+            currentTonalityIndex = (currentTonalityIndex + 1) % tonalities.length;
+        } else { // counter-clockwise
+            currentTonalityIndex = (currentTonalityIndex - 1 + tonalities.length) % tonalities.length;
+        }
         updateDisplay();
         playChord(tonalities[currentTonalityIndex], currentMode);
     }
@@ -707,6 +741,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             startTimer();
         }
+    });
+
+    leftArrow.addEventListener('click', () => {
+        rotationDirection = 'counter-clockwise';
+        leftArrow.classList.add('active-direction');
+        rightArrow.classList.remove('active-direction');
+    });
+
+    rightArrow.addEventListener('click', () => {
+        rotationDirection = 'clockwise';
+        rightArrow.classList.add('active-direction');
+        leftArrow.classList.remove('active-direction');
     });
 
     // Inicialización

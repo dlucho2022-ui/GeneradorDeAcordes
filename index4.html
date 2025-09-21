@@ -240,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalTimeSelector = document.getElementById('total-time-selector');
     const totalTimeDisplay = document.getElementById('total-time-display');
     const modeSelector = document.getElementById('mode-selector');
+    let masterGainNode;
 
     const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
     const escalas = {
@@ -277,6 +278,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const diatonicSteps = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const flatToSharpMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
 
+    const midiToNoteName = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const enharmonicMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+
     let audioContext;
     const audioBuffers = {};
     let currentlyPlayingNodes = [];
@@ -304,6 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return note;
     }
+
+
 
     function getChordNotes(rootNote, quality) {
         const formula = chordFormulas[quality];
@@ -344,6 +350,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${finalNoteName}${octave}`;
         });
 
+        // Agregar la tónica una octava más abajo
+        const lowerRootMidi = rootMidi - 12;
+        const lowerRootNoteName = midiToNoteName[lowerRootMidi % 12];
+        const lowerRootOctave = Math.floor(lowerRootMidi / 12) - 1;
+        const lowerRootFullNote = `${lowerRootNoteName}${lowerRootOctave}`;
+
+        chordNotes.unshift(lowerRootFullNote); // Agregar al principio del array
+
         return chordNotes;
     }
 
@@ -362,11 +376,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initAudio() {
         if (audioContext) return;
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        masterGainNode = audioContext.createGain();
+        masterGainNode.connect(audioContext.destination);
+        // Establecer el valor inicial del volumen
+        masterGainNode.gain.setValueAtTime(Math.pow(10, 7 / 20), audioContext.currentTime); // Volumen fijo en +7 dB
         
         loadingOverlay.style.display = 'flex';
         const notesToLoad = [];
-        const midiToNoteName = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        const enharmonicMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' }; // Para cargar ambas versiones
+
         for (let midi = 48; midi <= 84; midi++) { // C3 a C6
             const noteName = midiToNoteName[midi % 12];
             const octave = Math.floor(midi / 12) - 1;
@@ -452,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gainNode.gain.setValueAtTime(0, now);
                 gainNode.gain.linearRampToValueAtTime(1, now + loopFadeInTime);
 
-                source.connect(gainNode).connect(audioContext.destination);
+                source.connect(gainNode).connect(masterGainNode);
                 source.start(now);
                 newNodes.push({ source, gainNode });
             });
@@ -690,7 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderOuterCircle();
     updateDisplay();
     updateTimers(duration, duration * 12);
-});
+    });
 </script>
 </body>
 </html>

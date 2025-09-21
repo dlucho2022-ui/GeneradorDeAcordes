@@ -112,11 +112,7 @@
         #timer-display {
             font-size: 2em;
             color: #aaa;
-            margin-top: 10px;
-            position: absolute;
-            bottom: -80px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-top: 20px; /* Ajustado para dar espacio */
         }
         .bottom-controls {
             display: flex;
@@ -125,8 +121,8 @@
             margin-top: 10px;
         }
         #total-time-display {
-            color: #ccc;
-            font-size: 1.2em;
+            color: #bb86fc;
+            font-size: 2em;
             margin-bottom: 15px;
             height: 1.2em;
         }
@@ -217,11 +213,11 @@
                     <div id="scale-display-container">
                         <!-- Las notas se renderizan aquí -->
                     </div>
-                    <div id="timer-display">00:30</div>
                 </div>
             </div>
             <div class="bottom-controls">
-                <div id="total-time-display"></div>
+                <div id="timer-display">Tonalidad: 00:30</div>
+                <div id="total-time-display">Total:</div>
                 <button id="startStopButton" class="control-button">Iniciar</button>
             </div>
         </div>
@@ -577,13 +573,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateTotalTimeDisplay(seconds) {
-        totalTimeDisplay.textContent = `Tiempo total restante: ${formatTime(seconds)}`;
+        totalTimeDisplay.textContent = `Total: ${formatTime(seconds)}`;
     }
 
     function updateTimers(newDuration, newTotal) {
         duration = newDuration;
         totalCountdown = newTotal;
-        timerDisplay.textContent = formatTime(duration);
+        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
         updateTotalTimeDisplay(totalCountdown);
 
         if (isTimerRunning) {
@@ -592,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mainTimerId = setInterval(() => {
                 countdown--;
                 totalCountdown--;
-                timerDisplay.textContent = formatTime(countdown);
+                timerDisplay.textContent = 'Tonalidad: ' + formatTime(countdown);
                 updateTotalTimeDisplay(totalCountdown);
 
                 if (totalCountdown <= 0) {
@@ -621,13 +617,13 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(mainTimerId);
         countdown = duration;
         totalCountdown = duration * 12;
-        timerDisplay.textContent = formatTime(countdown);
+        timerDisplay.textContent = 'Tonalidad: ' + formatTime(countdown);
         updateTotalTimeDisplay(totalCountdown);
 
         mainTimerId = setInterval(() => {
             countdown--;
             totalCountdown--;
-            timerDisplay.textContent = formatTime(countdown);
+            timerDisplay.textContent = 'Tonalidad: ' + formatTime(countdown);
             updateTotalTimeDisplay(totalCountdown);
 
             if (totalCountdown <= 0) {
@@ -648,6 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startStopButton.textContent = 'Iniciar';
         startStopButton.style.backgroundColor = '#198754';
         updateTotalTimeDisplay(duration * 12);
+        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
     }
 
     function populateKeySelector() {
@@ -671,7 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentTonalityIndex = newIndex;
         updateDisplay();
-        timerDisplay.textContent = formatTime(duration);
+        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
         updateTotalTimeDisplay(duration * 12);
     });
 

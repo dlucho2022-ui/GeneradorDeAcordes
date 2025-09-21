@@ -33,6 +33,9 @@
             justify-content: center;
             margin-right: 15px; /* Add some space to the right if needed */
         }
+        .selector-container {
+            position: relative;
+        }
         .selector-container label {
             margin-right: 5px;
             color: #ccc;
@@ -46,6 +49,7 @@
             border-radius: 5px;
             padding: 4px 2px;
         }
+
         .circle-area {
             position: relative;
             width: 600px;
@@ -70,10 +74,10 @@
             margin: -60px;
             background-color: #333;
             border-radius: 50%;
-            border: 3px solid #555;
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: pointer; /* Add this line */
         }
         .tonality-text {
             display: inline-block;
@@ -218,7 +222,7 @@
                     </select>
                 </div>
                 <div class="selector-container">
-                    <label for="time-per-key-selector">Tonalidad:</label>
+                    <label for="time-per-key-selector">Tiempo/Tonalidad:</label>
                     <select id="time-per-key-selector">
                         <option value="-" disabled>-</option>
                         <option value="10">10s</option>
@@ -269,10 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalTimeSelector = document.getElementById('total-time-selector');
     const totalTimeDisplay = document.getElementById('total-time-display');
     const modeSelector = document.getElementById('mode-selector');
-    const leftArrow = document.getElementById('leftArrow');
-    const rightArrow = document.getElementById('rightArrow');
     let rotationDirection = 'clockwise'; // 'clockwise' or 'counter-clockwise'
     let masterGainNode;
+    let currentRotationAngle = 0; // New variable
 
     const tonalities = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
     const keySignatures = {
@@ -562,6 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateDisplay();
                 timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
                 updateTotalTimeDisplay(duration * 12);
+                modeSelector.disabled = false; // Explicitly enable the mode selector
             });
             
             circle.appendChild(el);
@@ -605,11 +609,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateDisplay() {
-        const rotation = -currentTonalityIndex * 30;
-        circle.style.transform = `rotate(${rotation}deg)`;
+        // Calculate the target angle for the current tonality
+        const targetAngle = -currentTonalityIndex * 30;
+
+        // Calculate the shortest path to the target angle
+        let angleDifference = targetAngle - currentRotationAngle;
+
+        // Normalize angleDifference to be between -180 and 180
+        if (angleDifference > 180) angleDifference -= 360;
+        if (angleDifference < -180) angleDifference += 360;
+
+        currentRotationAngle += angleDifference; // Accumulate the rotation
+
+        circle.style.transform = `rotate(${currentRotationAngle}deg)`;
 
         document.querySelectorAll('.tonality-text').forEach(span => {
-            span.style.transform = `rotate(${-rotation}deg)`;
+            span.style.transform = `rotate(${-currentRotationAngle}deg)`;
         });
 
         document.querySelectorAll('.tonality').forEach((el, index) => {

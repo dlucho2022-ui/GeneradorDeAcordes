@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioBuffers = {};
     let currentlyPlayingNodes = [];
     const AUDIO_DURATION = 8.0;
-    const QUICK_FADE_OUT = 0.1;
+    const QUICK_FADE_OUT = 1.0;
     const loopFadeOutTime = 4.0;
     const loopFadeInTime = 4.0;
     let previousTonality = null;
@@ -488,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(loopTimeoutId);
         const now = audioContext.currentTime;
         currentlyPlayingNodes.forEach(node => {
+            node.gainNode.gain.cancelAndHoldAtTime(now); // Cancelar automatizaciones pendientes
             node.gainNode.gain.linearRampToValueAtTime(0, now + QUICK_FADE_OUT);
             node.source.stop(now + QUICK_FADE_OUT);
         });

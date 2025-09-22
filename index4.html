@@ -428,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lowerRootOctave = Math.floor(lowerRootMidi / 12) - 1;
         const lowerRootFullNote = `${lowerRootNoteName}${lowerRootOctave}`;
 
+        chordNotes.unshift(lowerRootFullNote);
         return chordNotes;
     }
 

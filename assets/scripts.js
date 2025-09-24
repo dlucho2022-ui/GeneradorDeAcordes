@@ -2015,22 +2015,27 @@ function addChordFromInput() {
     };
 
     const lowerCaseChordTypeInput = chordTypeInput.toLowerCase();
-    for (const key in acordes) {
-        if (acordes[key].notacion.toLowerCase() === lowerCaseChordTypeInput) {
-            normalizedChordType = acordes[key].notacion;
-            chordDisplay = formatChordDisplay(normalizedChordType);
-            break;
-        }
-    }
-
-    if (!normalizedChordType) {
-        // Intentar con el chordAliasMap
-        if (chordAliasMap[lowerCaseChordTypeInput]) {
-            const internalKey = chordAliasMap[lowerCaseChordTypeInput];
-            const matchingChord = Object.values(acordes).find(c => c.notacion === internalKey.match(/\(([^)]+)\)/)[1]);
-            if (matchingChord) {
-                normalizedChordType = matchingChord.notacion;
+    if (lowerCaseChordTypeInput === '') {
+        normalizedChordType = 'maj';
+        chordDisplay = formatChordDisplay(normalizedChordType);
+    } else {
+        for (const key in acordes) {
+            if (acordes[key].notacion.toLowerCase() === lowerCaseChordTypeInput) {
+                normalizedChordType = acordes[key].notacion;
                 chordDisplay = formatChordDisplay(normalizedChordType);
+                break;
+            }
+        }
+
+        if (!normalizedChordType) {
+            // Intentar con el chordAliasMap
+            if (chordAliasMap[lowerCaseChordTypeInput]) {
+                const internalKey = chordAliasMap[lowerCaseChordTypeInput];
+                const matchingChord = Object.values(acordes).find(c => c.notacion === internalKey.match(/\(([^)]+)\)/)[1]);
+                if (matchingChord) {
+                    normalizedChordType = matchingChord.notacion;
+                    chordDisplay = formatChordDisplay(normalizedChordType);
+                }
             }
         }
     }

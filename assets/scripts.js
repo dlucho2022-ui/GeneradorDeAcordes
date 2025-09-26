@@ -1189,6 +1189,26 @@ function getChordNotes(rootNote, chordType) {
     return notes;
 }
 
+function getNotesForPlayback(notes, chordType) {
+    const triadNotations = ["maj", "m", "aug", "dim"];
+    const matchingChord = Object.values(acordes).find(c => c.notacion === chordType);
+
+    if (matchingChord && triadNotations.includes(matchingChord.notacion) && matchingChord.intervalos.length === 3) {
+        return [...notes, notes[0]];
+    }
+    return notes;
+}
+
+function getNotesForPlayback(notes, chordType) {
+    const triadNotations = ["maj", "m", "aug", "dim"];
+    const matchingChord = Object.values(acordes).find(c => c.notacion === chordType);
+
+    if (matchingChord && triadNotations.includes(matchingChord.notacion) && matchingChord.intervalos.length === 3) {
+        return [...notes, notes[0]];
+    }
+    return notes;
+}
+
 function updateProgressionDisplay() {
     const builder = document.getElementById('progression-builder');
     builder.innerHTML = '';
@@ -1235,7 +1255,8 @@ function addChordToProgression(nota, tipo, display) {
     
     // Play piano preview
     if (chordSampler && notes && notes.length > 0) {
-        const simplifiedNotes = notes.map(n => simplifyEnharmonic(n));
+        const notesForPlayback = getNotesForPlayback(notes, tipo);
+        const simplifiedNotes = notesForPlayback.map(n => simplifyEnharmonic(n));
         const pianoNotes = getPlayablePianoNotes(simplifiedNotes);
         if (pianoNotes.length > 0) {
             console.log("Reproduciendo notas de piano:", pianoNotes);

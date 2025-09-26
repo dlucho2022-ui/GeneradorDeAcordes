@@ -1508,7 +1508,7 @@ body:not(.body-sheet-music) .button.playing svg {
 }
 
 .piano-volume {
-    -webkit-appearance: slider-vertical; /* Make it vertical */
+   -webkit-appearance: slider-vertical; /* Make it vertical */
     width: 20px; /* Thickness */
     height: 100px; /* Length */
     cursor: pointer;

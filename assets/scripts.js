@@ -283,7 +283,6 @@ function updateFretboard(scaleNotes, rootNote) {
 
     fretboardContainer.style.display = 'block';
     
-    // Convertir la escala y la tónica a números MIDI (0-11) para una comparación robusta
     const scaleMidiNumbers = scaleNotes.map(n => (mapNotaToSemitone(n) + 12) % 12);
     const rootMidiNumber = (mapNotaToSemitone(rootNote) + 12) % 12;
 
@@ -293,7 +292,10 @@ function updateFretboard(scaleNotes, rootNote) {
         if (scaleMidiNumbers.includes(fretMidiNumber)) {
             const noteMarker = document.createElement('div');
             noteMarker.className = 'note-marker';
-            noteMarker.textContent = fret.dataset.note; // Usar el nombre de nota pre-calculado para el texto
+
+            // Buscar el nombre correcto (con bemoles si es necesario) en la escala original
+            const displayName = scaleNotes.find(scaleNote => (mapNotaToSemitone(scaleNote) + 12) % 12 === fretMidiNumber);
+            noteMarker.textContent = displayName || fret.dataset.note;
             
             if (fretMidiNumber === rootMidiNumber) {
                 noteMarker.classList.add('root-note');
@@ -1196,11 +1198,13 @@ function calcularEscala() {
         });
     }
     else if (selectedAcorde) {
-        updateFretboard([]); // Ocultar diapasón al seleccionar un acorde
         const opcionesSeleccionadas = acordes[selectedAcorde];
         const notasAcorde = getChordNotes(selectedSemitono, opcionesSeleccionadas.notacion);
-        const notasAcordeDisplay = notasAcorde.map(nota => simplifyEnharmonic(nota)); // Get simplified notes for playback
-        const gradosAcordeDisplay = opcionesSeleccionadas.grados; // Use original grades for display
+        
+        updateFretboard(notasAcorde, selectedSemitono); // Mostrar notas del acorde en el diapasón
+
+        const notasAcordeDisplay = notasAcorde.map(nota => simplifyEnharmonic(nota));
+        const gradosAcordeDisplay = opcionesSeleccionadas.grados;
 
         const acordeNotacion = formatChordDisplay(opcionesSeleccionadas.notacion);
         const escapedAcordeNotacion = escapeHtmlQuotesForJs(formatChordDisplay(opcionesSeleccionadas.notacion, true)); // Pass true for forOnClick

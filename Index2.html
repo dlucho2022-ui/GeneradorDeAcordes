@@ -595,6 +595,23 @@
                 const currentKeyData = keyData[selectedKey];
                 
                 let diatonicNotePool = currentKeyData.notes;
+
+                // Reemplazar enarmónicos no comunes del pool diatónico
+                const enharmonicReplacements = {
+                    'E#': 'F', 'B#': 'C', 'Fb': 'E', 'Cb': 'B'
+                };
+                diatonicNotePool = diatonicNotePool.map(note => {
+                    const noteName = note.slice(0, -1);
+                    const octave = note.slice(-1);
+                    const replacement = enharmonicReplacements[noteName];
+                    if (replacement) {
+                        let newOctave = parseInt(octave, 10);
+                        if (noteName === 'B#') newOctave++;
+                        if (noteName === 'Cb') newOctave--;
+                        return replacement + newOctave;
+                    }
+                    return note;
+                });
                 
                 const minNotePitch = parseInt(document.getElementById('min-note-slider').value, 10);
                 const maxNotePitch = parseInt(document.getElementById('max-note-slider').value, 10);
@@ -751,14 +768,24 @@
                 const [beats, beatType] = timeSignature.split('/');
                 let measuresXML = '';
                 let noteIndex = 0;
-                const divisions = 12; // Standard divisions per quarter note for this app's rhythms
+                const divisions = 12;
                 const measureCapacity = parseInt(beats, 10) * (divisions * 4 / parseInt(beatType, 10));
 
+                const sharpOrder = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
+                const flatOrder = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
+                const keySignatureAccidentals = {};
+                if (fifths > 0) {
+                    for (let k = 0; k < fifths; k++) keySignatureAccidentals[sharpOrder[k]] = 1;
+                } else if (fifths < 0) {
+                    for (let k = 0; k < -fifths; k++) keySignatureAccidentals[flatOrder[k]] = -1;
+                }
+
                 for (let i = 0; i < numMeasures; i++) {
+                    let measureAccidentals = { ...keySignatureAccidentals };
                     measuresXML += `<measure number="${i + 1}">`;
                     if (i === 0) {
                         let clefSign, clefLine;
-                        if (selectedClef === 'G') { clefSign = 'G'; clefLine = '2'; } 
+                        if (selectedClef === 'G') { clefSign = 'G'; clefLine = '2'; }
                         else if (selectedClef === 'F') { clefSign = 'F'; clefLine = '4'; }
                         else if (selectedClef === 'C3') { clefSign = 'C'; clefLine = '3'; }
                         else if (selectedClef === 'C4') { clefSign = 'C'; clefLine = '4'; }
@@ -769,10 +796,7 @@
                     while (noteIndex < notes.length) {
                         const note = notes[noteIndex];
                         const noteDuration = note.xml;
-
-                        if (currentMeasureDuration + noteDuration > measureCapacity) {
-                            break; 
-                        }
+                        if (currentMeasureDuration + noteDuration > measureCapacity) break;
 
                         if (note.isRest) {
                             measuresXML += `<note><rest/><duration>${noteDuration}</duration><type>${note.type}</type></note>`;
@@ -786,17 +810,17 @@
                             else if (note.name.includes('b')) alter = -1;
 
                             let accidentalTag = '';
-                            if (note.isChromatic) {
-                                if (alter > 0) accidentalTag = `<accidental>${alter === 2 ? 'double-' : ''}sharp</accidental>`;
-                                else if (alter < 0) accidentalTag = `<accidental>${alter === -2 ? 'flat-' : ''}flat</accidental>`;
-                                else {
-                                     const diatonicNotesInKey = keyData[selectedKey].notes;
-                                     if (diatonicNotesInKey.some(n => n.startsWith(step) && (n.includes('#') || n.includes('b')))) {
-                                         accidentalTag = '<accidental>natural</accidental>';
-                                     }
-                                }
-                            }
+                            const currentAlterInMeasure = measureAccidentals[step] === undefined ? (keySignatureAccidentals[step] || 0) : measureAccidentals[step];
                             
+                            if (alter !== currentAlterInMeasure) {
+                                if (alter === 1) accidentalTag = '<accidental>sharp</accidental>';
+                                else if (alter === 2) accidentalTag = '<accidental>double-sharp</accidental>';
+                                else if (alter === -1) accidentalTag = '<accidental>flat</accidental>';
+                                else if (alter === -2) accidentalTag = '<accidental>flat-flat</accidental>';
+                                else if (alter === 0) accidentalTag = '<accidental>natural</accidental>';
+                                measureAccidentals[step] = alter;
+                            }
+
                             let timeModificationTag = '';
                             if (note.isTuplet === 'triplet') timeModificationTag = `<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>`;
                             else if (note.isTuplet === 'duplet') timeModificationTag = `<time-modification><actual-notes>2</actual-notes><normal-notes>3</normal-notes></time-modification>`;
@@ -806,22 +830,17 @@
                             const stemDirection = currentPitch >= middleLinePitch ? 'down' : 'up';
 
                             let notationsContent = '';
-                            if (note.tupletPosition) {
-                                notationsContent += `<tuplet type="${note.tupletPosition}" number="1" bracket="yes"/>`;
-                            }
-                            if (note.tie) {
-                                notationsContent += `<tied type="${note.tie}"/>`;
-                            }
+                            if (note.tupletPosition) notationsContent += `<tuplet type="${note.tupletPosition}" number="1" bracket="yes"/>`;
+                            if (note.tie) notationsContent += `<tied type="${note.tie}"/>`;
 
                             measuresXML += `<note>`;
                             measuresXML += `<pitch><step>${step}</step>${alter !== 0 ? `<alter>${alter}</alter>` : ''}<octave>${octave}</octave></pitch>`;
                             measuresXML += `<duration>${noteDuration}</duration>`;
                             measuresXML += timeModificationTag;
                             measuresXML += `<type>${note.type}</type>`;
-                            measuresXML += `${accidentalTag}`; 
-                            if(note.dot) measuresXML += '<dot/>';
+                            measuresXML += accidentalTag;
+                            if (note.dot) measuresXML += '<dot/>';
                             measuresXML += `<stem>${stemDirection}</stem>`;
-                            
                             if (note.beams) {
                                 note.beams.forEach(beam => {
                                     measuresXML += `<beam number="${beam.number}">${beam.type}</beam>`;

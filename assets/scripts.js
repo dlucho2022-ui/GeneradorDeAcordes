@@ -37,7 +37,7 @@ const escalas_modos = {
     "Hexatonal (Tonos Enteros)": { "intervalos": [0, 2, 4, 6, 8, 10], "grados": ["1", "2", "3", "#4", "#5", "b7"], "acordes": ["△7#5", "△7#5", "△7#5", "△7#5", "△7#5", "△7#5"] },
     "Pentatónica Mayor": { "intervalos": [0, 2, 4, 7, 9], "grados": ["1", "2", "3", "5", "6"], "acordes": ["7", "7", "7", "7", "7"] },
     "Pentatónica Menor": { "intervalos": [0, 3, 5, 7, 10], "grados": ["1", "b3", "4", "5", "b7"], "acordes": ["7", "7", "7", "7", "7"] },
-    "Hirajōshi": { "intervalos": [0, 2, 3, 7, 8], "grados": ["1", "2", "b3", "5", "b6"], "acordes": [] },
+    "Hirajōshi": { "intervalos": [0, 2, 3, 7, 8], "grados": ["1", "2", "b3", "5", "b6"], "acordes": ["sus2", "7sus4b5", "aug", "sus4", "maj7"] },
     "Elefante": { "intervalos": [0, 1, 2, 4, 5, 8, 10], "grados": ["1", "b2", "2", "3", "4", "b6", "b7"], "acordes": ["7#5", "m△7", "m7b5", "7b5", "m△7", "maj7", "7"] },
     "Árabe": { "intervalos": [0, 1, 4, 5, 7, 8, 11], "grados": ["1", "b2", "3", "4", "5", "b6", "7"], "acordes": ["m△7", "maj7", "m7b5", "m7", "7", "maj7", "dim7"] },
     "Blues": { "intervalos": [0, 3, 5, 6, 7, 10], "grados": ["1", "b3", "4", "b5", "5", "b7"], "acordes": ["7", "7", "7", "7", "7", "7"] },
@@ -65,11 +65,11 @@ const escalas_modos = {
     "Oriental": { "intervalos": [0, 1, 4, 5, 7, 8, 10], "grados": ["1", "b2", "3", "4", "5", "b6", "b7"], "acordes": ["7b5", "△7#5", "dim7", "maj7", "maj7", "m7b5", "m△7"] },
     "Jónico Aumentado ♯2": { "intervalos": [0, 3, 4, 5, 8, 9, 11], "grados": ["1", "#2", "3", "4", "#5", "6", "7"], "acordes": ["△7#5", "dim7", "maj7", "maj7", "m7b5", "m△7", "7b5"] },
     "Locrio ♭♭7": { "intervalos": [0, 1, 2, 5, 6, 8, 9], "grados": ["1", "b2", "bb3", "4", "b5", "b6", "bb7"], "acordes": ["dim7", "maj7", "maj7", "m7b5", "m△7", "7b5", "△7#5"] },
-    "Pentatónica Egipcia": { "intervalos": [0, 2, 5, 7, 10], "grados": ["1", "2", "4", "5", "b7"], "acordes": [] },
-    "Pentatónica Kumoi": { "intervalos": [0, 2, 3, 7, 9], "grados": ["1", "2", "b3", "5", "6"], "acordes": ["m", "m6", "m7"] },
-    "Escala de Prometeo": { "intervalos": [0, 2, 4, 6, 9, 10], "grados": ["1", "2", "3", "#4", "6", "b7"], "acordes": ["7b5", "7", ] },
+    "Pentatónica Egipcia": { "intervalos": [0, 2, 5, 7, 10], "grados": ["1", "2", "4", "5", "b7"], "acordes": ["7sus4", "m7", "sus4", "m7", "maj"] },
+    "Pentatónica Kumoi": { "intervalos": [0, 2, 3, 7, 9], "grados": ["1", "2", "b3", "5", "6"], "acordes": ["m6", "7sus4", "aug", "sus4", "m7b5"] },
+    "Escala de Prometeo": { "intervalos": [0, 2, 4, 6, 9, 10], "grados": ["1", "2", "3", "#4", "6", "b7"], "acordes": ["7b5", "7", "m7b5", "m7b5", "m6", "△7#5"] },
     "Escala de Tritono": { "intervalos": [0, 1, 4, 6, 7, 10], "grados": ["1", "b2", "3", "#4", "5", "b7"], "acordes": ["7b5", "7#11", "dim7"] },
-    "Escala Enigmática": { "intervalos": [0, 1, 4, 6, 8, 10, 11], "grados": ["1", "b2", "3", "#4", "#5", "#6", "7"], "acordes": ["maj7#5", "dim7", "7#5"] }
+    "Escala Enigmática": { "intervalos": [0, 1, 4, 6, 8, 10, 11], "grados": ["1", "b2", "3", "#4", "#5", "#6", "7"], "acordes": ["△7#5", "m6", "maj", "7b5", "dim", "dim", "sus4"] }
 
 };
 

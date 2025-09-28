@@ -200,8 +200,16 @@ let currentProgression = [];
 let currentMidiPart = null; // Variable to hold the current MIDI part
 let selectedDrumPattern = "midi_beat_1.mid"; // Default drum pattern
 
+let selectedInstrument = 'bajo'; // 'bajo' o 'cello'
+const instrumentTunings = {
+    bajo: [43, 38, 33, 28],   // G2, D2, A1, E1
+    guitarra: [64, 59, 55, 50, 45, 40], // E4, B3, G3, D3, A2, E2
+    cello: [57, 50, 43, 36], // A3, D3, G2, C2
+    violin: [76, 69, 62, 55]  // E5, A4, D4, G3
+};
+
 // --- LÓGICA DEL DIAPASÓN ---
-const bassTuning = [28, 33, 38, 43]; // E1, A1, D2, G2 en MIDI
+const tuning = instrumentTunings[selectedInstrument];
 const noteNames = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
 
 function midiToNoteName(midi) {
@@ -218,9 +226,9 @@ function renderFretboard() {
     fretboard.className = 'fretboard';
 
     const numFrets = 12;
-    const bassTuningMidi = [43, 38, 33, 28]; // G, D, A, E
+    const tuningMidi = instrumentTunings[selectedInstrument];
 
-    bassTuningMidi.forEach((openNoteMidi, stringIndex) => {
+    [...tuningMidi].forEach((openNoteMidi, stringIndex) => {
         const stringDiv = document.createElement('div');
         stringDiv.className = 'string';
 
@@ -875,6 +883,26 @@ function renderSelectors() {
             }
         });
         tonalidadOptionsContainer.appendChild(option);
+    });
+
+    const instrumentOptionsContainer = document.getElementById('instrument-options');
+    instrumentOptionsContainer.innerHTML = '';
+    Object.keys(instrumentTunings).forEach(instrument => {
+        const option = document.createElement('div');
+        option.className = 'card-option';
+        option.textContent = instrument.charAt(0).toUpperCase() + instrument.slice(1);
+        option.dataset.value = instrument;
+        if (instrument === selectedInstrument) {
+            option.classList.add('selected');
+        }
+        option.addEventListener('click', () => {
+            selectedInstrument = instrument;
+            document.querySelectorAll('#instrument-options .card-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            renderFretboard();
+            calcularEscala();
+        });
+        instrumentOptionsContainer.appendChild(option);
     });
 
     const escalaOptionsContainer = document.getElementById('escala-options-modal');

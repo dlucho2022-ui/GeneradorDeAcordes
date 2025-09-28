@@ -2011,3 +2011,27 @@ body:not(.body-sheet-music) .button.playing svg {
     background-color: #ffc107;
     transform: scale(1.1);
 }
+
+/* Estilo para resaltar trastes en instrumentos sin trastes */
+.fret.fret-highlight {
+    background-color: rgba(255, 255, 255, 0.1); /* Un sutil resaltado de fondo */
+    border-right-color: #fff; /* Línea del traste más brillante */
+}
+
+/* Estilos para ocultar trastes en Cello y Violin */
+.fretboard.cello .fret,
+.fretboard.violin .fret {
+    border-right-color: transparent; /* Oculta las líneas de los trastes */
+}
+
+/* Pero mantenemos la cejuela visible */
+.fretboard.cello .fret:first-child,
+.fretboard.violin .fret:first-child {
+    border-right-color: #f0f0f0;
+}
+
+/* Y hacemos que el resaltado de posición también muestre una línea */
+.fretboard.cello .fret.fret-highlight,
+.fretboard.violin .fret.fret-highlight {
+    /* border-right: 1px solid #fff; */ /* Desactivado por pedido del usuario */
+}

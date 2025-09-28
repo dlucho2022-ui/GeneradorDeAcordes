@@ -224,6 +224,7 @@ function renderFretboard() {
 
     const fretboard = document.createElement('div');
     fretboard.className = 'fretboard';
+    fretboard.classList.add(selectedInstrument);
 
     const numFrets = 12;
     const tuningMidi = instrumentTunings[selectedInstrument];
@@ -240,13 +241,22 @@ function renderFretboard() {
             fretDiv.dataset.note = noteName;
             fretDiv.dataset.midi = currentNoteMidi % 12;
 
-            // Inlays for specific strings, attached to the 3rd string (A-string) to be centered
-            if (stringIndex === 2) { 
-                 if (fret === 3 || fret === 5 || fret === 7 || fret === 9) {
-                    fretDiv.classList.add('single-inlay');
+            // Add inlays/markers based on instrument type
+            if (selectedInstrument === 'bajo' || selectedInstrument === 'guitarra') {
+                // Standard dot inlays for fretted instruments
+                const inlayStringIndex = (tuningMidi.length === 6) ? 2 : 2; 
+                if (stringIndex === inlayStringIndex) { 
+                     if (fret === 3 || fret === 5 || fret === 7 || fret === 9) {
+                        fretDiv.classList.add('single-inlay');
+                    }
+                    if (fret === 12) {
+                        fretDiv.classList.add('double-inlay');
+                    }
                 }
-                if (fret === 12) {
-                    fretDiv.classList.add('double-inlay');
+            } else if (selectedInstrument === 'cello' || selectedInstrument === 'violin') {
+                // Highlight the entire fret column for fretless-style position markers
+                if (fret === 2 || fret === 5 || fret === 7 || fret === 12) {
+                    fretDiv.classList.add('fret-highlight');
                 }
             }
 

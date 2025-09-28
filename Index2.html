@@ -573,7 +573,7 @@
                 for (let i = 0; i < notes.length - 1; i++) {
                     const currentNote = notes[i];
                     const nextNote = notes[i + 1];
-                    if (Math.random() < TIE_PROBABILITY && !currentNote.isRest && !nextNote.isRest && currentNote.tie !== 'stop') {
+                    if (currentNote.isLastInBlock && Math.random() < TIE_PROBABILITY && !currentNote.isRest && !nextNote.isRest && currentNote.tie !== 'stop') {
                         nextNote.name = currentNote.name;
                         nextNote.isChromatic = currentNote.isChromatic;
                         currentNote.tie = 'start';
@@ -656,6 +656,8 @@
                         const blockNotes = [];
                         blockInfo.notes.forEach((noteInfo, index) => {
                             let currentNoteName, isChromatic = false;
+                            const isLastInBlock = (index === blockInfo.notes.length - 1);
+
                             if (noteInfo.isRest) {
                                 currentNoteName = null; // No cambiamos lastNoteName
                             } else {
@@ -690,7 +692,7 @@
                                 }
                                 lastNoteName = currentNoteName; // Actualizamos solo si no es silencio
                             }
-                            blockNotes.push({ ...noteInfo, name: currentNoteName, isChromatic: isChromatic });
+                            blockNotes.push({ ...noteInfo, name: currentNoteName, isChromatic: isChromatic, isLastInBlock: isLastInBlock });
                         });
                         addBeaming(blockNotes);
                         addTupletNotations(blockNotes);

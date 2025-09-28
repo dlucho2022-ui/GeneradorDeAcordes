@@ -232,9 +232,9 @@ function renderFretboard() {
             fretDiv.dataset.note = noteName;
             fretDiv.dataset.midi = currentNoteMidi % 12;
 
-            // Inlays for specific strings for a more realistic look
-            if (stringIndex === 1) { // D string
-                 if (fret === 3 || fret === 5 || fret === 7 || fret === 9 || fret === 15 || fret === 17 || fret === 19) {
+            // Inlays for specific strings, attached to the 3rd string (A-string) to be centered
+            if (stringIndex === 2) { 
+                 if (fret === 3 || fret === 5 || fret === 7 || fret === 9) {
                     fretDiv.classList.add('single-inlay');
                 }
                 if (fret === 12) {

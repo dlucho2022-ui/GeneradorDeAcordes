@@ -1928,7 +1928,7 @@ body:not(.body-sheet-music) .button.playing svg {
 .string {
     display: flex;
     flex-direction: row;
-    height: 35px;
+    height: 45px; /* Increased height */
     align-items: center;
     position: relative;
 }
@@ -1939,7 +1939,7 @@ body:not(.body-sheet-music) .button.playing svg {
     left: 0;
     right: 0;
     top: 50%;
-    height: 2px;
+    height: 3px; /* Thicker string */
     background-color: #d3d3d3;
     transform: translateY(-50%);
     z-index: 1;
@@ -1965,33 +1965,35 @@ body:not(.body-sheet-music) .button.playing svg {
 .fret.single-inlay::after {
     content: '';
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     background-color: #d3d3d3;
     border-radius: 50%;
-    top: -20px;
+    top: 0;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     opacity: 0.6;
+    z-index: 0;
 }
 
 .fret.double-inlay::before, .fret.double-inlay::after {
     content: '';
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     background-color: #d3d3d3;
     border-radius: 50%;
     left: 50%;
     transform: translateX(-50%);
     opacity: 0.6;
+    z-index: 0;
 }
-.fret.double-inlay::before { top: -30px; }
-.fret.double-inlay::after { top: 30px; }
+.fret.double-inlay::before { top: -45px; }
+.fret.double-inlay::after { top: 0; transform: translate(-50%, -50%); }
 
 .note-marker {
-    width: 25px;
-    height: 25px;
+    width: 35px; /* Increased size */
+    height: 35px; /* Increased size */
     border-radius: 50%;
     background-color: #bb86fc;
     color: #121212;
@@ -1999,7 +2001,7 @@ body:not(.body-sheet-music) .button.playing svg {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 18px; /* Increased font size */
     z-index: 2;
     border: 1px solid #121212;
     box-shadow: 0 2px 5px rgba(0,0,0,0.5);

@@ -301,6 +301,7 @@
 
             let allGeneratedNotes = []; 
             let activeAudio = {}; 
+            let playbackSessionId = 0; 
 
             const floatingPlayStopButton = document.getElementById('floating-play-stop-button');
             const floatingGenerateButton = document.getElementById('floating-generate-button');
@@ -555,15 +556,15 @@
     'A':{fifths:3,notes:['C#2','D2','E2','F#2','G#2','A2','B2','C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4','E4','F#4','G#4','A4','B4','C#5','D5','E5','F#5','G#5','A5','B5','C#6','D6','E6','F#6','G#6','A6','B6','C#7']},
     'E':{fifths:4,notes:['C#2','D#2','E2','F#2','G#2','A2','B2','C#3','D#3','E3','F#3','G#3','A3','B3','C#4','D#4','E4','F#4','G#4','A4','B4','C#5','D#5','E5','F#5','G#5','A5','B5','C#6','D#6','E6','F#6','G#6','A6','B6','C#7']},
     'B':{fifths:5,notes:['C#2','D#2','E2','F#2','G#2','A#2','B2','C#3','D#3','E3','F#3','G#3','A#3','B3','C#4','D#4','E4','F#4','G#4','A#4','B4','C#5','D#5','E5','F#5','G#5','A#5','B5','C#6','D#6','E6','F#6','G#6','A#6','B6','C#7']},
-    'F#':{fifths:6,notes:['C#2','D#2','E#2','F#2','G#2','A#2','B2','C#3','D#3','E#3','F#3','G#3','A#3','B3','C#4','D#4','E#4','F#4','G#4','A#4','B4','C#5','D#5','E#5','F#5','G#5','A#5','B5','C#6','D#6','E#6','F#6','G#6','A#6','B6','C#7']},
-    'C#':{fifths:7,notes:['C#2','D#2','E#2','F#2','G#2','A#2','B#2','C#3','D#3','E#3','F#3','G#3','A#3','B#3','C#4','D#4','E#4','F#4','G#4','A#4','B#4','C#5','D#5','E#5','F#5','G#5','A#5','B#5','C#6','D#6','E#6','F#6','G#6','A#6','B#6','C#7']},
+    'F#':{fifths:6,notes:['C#2','D#2','F2','F#2','G#2','A#2','B2','C#3','D#3','F3','F#3','G#3','A#3','B3','C#4','D#4','F4','F#4','G#4','A#4','B4','C#5','D#5','F5','F#5','G#5','A#5','B5','C#6','D#6','F6','F#6','G#6','A#6','B6','C#7']},
+    'C#':{fifths:7,notes:['C#2','D#2','F2','F#2','G#2','A#2','C3','C#3','D#3','F3','F#3','G#3','A#3','C4','C#4','D#4','F4','F#4','G#4','A#4','C5','C#5','D#5','F5','F#5','G#5','A#5','C6','C#6','D#6','F6','F#6','G#6','A#6','C7','C#7']},
     'F':{fifths:-1,notes:['C2','D2','E2','F2','G2','A2','Bb2','C3','D3','E3','F3','G3','A3','Bb3','C4','D4','E4','F4','G4','A4','Bb4','C5','D5','E5','F5','G5','A5','Bb5','C6','D6','E6','F6','G6','A6','Bb6','C7']},
     'Bb':{fifths:-2,notes:['C2','D2','Eb2','F2','G2','A2','Bb2','C3','D3','Eb3','F3','G3','A3','Bb3','C4','D4','Eb4','F4','G4','A4','Bb4','C5','D5','Eb5','F5','G5','A5','Bb5','C6','D6','Eb6','F6','G6','A6','Bb6','C7']},
     'Eb':{fifths:-3,notes:['C2','D2','Eb2','F2','G2','Ab2','Bb2','C3','D3','Eb3','F3','G3','Ab3','Bb3','C4','D4','Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5','F5','G5','Ab5','Bb5','C6','D6','Eb6','F6','G6','Ab6','Bb6','C7']},
     'Ab':{fifths:-4,notes:['C2','Db2','Eb2','F2','G2','Ab2','Bb2','C3','Db3','Eb3','F3','G3','Ab3','Bb3','C4','Db4','Eb4','F4','G4','Ab4','Bb4','C5','Db5','Eb5','F5','G5','Ab5','Bb5','C6','Db6','Eb6','F6','G6','Ab6','Bb6','C7']},
     'Db':{fifths:-5,notes:['C2','Db2','Eb2','F2','Gb2','Ab2','Bb2','C3','Db3','Eb3','F3','Gb3','Ab3','Bb3','C4','Db4','Eb4','F4','Gb4','Ab4','Bb4','C5','Db5','Eb5','F5','Gb5','Ab5','Bb5','C6','Db6','Eb6','F6','Gb6','Ab6','Bb6','C7']},
-    'Gb':{fifths:-6,notes:['Cb2','Db2','Eb2','F2','Gb2','Ab2','Bb2','Cb3','Db3','Eb3','F3','Gb3','Ab3','Bb3','Cb4','Db4','Eb4','F4','Gb4','Ab4','Bb4','Cb5','Db5','Eb5','F5','Gb5','Ab5','Bb5','Cb6','Db6','Eb6','F6','Gb6','Ab6','Bb6','Cb7']},
-    'Cb':{fifths:-7,notes:['Cb2','Db2','Eb2','Fb2','Gb2','Ab2','Bb2','Cb3','Db3','Eb3','Fb3','Gb3','Ab3','Bb3','Cb4','Db4','Eb4','Fb4','Gb4','Ab4','Bb4','Cb5','Db5','Eb5','Fb5','Gb5','Ab5','Bb5','Cb6','Db6','Eb6','Fb6','Gb6','Ab6','Bb6','Cb7']} };
+    'Gb':{fifths:-6,notes:['B1','Db2','Eb2','F2','Gb2','Ab2','Bb2','B2','Db3','Eb3','F3','Gb3','Ab3','Bb3','B3','Db4','Eb4','F4','Gb4','Ab4','Bb4','B4','Db5','Eb5','F5','Gb5','Ab5','Bb5','B5','Db6','Eb6','F6','Gb6','Ab6','Bb6','B6']},
+    'Cb':{fifths:-7,notes:['B1','Db2','Eb2','E2','Gb2','Ab2','Bb2','B2','Db3','Eb3','E3','Gb3','Ab3','Bb3','B3','Db4','Eb4','E4','Gb4','Ab4','Bb4','B4','Db5','Eb5','E5','Gb5','Ab5','Bb5','B5','Db6','Eb6','E6','Gb6','Ab6','Bb6','B6']} };
             const simpleRhythmicBlocks = { 'quarters':{beats:1,notes:[{duration:'4n',type:'quarter',xml:12}]},'eighths':{beats:1,notes:[{duration:'8n',type:'eighth',xml:6},{duration:'8n',type:'eighth',xml:6}]},'sixteenths':{beats:1,notes:[{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3}]},'eighth-sixteenths':{beats:1,notes:[{duration:'8n',type:'eighth',xml:6},{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3}]},'sixteenths-eighth':{beats:1,notes:[{duration:'16n',type:'16th',xml:3},{duration:'16n',type:'16th',xml:3},{duration:'8n',type:'eighth',xml:6}]},'sixteenth-eighth-sixteenth':{beats:1,notes:[{duration:'16n',type:'16th',xml:3},{duration:'8n',type:'eighth',xml:6},{duration:'16n',type:'16th',xml:3}]},'syncopation':{beats:1,notes:[{duration:'8n',type:'eighth',xml:6,isRest:true},{duration:'8n',type:'eighth',xml:6}]},'triplets':{beats:1,notes:[{duration:'8t',type:'eighth',xml:4,isTuplet:'triplet'},{duration:'8t',type:'eighth',xml:4,isTuplet:'triplet'},{duration:'8t',type:'eighth',xml:4,isTuplet:'triplet'}]},'quarter-triplets':{beats:2,notes:[{duration:'4t',type:'quarter',xml:8,isTuplet:'triplet'},{duration:'4t',type:'quarter',xml:8,isTuplet:'triplet'},{duration:'4t',type:'quarter',xml:8,isTuplet:'triplet'}]},'two-dotted-quarters':{beats:3,notes:[{duration:'4n.',type:'quarter',xml:18,dot:true},{duration:'4n.',type:'quarter',xml:18,dot:true}]},'sixteenth-syncopation':{beats:1,notes:[{duration:'16n',type:'16th',xml:3,isRest:true},{duration:'8n.',type:'eighth',xml:9,dot:true}]},'long-syncopation':{beats:2,notes:[{duration:'8n',type:'eighth',xml:6},{duration:'4n',type:'quarter',xml:12},{duration:'8n',type:'eighth',xml:6}]} };
             const compoundRhythmicBlocks = { 'dotted-quarter': { beats: 1.5, notes: [{ duration: '4n.', type: 'quarter', xml: 18, dot: true }] }, 'three-eighths': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'rest-quarter-eighth': { beats: 1.5, notes: [{ duration: '4n', type: 'quarter', xml: 12, isRest: true }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'rest-eighth-quarter': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6, isRest: true }, { duration: '4n', type: 'quarter', xml: 12 }] }, 'rest-eighth-two-eighths': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6, isRest: true }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'two-eighths-rest-eighth': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6, isRest: true }] }, 'eighth-rest-eighth': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6, isRest: true }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'eighth-duplet': { beats: 1.5, notes: [{ duration: '8n.', type: 'eighth', xml: 9, isTuplet: 'duplet' }, { duration: '8n.', type: 'eighth', xml: 9, isTuplet: 'duplet' }] }, 'two-sixteenths-two-eighths': { beats: 1.5, notes: [{ duration: '16n', type: '16th', xml: 3 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }] }, 'two-eighths-sixteenths': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '8n', type: 'eighth', xml: 6 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '16n', type: '16th', xml: 3 }] }, 'eighth-sixteenth-eighth': { beats: 1.5, notes: [{ duration: '8n', type: 'eighth', xml: 6 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '16n', type: '16th', xml: 3 }, { duration: '8n', type: 'eighth', xml: 6 }] } };
 
@@ -595,23 +596,6 @@
                 const currentKeyData = keyData[selectedKey];
                 
                 let diatonicNotePool = currentKeyData.notes;
-
-                // Reemplazar enarmónicos no comunes del pool diatónico
-                const enharmonicReplacements = {
-                    'E#': 'F', 'B#': 'C', 'Fb': 'E', 'Cb': 'B'
-                };
-                diatonicNotePool = diatonicNotePool.map(note => {
-                    const noteName = note.slice(0, -1);
-                    const octave = note.slice(-1);
-                    const replacement = enharmonicReplacements[noteName];
-                    if (replacement) {
-                        let newOctave = parseInt(octave, 10);
-                        if (noteName === 'B#') newOctave++;
-                        if (noteName === 'Cb') newOctave--;
-                        return replacement + newOctave;
-                    }
-                    return note;
-                });
                 
                 const minNotePitch = parseInt(document.getElementById('min-note-slider').value, 10);
                 const maxNotePitch = parseInt(document.getElementById('max-note-slider').value, 10);
@@ -861,9 +845,27 @@
 
             window.stopPlayback = function() {
                 if (Tone.Transport.state !== 'started') return;
-                Tone.Transport.stop(); Tone.Transport.cancel(); 
-                accompanimentSampler.releaseAll(); metronomePlayer.stop(); sampler.releaseAll();
-                if (activeAudio.part) activeAudio.part.dispose(); if (activeAudio.loop) activeAudio.loop.dispose(); if (activeAudio.sequence) activeAudio.sequence.dispose();
+                
+                playbackSessionId++;
+
+                Tone.Transport.stop(); 
+                Tone.Transport.cancel(); 
+
+                accompanimentSampler.releaseAll(); 
+                metronomePlayer.stop(); 
+                sampler.releaseAll();
+
+                if (activeAudio.part) {
+                    activeAudio.part.clear();
+                    activeAudio.part.dispose();
+                }
+                if (activeAudio.loop) {
+                    activeAudio.loop.dispose();
+                }
+                if (activeAudio.sequence) {
+                    activeAudio.sequence.dispose();
+                }
+
                 activeAudio = {};
                 if (osmd.cursor) osmd.cursor.hide();
                 floatingPlayStopButton.innerHTML = playIconSVG;
@@ -876,30 +878,46 @@
                     const visualGuideCheckbox = document.getElementById('visual-guide-checkbox');
                     const loopPlaybackCheckbox = document.getElementById('loop-playback-checkbox'); // Get the new checkbox
 
+                    playbackSessionId++; // Increment session ID for each new playback
+                    const currentSessionId = playbackSessionId;
+
+                    const triggeredTimes = new Set();
                     const part = new Tone.Part((time, note) => {
+                        if (triggeredTimes.has(time)) {
+                            return;
+                        }
+                        triggeredTimes.add(time);
+
                         let duration = note.duration;
                         if (note.isTuplet === 'quadruplet') {
                             duration = Tone.Time('4n.').toSeconds() / 4;
                         }
                         if (!note.isRest && note.tie !== 'stop') { sampler.triggerAttackRelease(note.name, duration, time); }
+
                         Tone.Draw.schedule(() => {
+                            if (note.sessionId !== playbackSessionId) return;
+
                             if (osmd.cursor && Tone.Transport.state === 'started') {
-                                osmd.cursor.next();
+                                if (note.index > 0) {
+                                    osmd.cursor.next();
+                                }
                                 const autoscrollCheckbox = document.getElementById('autoscroll-checkbox');
                                 if (autoscrollCheckbox && autoscrollCheckbox.checked && osmd.cursor.cursorElement) {
                                     osmd.cursor.cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }
                             }
-                        }, time + Tone.Time(duration).toSeconds());
+                        }, time);
                     });
 
                     let currentTime = 0;
-                    allGeneratedNotes.forEach(note => {
+                    allGeneratedNotes.forEach((note, index) => {
                         let durationForScheduling = note.duration;
                         if (note.isTuplet === 'quadruplet') {
                             durationForScheduling = Tone.Time('4n.').toSeconds() / 4;
                         }
-                        part.add(currentTime, note);
+                        // Create a copy of the note object for the callback to prevent race conditions on rapid start/stop
+                        const noteCopy = { ...note, index: index, sessionId: currentSessionId };
+                        part.add(currentTime, noteCopy);
                         currentTime += Tone.Time(durationForScheduling).toSeconds();
                     });
                     activeAudio.part = part;

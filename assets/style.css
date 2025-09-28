@@ -1905,3 +1905,107 @@ body:not(.body-sheet-music) .button.playing svg {
 .in-page-notification .close-btn:hover {
     color: #ccc;
 }
+
+/* --- ESTILOS DIAPASÓN DINÁMICO (Responsivo) --- */
+#fretboard-container {
+    width: 100%;
+    max-width: 1200px; /* Límite para que no sea gigante en pantallas grandes */
+    margin: 30px auto;
+    padding: 10px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.fretboard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 2px solid #614126;
+    background-color: #8B4513;
+}
+
+.string {
+    display: flex;
+    flex-direction: row;
+    height: 35px;
+    align-items: center;
+    position: relative;
+}
+
+.string::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background-color: #d3d3d3;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.fret {
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 100%;
+    border-right: 2px solid #a0a0a0;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fret:first-child {
+    flex-grow: 0.5;
+    border-right: 4px solid #f0f0f0;
+}
+
+.fret.single-inlay::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #d3d3d3;
+    border-radius: 50%;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.6;
+}
+
+.fret.double-inlay::before, .fret.double-inlay::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #d3d3d3;
+    border-radius: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.6;
+}
+.fret.double-inlay::before { top: -30px; }
+.fret.double-inlay::after { top: 30px; }
+
+.note-marker {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #bb86fc;
+    color: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    z-index: 2;
+    border: 1px solid #121212;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.note-marker.root-note {
+    background-color: #ffc107;
+    transform: scale(1.1);
+}

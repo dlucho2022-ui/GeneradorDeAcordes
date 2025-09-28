@@ -200,6 +200,91 @@ let currentProgression = [];
 let currentMidiPart = null; // Variable to hold the current MIDI part
 let selectedDrumPattern = "midi_beat_1.mid"; // Default drum pattern
 
+// --- LÓGICA DEL DIAPASÓN ---
+const bassTuning = [28, 33, 38, 43]; // E1, A1, D2, G2 en MIDI
+const noteNames = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
+
+function midiToNoteName(midi) {
+    const noteIndex = (midi % 12 + 12) % 12; // Ensure positive index
+    return noteNames[noteIndex];
+}
+
+function renderFretboard() {
+    const fretboardContainer = document.getElementById('fretboard-container');
+    if (!fretboardContainer) return;
+    fretboardContainer.innerHTML = ''; // Clear previous content
+
+    const fretboard = document.createElement('div');
+    fretboard.className = 'fretboard';
+
+    const numFrets = 12;
+    const bassTuningMidi = [43, 38, 33, 28]; // G, D, A, E
+
+    bassTuningMidi.forEach((openNoteMidi, stringIndex) => {
+        const stringDiv = document.createElement('div');
+        stringDiv.className = 'string';
+
+        for (let fret = 0; fret <= numFrets; fret++) {
+            const fretDiv = document.createElement('div');
+            fretDiv.className = 'fret';
+            const currentNoteMidi = openNoteMidi + fret;
+            const noteName = midiToNoteName(currentNoteMidi);
+            fretDiv.dataset.note = noteName;
+            fretDiv.dataset.midi = currentNoteMidi % 12;
+
+            // Inlays for specific strings for a more realistic look
+            if (stringIndex === 1) { // D string
+                 if (fret === 3 || fret === 5 || fret === 7 || fret === 9 || fret === 15 || fret === 17 || fret === 19) {
+                    fretDiv.classList.add('single-inlay');
+                }
+                if (fret === 12) {
+                    fretDiv.classList.add('double-inlay');
+                }
+            }
+
+            stringDiv.appendChild(fretDiv);
+        }
+        fretboard.appendChild(stringDiv);
+    });
+
+    fretboardContainer.appendChild(fretboard);
+}
+
+function updateFretboard(scaleNotes, rootNote) {
+    const fretboardContainer = document.getElementById('fretboard-container');
+    if (!fretboardContainer) return;
+
+    document.querySelectorAll('.fret').forEach(fret => {
+        fret.innerHTML = ''; // Limpiar marcadores anteriores
+    });
+
+    if (!scaleNotes || scaleNotes.length === 0) {
+        fretboardContainer.style.display = 'none';
+        return;
+    }
+
+    fretboardContainer.style.display = 'block';
+    
+    // Convertir la escala y la tónica a números MIDI (0-11) para una comparación robusta
+    const scaleMidiNumbers = scaleNotes.map(n => (mapNotaToSemitone(n) + 12) % 12);
+    const rootMidiNumber = (mapNotaToSemitone(rootNote) + 12) % 12;
+
+    document.querySelectorAll('.fret').forEach(fret => {
+        const fretMidiNumber = parseInt(fret.dataset.midi, 10);
+
+        if (scaleMidiNumbers.includes(fretMidiNumber)) {
+            const noteMarker = document.createElement('div');
+            noteMarker.className = 'note-marker';
+            noteMarker.textContent = fret.dataset.note; // Usar el nombre de nota pre-calculado para el texto
+            
+            if (fretMidiNumber === rootMidiNumber) {
+                noteMarker.classList.add('root-note');
+            }
+            
+            fret.appendChild(noteMarker);
+        }
+    });
+}
 
 
 let chordSampler;
@@ -1006,6 +1091,7 @@ function calcularEscala() {
     if (!selectedSemitono || (!selectedEscala && !selectedAcorde)) {
         resultadoBox.innerHTML = "Por favor, seleccione una tonalidad y una escala o acorde.";
         contextoBox.style.display = 'none';
+        updateFretboard([]); // Ocultar diapasón
         return;
     }
 
@@ -1026,8 +1112,10 @@ function calcularEscala() {
             }
         }
 
-        const escalaNotasDisplay = smartSimplify(escalaNotas); // Get simplified notes for playback
-        const gradosDisplay = grados; // Use original grades for display
+        const escalaNotasDisplay = smartSimplify(escalaNotas);
+        const gradosDisplay = grados;
+
+        updateFretboard(escalaNotas, selectedSemitono); // Actualizar diapasón
 
         const acordesPredefinidos = opcionesSeleccionadas.acordes;
         let acordesHtml = "";
@@ -1070,6 +1158,7 @@ function calcularEscala() {
         });
     }
     else if (selectedAcorde) {
+        updateFretboard([]); // Ocultar diapasón al seleccionar un acorde
         const opcionesSeleccionadas = acordes[selectedAcorde];
         const notasAcorde = getChordNotes(selectedSemitono, opcionesSeleccionadas.notacion);
         const notasAcordeDisplay = notasAcorde.map(nota => simplifyEnharmonic(nota)); // Get simplified notes for playback
@@ -1714,6 +1803,7 @@ window.onload = () => {
     }, { once: true });
 
     renderSelectors();
+    renderFretboard();
 
     // Modal Logic
     const escalaModal = document.getElementById('escala-modal');

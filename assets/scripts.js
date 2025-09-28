@@ -203,6 +203,7 @@ let selectedDrumPattern = "midi_beat_1.mid"; // Default drum pattern
 let selectedInstrument = 'bajo'; // 'bajo' o 'cello'
 const instrumentTunings = {
     bajo: [43, 38, 33, 28],   // G2, D2, A1, E1
+    'bajo-5-cuerdas': [43, 38, 33, 28, 23], // G2, D2, A1, E1, B0
     guitarra: [64, 59, 55, 50, 45, 40], // E4, B3, G3, D3, A2, E2
     cello: [57, 50, 43, 36], // A3, D3, G2, C2
     violin: [76, 69, 62, 55]  // E5, A4, D4, G3
@@ -295,7 +296,9 @@ function updateFretboard(scaleNotes, rootNote) {
 
             // Buscar el nombre correcto (con bemoles si es necesario) en la escala original
             const displayName = scaleNotes.find(scaleNote => (mapNotaToSemitone(scaleNote) + 12) % 12 === fretMidiNumber);
-            noteMarker.textContent = displayName || fret.dataset.note;
+            
+            // Simplificar enarmónicos dobles para la visualización
+            noteMarker.textContent = simplifyEnharmonic(displayName || fret.dataset.note);
             
             if (fretMidiNumber === rootMidiNumber) {
                 noteMarker.classList.add('root-note');
@@ -899,10 +902,17 @@ function renderSelectors() {
 
     const instrumentOptionsContainer = document.getElementById('instrument-options');
     instrumentOptionsContainer.innerHTML = '';
+    const instrumentDisplayNames = {
+        'bajo': 'Bajo',
+        'bajo-5-cuerdas': 'Bajo (5 Cuerdas)',
+        'guitarra': 'Guitarra',
+        'cello': 'Cello',
+        'violin': 'Violín'
+    };
     Object.keys(instrumentTunings).forEach(instrument => {
         const option = document.createElement('div');
         option.className = 'card-option';
-        option.textContent = instrument.charAt(0).toUpperCase() + instrument.slice(1);
+        option.textContent = instrumentDisplayNames[instrument] || instrument;
         option.dataset.value = instrument;
         if (instrument === selectedInstrument) {
             option.classList.add('selected');

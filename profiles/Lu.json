@@ -24,11 +24,10 @@
   "activeTab": "simple",
   "bpm": "60",
   "zoom": "1.1",
-  "melodyVol": "0",
-  "metroVol": "-7",
-  "accompVol": "-48",
+  "melodyVol": "-4",
+  "metroVol": "-9",
+  "accompVol": "-8",
   "visualGuide": true,
   "autoscroll": true,
-  "loop": false,
-  "studyTime": 9.816666666666666
+  "loop": false
 }

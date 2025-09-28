@@ -71,18 +71,15 @@
         </div>
         <div class="selector-container">
             <label for="melody-volume-slider">Vol. Melodía:</label>
-            <input type="range" id="melody-volume-slider" min="-48" max="6" value="0" step="1">
-            <span id="melody-volume-value">0 dB</span>
+            <input type="range" id="melody-volume-slider" min="-70" max="6" value="0" step="1">
         </div>
         <div class="selector-container">
             <label for="metronome-volume-slider">Metrónomo:</label>
-            <input type="range" id="metronome-volume-slider" min="-48" max="0" value="-48" step="1">
-            <span id="metronome-volume-value">-Inf</span>
+            <input type="range" id="metronome-volume-slider" min="-70" max="0" value="-70" step="1">
         </div>
         <div class="selector-container">
             <label for="accompaniment-volume-slider">Acompañ.:</label>
-            <input type="range" id="accompaniment-volume-slider" min="-48" max="0" value="-48" step="1">
-            <span id="accompaniment-volume-value">-Inf</span>
+            <input type="range" id="accompaniment-volume-slider" min="-70" max="0" value="-70" step="1">
         </div>
         <div class="selector-container">
             <label for="fullscreen-button">Pantalla Completa</label>
@@ -273,8 +270,34 @@
             }).toDestination();
 
             const metronomePlayer = new Tone.Player("assets/audios/metronome_click.wav").toDestination();
-            const accompanimentChords = { 'C': ['c-maj7.mp3', 'a-m7.mp3'], 'G': ['g-maj7.mp3', 'e-m7.mp3'], 'D': ['d-maj7.mp3', 'b-m7.mp3'], 'A': ['a-maj7.mp3', 'f-sharp-m7.mp3'], 'E': ['e-maj7.mp3', 'c-sharp-m7.mp3'], 'B': ['b-maj7.mp3', 'g-sharp-m7.mp3'], 'F#': ['f-sharp-maj7.mp3', 'd-sharp-m7.mp3'], 'C#': ['c-sharp-maj7.mp3', 'a-sharp-m7.mp3'], 'F': ['f-maj7.mp3', 'd-m7.mp3'], 'Bb': ['a-sharp-maj7.mp3', 'g-m7.mp3'], 'Eb': ['d-sharp-maj7.mp3', 'c-m7.mp3'], 'Ab': ['g-sharp-maj7.mp3', 'f-m7.mp3'], 'Db': ['c-sharp-maj7.mp3', 'a-sharp-m7.mp3'], 'Gb': ['f-sharp-maj7.mp3', 'd-sharp-m7.mp3'], 'Cb': ['b-maj7.mp3', 'g-sharp-m7.mp3'], };
-            const players = { 'chord1': new Tone.Player().toDestination(), 'chord2': new Tone.Player().toDestination() };
+            const accompanimentNotes = {
+                'C': { chord1: ['c3', 'g3', 'e4', 'b4'], chord2: ['a3', 'e4', 'c4', 'g4'] },
+                'G': { chord1: ['g3', 'd4', 'b3', 'f#4'], chord2: ['e3', 'b3', 'g3', 'd4'] },
+                'D': { chord1: ['d3', 'a3', 'f#3', 'c#4'], chord2: ['b3', 'f#4', 'd4', 'a4'] },
+                'A': { chord1: ['a3', 'e4', 'c#4', 'g#4'], chord2: ['f#3', 'c#4', 'a3', 'e4'] },
+                'E': { chord1: ['e3', 'b3', 'g#3', 'd#4'], chord2: ['c#3', 'g#3', 'e3', 'b3'] },
+                'B': { chord1: ['b3', 'f#4', 'd#4', 'a#4'], chord2: ['g#3', 'd#4', 'b3', 'f#4'] },
+                'F#': { chord1: ['f#3', 'c#4', 'a#3', 'f4'], chord2: ['d#3', 'a#3', 'f#3', 'c#4'] },
+                'C#': { chord1: ['c#3', 'g#3', 'f4', 'c4'], chord2: ['a#3', 'f4', 'c#4', 'g#4'] },
+                'F': { chord1: ['f3', 'c4', 'a3', 'e4'], chord2: ['d3', 'a3', 'f3', 'c4'] },
+                'Bb': { chord1: ['a#3', 'f4', 'd4', 'a4'], chord2: ['g3', 'd4', 'f3', 'a#3'] },
+                'Eb': { chord1: ['d#3', 'a#3', 'g3', 'd4'], chord2: ['c3', 'g3', 'd#3', 'a#3'] },
+                'Ab': { chord1: ['g#3', 'd#4', 'c4', 'g4'], chord2: ['f3', 'c4', 'g#3', 'd#4'] },
+                'Db': { chord1: ['c#3', 'g#3', 'f3', 'c4'], chord2: ['a#3', 'f4', 'c#4', 'g#4'] },
+                'Gb': { chord1: ['f#3', 'c#4', 'a#3', 'f4'], chord2: ['d#3', 'a#3', 'f#3', 'c#4'] },
+                'Cb': { chord1: ['b3', 'f#4', 'd#4', 'a#4'], chord2: ['g#3', 'd#4', 'b3', 'f#4'] }
+            };
+
+            const accompanimentSampler = new Tone.Sampler({
+                urls: {
+                    'c3': 'c3.wav', 'c#3': 'cs3.wav', 'd3': 'd3.wav', 'd#3': 'ds3.wav', 'e3': 'e3.wav', 'f3': 'f3.wav', 'f#3': 'fs3.wav', 'g3': 'g3.wav', 'g#3': 'gs3.wav', 'a3': 'a3.wav', 'a#3': 'as3.wav', 'b3': 'b3.wav',
+                    'c4': 'c4.wav', 'c#4': 'cs4.wav', 'd4': 'd4.wav', 'd#4': 'ds4.wav', 'e4': 'e4.wav', 'f4': 'f4.wav', 'f#4': 'fs4.wav', 'g4': 'g4.wav', 'g#4': 'gs4.wav', 'a4': 'a4.wav', 'a#4': 'as4.wav', 'b4': 'b4.wav'
+                },
+                release: 1,
+                baseUrl: "assets/audios/",
+            }).toDestination();
+            
+            let currentAccompaniment = accompanimentNotes['C'];
 
             let allGeneratedNotes = []; 
             let activeAudio = {}; 
@@ -469,11 +492,7 @@
             // --- Fin Profile Management ---
 
             function loadChords(key) {
-                const chordsData = accompanimentChords[key];
-                if (chordsData) {
-                    players.chord1.load(`assets/audios/${chordsData[0]}`).catch(e => console.error("Error al cargar acorde 1:", e));
-                    players.chord2.load(`assets/audios/${chordsData[1]}`).catch(e => console.error("Error al cargar acorde 2:", e));
-                }
+                currentAccompaniment = accompanimentNotes[key] || accompanimentNotes['C'];
             }
 
             const pitchMap = { 'Cb2': 23, 'B#1': 24, 'C2': 24, 'C#2': 25, 'Db2': 25, 'D2': 26, 'D#2': 27, 'Eb2': 27, 'E2': 28, 'Fb2': 28, 'E#2': 29, 'F2': 29, 'F#2': 30, 'Gb2': 30, 'G2': 31, 'G#2': 32, 'Ab2': 32, 'A2': 33, 'A#2': 34, 'Bb2': 34, 'B2': 35, 'Cb3': 35, 'B#2': 36, 'C3': 36, 'C#3': 37, 'Db3': 37, 'D3': 38, 'D#3': 39, 'Eb3': 39, 'E3': 40, 'Fb3': 40, 'E#3': 41, 'F3': 41, 'F#3': 42, 'Gb3': 42, 'G3': 43, 'G#3': 44, 'Ab3': 44, 'A3': 45, 'A#3': 46, 'Bb3': 46, 'B3': 47, 'Cb4': 47, 'B#3': 48, 'C4': 48, 'C#4': 49, 'Db4': 49, 'D4': 50, 'D#4': 51, 'Eb4': 51, 'E4': 52, 'Fb4': 52, 'F4': 53, 'E#4': 53, 'F#4': 54, 'Gb4': 54, 'G4': 55, 'G#4': 56, 'Ab4': 56, 'A4': 57, 'A#4': 58, 'Bb4': 58, 'B4': 59, 'Cb5': 59, 'B#4': 60, 'C5': 60, 'C#5': 61, 'Db5': 61, 'D5': 62, 'D#5': 63, 'Eb5': 63, 'E5': 64, 'Fb5': 64, 'E#5': 65, 'F5': 65, 'F#5': 66, 'Gb5': 66, 'G5': 67, 'G#5': 68, 'Ab5': 68, 'A5': 69, 'A#5': 70, 'Bb5': 70, 'B5': 71, 'Cb6': 71, 'B#5': 72, 'C6': 72, 'C#6': 73, 'Db6': 73, 'D6': 74, 'D#6': 75, 'Eb6': 75, 'E6': 76, 'Fb6': 76, 'E#6': 77, 'F6': 77, 'F#6': 78, 'Gb6': 78, 'G6': 79, 'G#6': 80, 'Ab6': 80, 'A6': 81, 'A#6': 82, 'Bb6': 82, 'B6': 83, 'Cb7': 83, 'B#6': 84, 'C7': 84 };
@@ -656,9 +675,13 @@
                                     const currentPitch = pitchMap[currentNoteName];
                                     const direction = Math.random() < 0.5 ? -1 : 1;
                                     const newPitch = currentPitch + direction;
-                                    const allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch);
-                                    if (allPossibleNames.length > 0) {
-                                        const alteredNoteName = allPossibleNames[Math.floor(Math.random() * allPossibleNames.length)];
+                                    let allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch);
+                                    
+                                    const forbiddenNotes = ['E#', 'B#', 'Fb', 'Cb', 'Mi#', 'Si#', 'Fab', 'Dob'];
+                                    let preferredNames = allPossibleNames.filter(name => !forbiddenNotes.includes(name));
+
+                                    if (preferredNames.length > 0) {
+                                        const alteredNoteName = preferredNames[Math.floor(Math.random() * preferredNames.length)];
                                         if (!diatonicNotePool.includes(alteredNoteName)) {
                                             currentNoteName = alteredNoteName;
                                             isChromatic = true;
@@ -818,7 +841,7 @@
             window.stopPlayback = function() {
                 if (Tone.Transport.state !== 'started') return;
                 Tone.Transport.stop(); Tone.Transport.cancel(); 
-                players.chord1.stop(); players.chord2.stop(); metronomePlayer.stop(); sampler.releaseAll();
+                accompanimentSampler.releaseAll(); metronomePlayer.stop(); sampler.releaseAll();
                 if (activeAudio.part) activeAudio.part.dispose(); if (activeAudio.loop) activeAudio.loop.dispose(); if (activeAudio.sequence) activeAudio.sequence.dispose();
                 activeAudio = {};
                 if (osmd.cursor) osmd.cursor.hide();
@@ -866,7 +889,12 @@
                     const metronomeLoop = new Tone.Loop(time => { metronomePlayer.start(time); }, metronomeInterval).start(0);
                     activeAudio.loop = metronomeLoop;
 
-                    const accompanimentSequence = new Tone.Sequence((time, chordIndex) => { const currentPlayer = chordIndex === 0 ? players.chord1 : players.chord2; const otherPlayer = chordIndex === 0 ? players.chord2 : players.chord1; otherPlayer.stop(time); if (currentPlayer.loaded) { currentPlayer.start(time); } }, [0, 1], '1m').start(0);
+                    const accompanimentSequence = new Tone.Sequence((time, chordIndex) => {
+                        const notesToPlay = chordIndex === 0 ? currentAccompaniment.chord1 : currentAccompaniment.chord2;
+                        if (accompanimentSampler.loaded && notesToPlay) {
+                            accompanimentSampler.triggerAttackRelease(notesToPlay, '1n', time);
+                        }
+                    }, [0, 1], '1m').start(0);
                     accompanimentSequence.loop = true;
                     activeAudio.sequence = accompanimentSequence;
 
@@ -998,20 +1026,16 @@
             document.getElementById('melody-volume-slider').addEventListener('input', e => {
                 const volumeDb = parseInt(e.target.value, 10);
                 sampler.volume.value = volumeDb;
-                document.getElementById('melody-volume-value').textContent = `${volumeDb} dB`;
             });
 
             document.getElementById('metronome-volume-slider').addEventListener('input', e => {
                 const volumeDb = parseInt(e.target.value, 10);
                 metronomePlayer.volume.value = volumeDb;
-                document.getElementById('metronome-volume-value').textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
             });
 
             document.getElementById('accompaniment-volume-slider').addEventListener('input', e => {
                 const volumeDb = parseInt(e.target.value, 10);
-                players.chord1.volume.value = volumeDb;
-                players.chord2.volume.value = volumeDb;
-                document.getElementById('accompaniment-volume-value').textContent = volumeDb < -47 ? "-Inf" : `${volumeDb} dB`;
+                accompanimentSampler.volume.value = volumeDb;
             });
             
             document.getElementById('bpm-slider').addEventListener('input', (e) => {

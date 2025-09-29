@@ -70,6 +70,10 @@
             <input type="checkbox" id="loop-playback-checkbox">
         </div>
         <div class="selector-container">
+            <label for="count-in-checkbox">Cuenta (Metrónomo)</label>
+            <input type="checkbox" id="count-in-checkbox">
+        </div>
+        <div class="selector-container">
             <label for="melody-volume-slider">Vol. Melodía:</label>
             <input type="range" id="melody-volume-slider" min="-70" max="6" value="0" step="1">
         </div>
@@ -879,17 +883,17 @@
                 await Tone.start();
                 if (Tone.Transport.state !== 'started') {
                     const visualGuideCheckbox = document.getElementById('visual-guide-checkbox');
-                    const loopPlaybackCheckbox = document.getElementById('loop-playback-checkbox'); // Get the new checkbox
+                    const loopPlaybackCheckbox = document.getElementById('loop-playback-checkbox');
+                    const countInCheckbox = document.getElementById('count-in-checkbox');
 
-                    playbackSessionId++; // Increment session ID for each new playback
+                    playbackSessionId++;
                     const currentSessionId = playbackSessionId;
 
                     const triggeredTimes = new Set();
                     const part = new Tone.Part((time, note) => {
-                        // Redondear el tiempo a una precisión de 5 decimales para evitar errores de punto flotante
                         const quantizedTime = Math.round(time * 100000) / 100000;
                         if (triggeredTimes.has(quantizedTime)) {
-                            return; // Evita el doble disparo
+                            return;
                         }
                         triggeredTimes.add(quantizedTime);
 
@@ -920,52 +924,73 @@
                         if (note.isTuplet === 'quadruplet') {
                             durationForScheduling = Tone.Time('4n.').toSeconds() / 4;
                         }
-                        // Create a copy of the note object for the callback to prevent race conditions on rapid start/stop
                         const noteCopy = { ...note, index: index, sessionId: currentSessionId };
                         part.add(currentTime, noteCopy);
                         currentTime += Tone.Time(durationForScheduling).toSeconds();
                     });
                     activeAudio.part = part;
-                    part.start(0);
 
                     const activeTab = document.querySelector('.tab-button.active').dataset.tab;
                     const metronomeInterval = activeTab === 'compound' ? '4n.' : '4n';
-                    const metronomeLoop = new Tone.Loop(time => { metronomePlayer.start(time); }, metronomeInterval).start(0);
+                    const timeSignature = activeTab === 'simple' ? document.getElementById('time-signature-selector-simple').value : document.getElementById('time-signature-selector-compound').value;
+                    const [beatsPerMeasure, beatType] = timeSignature.split('/').map(Number);
+
+                    let startOffset = 0;
+                    if (countInCheckbox.checked) {
+                        startOffset = '1m'; // One measure count-in
+                    }
+
+                    const metronomeLoop = new Tone.Loop(time => { metronomePlayer.start(time); }, metronomeInterval);
                     activeAudio.loop = metronomeLoop;
 
                     const accompanimentSequence = new Tone.Sequence((time, chordIndex) => {
                         const notesToPlay = chordIndex === 0 ? currentAccompaniment.chord1 : currentAccompaniment.chord2;
                         if (accompanimentSampler.loaded && notesToPlay) {
+                            console.log('Reproduciendo acorde:', notesToPlay.join(', ') + '.wav');
                             accompanimentSampler.triggerAttackRelease(notesToPlay, '1n', time);
                         }
-                    }, [0, 1], '1m').start(0);
+                    }, [0, 1], '1m');
                     accompanimentSequence.loop = true;
                     activeAudio.sequence = accompanimentSequence;
+
+                    metronomeLoop.start(0); // Metronome starts immediately for count-in
+                    part.start(startOffset); // Melody starts after count-in
+                    accompanimentSequence.start(startOffset); // Accompaniment starts after count-in
 
                     if (visualGuideCheckbox.checked) {
                         osmd.cursor.cursorOptions.alpha = 0.3;
                     } else {
                         osmd.cursor.cursorOptions.alpha = 0.0;
                     }
-                    osmd.cursor.show();
-                    osmd.cursor.reset();
+                    // Cursor should only show and reset *after* the count-in
+                    Tone.Transport.scheduleOnce(() => {
+                        if (osmd.cursor) {
+                            osmd.cursor.show();
+                            osmd.cursor.reset();
+                        }
+                    }, startOffset);
 
                     const numMeasures = parseInt(document.getElementById('measure-selector').value, 10);
+                    const totalMusicDuration = `${numMeasures}m`;
 
-                    // Loop logic
+                    // Calculate total playback duration in seconds
+                    const startOffsetSeconds = Tone.Time(startOffset).toSeconds();
+                    const totalMusicDurationSeconds = Tone.Time(totalMusicDuration).toSeconds();
+                    const totalPlaybackDurationSeconds = startOffsetSeconds + totalMusicDurationSeconds;
+
                     if (loopPlaybackCheckbox.checked) {
                         Tone.Transport.loop = true;
-                        Tone.Transport.loopEnd = `${numMeasures}m`; // Loop for the total number of measures
-
-                        // Schedule cursor reset at the beginning of each loop
+                        Tone.Transport.loopStart = startOffset;
+                        Tone.Transport.loopEnd = totalPlaybackDurationSeconds; // Use seconds here
+                        
                         Tone.Transport.scheduleRepeat(() => {
                             if (osmd.cursor) {
                                 osmd.cursor.reset();
                             }
-                        }, `${numMeasures}m`, 0); // Repeat every `numMeasures` at offset 0
+                        }, totalMusicDuration, startOffset);
                     } else {
-                        Tone.Transport.loop = false; // Ensure loop is off if checkbox is unchecked
-                        Tone.Transport.scheduleOnce(stopPlayback, `${numMeasures}m`);
+                        Tone.Transport.loop = false;
+                        Tone.Transport.scheduleOnce(stopPlayback, totalPlaybackDurationSeconds); // Use seconds here
                     }
 
                     Tone.Transport.start('+0.1');

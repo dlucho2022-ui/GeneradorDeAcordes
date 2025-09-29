@@ -143,8 +143,9 @@
             <span id="max-note-value">C7</span>
         </div>
          <div class="selector-container">
-            <label for="include-accidentals">Accidentales</label>
-            <input type="checkbox" id="include-accidentals">
+            <label for="accidentals-slider">Accidentales (%):</label>
+            <input type="range" id="accidentals-slider" min="0" max="50" value="5">
+            <span id="accidentals-value">5%</span>
         </div>
         <div class="selector-container">
             <label for="include-ties">Ligaduras</label>
@@ -610,7 +611,7 @@
                     return pitch >= minNotePitch && pitch <= maxNotePitch;
                 });
 
-                const includeAccidentals = document.getElementById('include-accidentals').checked;
+                const accidentalsPercentage = parseInt(document.getElementById('accidentals-slider').value, 10);
                 const includeTies = document.getElementById('include-ties').checked;
                 const maxDistance = parseInt(document.getElementById('interval-slider').value, 10);
                 let timeSignature, beatsPerMeasure, allowedBlocks, rhythmicBlocks;
@@ -679,7 +680,7 @@
                                     currentNoteName = candidateNotes.length > 0 ? candidateNotes[Math.floor(Math.random() * candidateNotes.length)] : diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)];
                                 }
 
-                                if (includeAccidentals && Math.random() < 0.05) {
+                                if (accidentalsPercentage > 0 && Math.random() < (accidentalsPercentage / 100)) {
                                     const currentPitch = pitchMap[currentNoteName];
                                     const direction = Math.random() < 0.5 ? -1 : 1;
                                     const newPitch = currentPitch + direction;
@@ -1125,6 +1126,10 @@
 
             document.getElementById('interval-slider').addEventListener('input', (e) => {
                 document.getElementById('interval-value').textContent = e.target.value;
+            });
+
+            document.getElementById('accidentals-slider').addEventListener('input', (e) => {
+                document.getElementById('accidentals-value').textContent = `${e.target.value}%`;
             });
 
             document.getElementById('min-note-slider').addEventListener('input', e => {

@@ -680,16 +680,19 @@
                                     const newPitch = currentPitch + direction;
                                     let allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch);
                                     
-                                    const forbiddenNotes = ['E#', 'B#', 'Fb', 'Cb', 'Mi#', 'Si#', 'Fab', 'Dob'];
-                                    let preferredNames = allPossibleNames.filter(name => !forbiddenNotes.includes(name));
-
-                                    if (preferredNames.length > 0) {
-                                        const alteredNoteName = preferredNames[Math.floor(Math.random() * preferredNames.length)];
-                                        if (!diatonicNotePool.includes(alteredNoteName)) {
-                                            currentNoteName = alteredNoteName;
-                                            isChromatic = true;
-                                        }
-                                    }
+                                                    const forbiddenNotes = ['E#', 'B#', 'Fb', 'Cb', 'Mi#', 'Si#', 'Fab', 'Dob'];
+                                                    let preferredNames = allPossibleNames.filter(name => !forbiddenNotes.some(forbidden => name.includes(forbidden)));
+                                    
+                                                    if (preferredNames.length > 0) {
+                                                        const alteredNoteName = preferredNames[Math.floor(Math.random() * preferredNames.length)];
+                                                        const alteredNotePitch = pitchMap[alteredNoteName]; // Get pitch of altered note
+                                                        if (alteredNotePitch >= minNotePitch && alteredNotePitch <= maxNotePitch) { // Check if within range
+                                                            if (!diatonicNotePool.includes(alteredNoteName)) {
+                                                                currentNoteName = alteredNoteName;
+                                                                isChromatic = true;
+                                                            }
+                                                        }
+                                                    }
                                 }
                                 lastNoteName = currentNoteName; // Actualizamos solo si no es silencio
                             }

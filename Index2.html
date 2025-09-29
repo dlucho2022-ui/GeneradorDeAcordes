@@ -883,10 +883,12 @@
 
                     const triggeredTimes = new Set();
                     const part = new Tone.Part((time, note) => {
-                        if (triggeredTimes.has(time)) {
-                            return;
+                        // Redondear el tiempo a una precisión de 5 decimales para evitar errores de punto flotante
+                        const quantizedTime = Math.round(time * 100000) / 100000;
+                        if (triggeredTimes.has(quantizedTime)) {
+                            return; // Evita el doble disparo
                         }
-                        triggeredTimes.add(time);
+                        triggeredTimes.add(quantizedTime);
 
                         let duration = note.duration;
                         if (note.isTuplet === 'quadruplet') {

@@ -113,17 +113,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetBaseSemitone = mapNotaToSemitone(targetBaseNote);
         let diff = (targetNoteSemitone - targetBaseSemitone + 12) % 12;
         let accidental = "";
+        
         if (diff === 1) accidental = "#";
         else if (diff === 2) accidental = "x";
         else if (diff === 11) accidental = "b";
         else if (diff === 10) accidental = "bb";
         else if (diff !== 0) {
-             const enharmonic = semitonos_display.find(n => mapNotaToSemitone(n) === targetNoteSemitone);
-             return enharmonic || targetBaseNote + ' (?)';
+            // Fallback para intervalos complejos, busca la mejor coincidencia enarmónica
+            const enharmonic = semitonos_display.find(n => mapNotaToSemitone(n) === targetNoteSemitone);
+            return enharmonic || targetBaseNote + ' (?)'; // Devuelve el enarmónico directamente
         }
-        return targetBaseNote + accidental;
+    
+        const finalNote = targetBaseNote + accidental;
+    
+        // Reemplazar notas enarmónicas no deseadas
+        const replacements = {
+            "Dob": "Si",
+            "Fab": "Mi",
+            "Mi#": "Fa",
+            "Si#": "Do"
+        };
+    
+        return replacements[finalNote] || finalNote;
     }
-
     function getChordNotes(rootNote, chordType) {
         let internalChordType = chordType;
         if (internalChordType === '△7') internalChordType = 'maj7';

@@ -576,7 +576,7 @@
 
             function applyTies(notes, includeTies) {
                 if (!includeTies) return;
-                const TIE_PROBABILITY = 0.15; // 15% chance
+                const TIE_PROBABILITY = 0.25; // 25% chance
                 for (let i = 0; i < notes.length - 1; i++) {
                     const currentNote = notes[i];
                     const nextNote = notes[i + 1];

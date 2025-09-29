@@ -31,12 +31,12 @@
         <div id="osmd-container"></div>
         <div id="pdf-viewer-container" style="display: none;">
             <div class="pdf-controls">
-                <button id="prev-page" class="button">&lt; Ant</button>
-                <span>Página: <span id="page-num">0</span> / <span id="page-count">0</span></span>
-                <button id="next-page" class="button">Sig &gt;</button>
+                <button id="prev-page" class="button" style="display: none;">&lt; Ant</button>
+                <span style="display: none;">Página: <span id="page-num">0</span> / <span id="page-count">0</span></span>
+                <button id="next-page" class="button" style="display: none;">Sig &gt;</button>
                 <label for="pdf-zoom-slider">Zoom:</label>
-                <input type="range" id="pdf-zoom-slider" min="0.5" max="3" value="2" step="0.1">
-                <span id="pdf-zoom-value">200%</span>
+                <input type="range" id="pdf-zoom-slider" min="0.5" max="3" value="1.5" step="0.1">
+                <span id="pdf-zoom-value">150%</span>
             </div>
             <div id="pdf-canvas-container">
                 <canvas id="pdf-canvas"></canvas>

@@ -664,7 +664,6 @@ document.addEventListener("DOMContentLoaded", function() {
 'sheets/The Stu Clark Shuffle.pdf',
 'sheets/The Sun Aint Gonna Shine.pdf',
 'sheets/The Trammps - Disco Inferno.pdf',
-
 'sheets/realbook 100.pdf',
 'sheets/realbook 101.pdf',
 'sheets/realbook 102.pdf',
@@ -884,7 +883,6 @@ document.addEventListener("DOMContentLoaded", function() {
 'sheets/realbook 297.pdf',
 'sheets/realbook 298.pdf',
 'sheets/realbook 299.pdf',
-
 'sheets/realbook 30.pdf',
 'sheets/realbook 300.pdf',
 'sheets/realbook 301.pdf',
@@ -995,7 +993,6 @@ document.addEventListener("DOMContentLoaded", function() {
 'sheets/realbook 397.pdf',
 'sheets/realbook 398.pdf',
 'sheets/realbook 399.pdf',
-
 'sheets/realbook 40.pdf',
 'sheets/realbook 400.pdf',
 'sheets/realbook 401.pdf',
@@ -1425,684 +1422,131 @@ document.addEventListener("DOMContentLoaded", function() {
 'sheets/Zanzibar  To.pdf',
 'sheets/Zombie To.pdf',
 'sheets/Zombie.pdf',
-'sheets/1 2 3.pdf',
-'sheets/205 Swing Street.pdf',
-'sheets/38 Special - Hold On Loosely.pdf',
-'sheets/A Day Without Love.pdf',
-'sheets/A Gentle Touch.pdf',
-'sheets/A Horse With No Name.pdf',
-'sheets/A Kind Of Magic.pdf',
-'sheets/A Little Blues Please.pdf',
-'sheets/A Little Less Conversation.pdf',
-'sheets/A Little Respect.pdf',
-'sheets/A Marshmallow World.pdf',
-'sheets/A New Day Has Come.pdf',
-'sheets/A Night In Tunisia.pdf',
-'sheets/A Phase Im Going.pdf',
-'sheets/A Place At Your.pdf',
-'sheets/A Summer Day Gary Gould.pdf',
-'sheets/A Town Called Malice.pdf',
-'sheets/Across The Line.pdf',
-'sheets/Across Yer Ocean.pdf',
-'sheets/Adventure Of A Lifetime.pdf',
-'sheets/Africa To.pdf',
-'sheets/Against All Odds.pdf',
-'sheets/Aint No Love In.pdf',
-'sheets/Aint No Love.pdf',
-'sheets/Aint No Mountain High Enough.pdf',
-'sheets/Aint No Mountain High.pdf',
-'sheets/Aint No Stoppin Us Le.pdf',
-'sheets/Aint No Stoppin Us.pdf',
-'sheets/Aint No Sunshine.pdf',
-'sheets/Aint Nobody To.pdf',
-'sheets/Aint Nothing Like The Real.pdf',
-'sheets/Aint That Good News.pdf',
-'sheets/Aint That Peculiar.pdf',
-'sheets/Aint Too Proud To.pdf',
-'sheets/aint-no-woman-like-the-one-i-got.pdf',
-'sheets/Al Jarreau - Sweet Potato Pie.pdf',
-'sheets/Al Jarreau - You Dont See Me.pdf',
-'sheets/Alfies Theme.pdf',
-'sheets/alice-merton-no-roots.pdf',
-'sheets/All About That.pdf',
-'sheets/All Day And Of.pdf',
-'sheets/All I Want.pdf',
-'sheets/All Night Long.pdf',
-'sheets/All Of My Life.pdf',
-'sheets/All Or Nothing X.pdf',
-'sheets/All Right Now full.pdf',
-'sheets/All Right Now single.pdf',
-'sheets/All Right.pdf',
-'sheets/All The Small Things.pdf',
-'sheets/All Your Love.pdf',
-'sheets/Alleluia Love Is Alive.pdf',
-'sheets/Alone Again Naturally.pdf',
-'sheets/Alright To.pdf',
-'sheets/Always On My Mind.pdf',
-'sheets/Amarillo.pdf',
-'sheets/Ambrosia - How Much I Feel.pdf',
-'sheets/American Boy.pdf',
-'sheets/American Idiot To.pdf',
-'sheets/American Trilogy.pdf',
-'sheets/And The Band Played.pdf',
-'sheets/Anderson .Paak - Celebrate.pdf',
-'sheets/Anderson .Paak - Come Home.pdf',
-'sheets/Angels Darren Day cabaret.pdf',
-'sheets/Angels To.pdf',
-'sheets/Anita Baker - Sweet Love.pdf',
-'sheets/anita-baker-sweet-love.pdf',
-'sheets/Another Brick In The.pdf',
-'sheets/Another Day In Paradise.pdf',
-'sheets/Another One Bites The.pdf',
-'sheets/Apache.pdf',
-'sheets/Are You Gonna Be.pdf',
-'sheets/Aretha Franklin - Until You Come Back To Me.pdf',
-'sheets/As If We Never.pdf',
-'sheets/At Last.pdf',
-'sheets/Atomic.pdf',
-'sheets/Auld Lang Syne.pdf',
-'sheets/Avenues Alleyways.pdf',
-'sheets/Average White Band - Pick Up The Pieces.pdf',
-'sheets/Baby Dont Change.pdf',
-'sheets/Baby I Love Your.pdf',
-'sheets/Baby Its Cold Outside.pdf',
-'sheets/Baby Love.pdf',
-'sheets/Baby One More Time.pdf',
-'sheets/Baby.pdf',
-'sheets/Babylon.pdf',
-'sheets/Back Good.pdf',
-'sheets/Back In The USSRBack.pdf',
-'sheets/Back Where It All.pdf',
-'sheets/Backstreets Back To.pdf',
-'sheets/Bad Brains - Shes Calling You (1).pdf',
-'sheets/Bad Brains - Shes Calling You.pdf',
-'sheets/Bad Habits To.pdf',
-'sheets/Bad Moon Rising.pdf',
-'sheets/Bad Romance.pdf',
-'sheets/Baggy Trousers To.pdf',
-'sheets/Baker Street.pdf',
-'sheets/Band Introductions.pdf',
-'sheets/Band Of Gold.pdf',
-'sheets/Barbados.pdf',
-'sheets/Barbie Girl To.pdf',
-'sheets/Barbra Streisand - Guilty.pdf',
-'sheets/Barefootin To.pdf',
-'sheets/Baroque Bordello.pdf',
-'sheets/Barry Manilow live concert arrangement.pdf',
-'sheets/Basket Case.pdf',
-'sheets/Bat Out Of Hell.pdf',
-'sheets/bbd-poison.pdf',
-'sheets/Beat It.pdf',
-'sheets/Beatles Medley DO.pdf',
-'sheets/Beautiful Is Your Love.pdf',
-'sheets/Because You Loved Me.pdf',
-'sheets/Bee Gees - How Deep Is Your Love.pdf',
-'sheets/Beggin.pdf',
-'sheets/Begin The Beguine.pdf',
-'sheets/Beginnings.pdf',
-'sheets/Behind The Lines.pdf',
-'sheets/Behind The Mask.pdf',
-'sheets/ben-e-king-spanish-harlem.pdf',
-'sheets/ben-e-king-stand-by-me.pdf',
-'sheets/Best Of My Love.pdf',
-'sheets/Better Off Alone.pdf',
-'sheets/Big Legged Woman.pdf',
-'sheets/Bill Withers - Lovely Day.pdf',
-'sheets/billie-eilish-bad-guy.pdf',
-'sheets/Billy Joel - Just The Way You Are.pdf',
-'sheets/Birds To.pdf',
-'sheets/Bitter Sweet Symphony REPEAT.pdf',
-'sheets/Black Friday live.pdf',
-'sheets/Black Friday To.pdf',
-'sheets/Black Gold AFTER.pdf',
-'sheets/Black Horse And The Cherry.pdf',
-'sheets/Black Magic Woman REPEAT.pdf',
-'sheets/Black Magic.pdf',
-'sheets/Black Velvet.pdf',
-'sheets/black-sabbath-paranoid.pdf',
-'sheets/Blame It On Me.pdf',
-'sheets/Blame It On The Boogie.pdf',
-'sheets/Blinding Lights.pdf',
-'sheets/Blitzkreig Bop.pdf',
-'sheets/Blue Bossa.pdf',
-'sheets/Blue Bubble Paradise.pdf',
-'sheets/Blue Collar To.pdf',
-'sheets/Blue Hotel.pdf',
-'sheets/Blue Suede Shoes.pdf',
-'sheets/Bob Floyd Band Time.pdf',
-'sheets/Bob Floyd Band Young.pdf',
-'sheets/Bob Floyd Living Forever.pdf',
-'sheets/Bob Marley And The Wailers - I Shot The Sheriff.pdf',
-'sheets/bobby-caldwell-what-you-wont-do-for-love.pdf',
-'sheets/Body and Soul Cuerpo.pdf',
-'sheets/Bohemian Rhapsody.pdf',
-'sheets/Boogie Nights.pdf',
-'sheets/Boogie Wonderland.pdf',
-'sheets/Boom.pdf',
-'sheets/Borderline.pdf',
-'sheets/Born To Be Wild.pdf',
-'sheets/Born Under A Bad Sign.pdf',
-'sheets/Born Under A.pdf',
-'sheets/Brain Damage Eclipse.pdf',
-'sheets/Brandy To.pdf',
-'sheets/Breakfast At Tiffanys To.pdf',
-'sheets/Breathe In The Air.pdf',
-'sheets/Breathe You In My.pdf',
-'sheets/Breathless.pdf',
-'sheets/Bring It All Back.pdf',
-'sheets/Bring It On Down.pdf',
-'sheets/Bringing On Back The.pdf',
-'sheets/Britpop Medley.pdf',
-'sheets/Brown Eyed Girl.pdf',
-'sheets/Brown Sugar To.pdf',
-'sheets/Bruno Mars - Chunky.pdf',
-'sheets/Bruno Mars live tribute version.pdf',
-'sheets/bruno-mars-24k-magic.pdf',
-'sheets/bruno-mars-locked-out-of-heaven.pdf',
-'sheets/bruno-mars-thats-what-i-like.pdf',
-'sheets/bruno-mars-treasure.pdf',
-'sheets/Buck Rogers.pdf',
-'sheets/Budapest.pdf',
-'sheets/Build Me Up Buttercup.pdf',
-'sheets/Burning Love.pdf',
-'sheets/busty-and-the-bass-up-top.pdf',
-'sheets/Butterfly and Zebra.pdf',
-'sheets/Bye Baby.pdf',
-'sheets/Cest la vie.pdf',
-'sheets/Cake By The Ocean.pdf',
-'sheets/cake-short-skirt-long-jacket.pdf',
-'sheets/California Blue.pdf',
-'sheets/California Dreaming To.pdf',
-'sheets/California Gurls.pdf',
-'sheets/Call Me.pdf',
-'sheets/calvin-harris-disco-heat.pdf',
-'sheets/calvin-harris-feels.pdf',
-'sheets/Cant Get Enough Of Your.pdf',
-'sheets/Cant Get Used To Losing.pdf',
-'sheets/Cant Stop The Feeling.pdf',
-'sheets/Cant Take My Eyes Off.pdf',
-'sheets/Cant Take My Eyes.pdf',
-'sheets/Candy LIBERATION DRUMS.pdf',
-'sheets/Candy Man HARMONICA X.pdf',
-'sheets/Canon Rock.pdf',
-'sheets/Canon.pdf',
-'sheets/Canteloupe Island.pdf',
-'sheets/Canteloupe Rock.pdf',
-'sheets/Car Wash.pdf',
-'sheets/Caravan.pdf',
-'sheets/carson-smith-i-fall-in-love-too-easily.pdf',
-'sheets/Castaways medley arrangement  Rudy.pdf',
-'sheets/Castle On The Hill.pdf',
-'sheets/Castles In The Sky.pdf',
-'sheets/Cataclysmic MELODY.pdf',
-'sheets/Catbot MELODY FUZZ EFFECT.pdf',
-'sheets/Celebration To.pdf',
-'sheets/chaka-khan-like-sugar.pdf',
-'sheets/Champagne Supernova.pdf',
-'sheets/Charlie Brown.pdf',
-'sheets/Chelsea Dagger.pdf',
-'sheets/Cherry Blossoms DRUMS wwwtomreadbasscoukwwwtomreadbasscouk.pdf',
-'sheets/Children Of The Night.pdf',
-'sheets/Chinatown INTRO.pdf',
-'sheets/Chiquitita.pdf',
-'sheets/Chitlins Con Carne.pdf',
-'sheets/Chocolate Salty Balls.pdf',
-'sheets/Christ In Me Arise.pdf',
-'sheets/Christmas Live Its Raining.pdf',
-'sheets/Christmas Live Modern Medley.pdf',
-'sheets/Christmas Live s Cheese.pdf',
-'sheets/Christmas Live s Dance.pdf',
-'sheets/Christmas Live s Medley.pdf',
-'sheets/Christmas Live Take On.pdf',
-'sheets/chuck-israels-how-my-heart-sings.pdf',
-'sheets/Cigarettes and Alcohol Whole Lotta.pdf',
-'sheets/Cigarettes and Alcohol.pdf',
-'sheets/City of God.pdf',
-'sheets/Clocks PIANO.pdf',
-'sheets/Close To My Fire.pdf',
-'sheets/Club Tropicana.pdf',
-'sheets/Cold Heart SYNTH.pdf',
-'sheets/Columbia REPEAT AD INFINITUM.pdf',
-'sheets/Come And Get Your Love.pdf',
-'sheets/Come Back And Finish.pdf',
-'sheets/Come Back My Love.pdf',
-'sheets/Come Like The.pdf',
-'sheets/Come On Eileen.pdf',
-'sheets/Come On Over To My.pdf',
-'sheets/Come Undone.pdf',
-'sheets/Comfortably Numb Bob Floyd Band.pdf',
-'sheets/Comfortably Numb.pdf',
-'sheets/Coming Back To Life.pdf',
-'sheets/Confucius  REPEAT.pdf',
-'sheets/Copacabana Could It Be Magic.pdf',
-'sheets/corinne-bailey-rae-put-your-records-on.pdf',
-'sheets/Cotton Eye Joe.pdf',
-'sheets/Could It Be Magic.pdf',
-'sheets/Could You Be Loved.pdf',
-'sheets/Couldnt Get It Right.pdf',
-'sheets/Counting Stars To.pdf',
-'sheets/Country House.pdf',
-'sheets/Country Side Of Life.pdf',
-'sheets/Crazy In Love.pdf',
-'sheets/Crazy Joe Longthorne To.pdf',
-'sheets/Crazy Joey MELODY.pdf',
-'sheets/Crazy Little Thing.pdf',
-'sheets/Crazy To.pdf',
-'sheets/Crazy.pdf',
-'sheets/Creep.pdf',
-'sheets/Crunchy Granola Suite.pdf',
-'sheets/cyndi-lauper-time-after-time.pdf',
-'sheets/Daddy Dont You Walk So.pdf',
-'sheets/Dakota.pdf',
-'sheets/Damned To.pdf',
-'sheets/Dan Hartman - Relight My Fire.pdf',
-'sheets/Dance Into The Light.pdf',
-'sheets/Dance The Night Away.pdf',
-'sheets/Dancing In The Dark.pdf',
-'sheets/Dancing In The Moonlight.pdf',
-'sheets/Dancing In The Street.pdf',
-'sheets/Dancing On The Ceiling.pdf',
-'sheets/Dancing Queen.pdf',
-'sheets/Dangerous Woman Aung Warangkana.pdf',
-'sheets/Daniel Dont Let The Sun.pdf',
-'sheets/Darren Day cabaret arrangement Flintstones.pdf',
-'sheets/Darren Day cabaret arrangement My.pdf',
-'sheets/Darren Day cabaret arrangement Shine.pdf',
-'sheets/Darren Day cabaret version I.pdf',
-'sheets/Daryl Hall Feat. CeeLo Green - I Cant Go For That (1).pdf',
-'sheets/Daryl Hall Feat. CeeLo Green - I Cant Go For That.pdf',
-'sheets/Dave Loggins - Please Come To Boston.pdf',
-'sheets/dave-holland-pass-it-on-solo.pdf',
-'sheets/dave-holland-processional-solo.pdf',
-'sheets/dave-peeples-ange.pdf',
-'sheets/Dawn.pdf',
-'sheets/Day Tripper To.pdf',
-'sheets/Day We Caught The.pdf',
-'sheets/Daydream Believer.pdf',
-'sheets/Deadeye Dick - New Age Girl.pdf',
-'sheets/Deadringer Tabs ON.pdf',
-'sheets/December  To.pdf',
-'sheets/deee-lite-groove-is-in-the-heart.pdf',
-'sheets/Deeper Underground.pdf',
-'sheets/Delilah.pdf',
-'sheets/Delpo.pdf',
-'sheets/Denis MIDDLE.pdf',
-'sheets/Desperado gliss.pdf',
-'sheets/Diggin On James Brown.pdf',
-'sheets/Digsys Dinner.pdf',
-'sheets/Dirty Dancing Medley DIRECTED.pdf',
-'sheets/Dirty Old Town.pdf',
-'sheets/Disco Inferno To.pdf',
-'sheets/Disco.pdf',
-'sheets/Do You Love Me.pdf',
-'sheets/Do You Remember.pdf',
-'sheets/Doctor Jones YIPPEE.pdf',
-'sheets/Does Your Mother Know.pdf',
-'sheets/Domino.pdf',
-'sheets/Don Cosmic.pdf',
-'sheets/Don McLean - American Pie.pdf',
-'sheets/Dont Believe A Word.pdf',
-'sheets/Dont Call Me Baby.pdf',
-'sheets/Dont Cry Out Loud.pdf',
-'sheets/Dont Go Down To Reno.pdf',
-'sheets/Dont Know Why.pdf',
-'sheets/Dont Leave Me This.pdf',
-'sheets/Dont Look Back In Anger.pdf',
-'sheets/Dont Lose My Number.pdf',
-'sheets/Dont Stop Believin.pdf',
-'sheets/Dont Stop Me Now.pdf',
-'sheets/Dont Take Me Alive.pdf',
-'sheets/Dont Turn Your.pdf',
-'sheets/Dont You Forget About Me.pdf',
-'sheets/Dont You Want Me.pdf',
-'sheets/Dont You Worry Child.pdf',
-'sheets/Donald Fagen - New Frontier.pdf',
-'sheets/Donald Fagen - Ruby Baby.pdf',
-'sheets/Donald Fagen - Walk Between The Raindrops.pdf',
-'sheets/donnell-pitman-burning-up.pdf',
-'sheets/Double Shot of My.pdf',
-'sheets/doug-watkins-doodlin.pdf',
-'sheets/Dr Dekker.pdf',
-'sheets/Drawn To You.pdf',
-'sheets/Dreadlock Holiday.pdf',
-'sheets/Dreaming DRUMS.pdf',
-'sheets/Dreaming Of You.pdf',
-'sheets/Dreams ON.pdf',
-'sheets/Drive Safely DarlinDrive Darlin.pdf',
-'sheets/Drive Safely DarlinDrive.pdf',
-'sheets/Drive.pdf',
-'sheets/Drums The Chain.pdf',
-'sheets/Drunken Sailor.pdf',
-'sheets/Dua Lipa - Dont Start Now.pdf',
-'sheets/Early Morning Memphis.pdf',
-'sheets/Earth Wind And Fire - September.pdf',
-'sheets/earth-wind-and-fire-cant-hide-love.pdf',
-'sheets/earth-wind-and-fire-dance-dance-dance.pdf',
-'sheets/earth-wind-and-fire-fantasy.pdf',
-'sheets/earth-wind-and-fire-got-to-get-you-into-my-life.pdf',
-'sheets/Eastern Standard Time.pdf',
-'sheets/Easy Lover.pdf',
-'sheets/Easy To Love Lisa T.pdf',
-'sheets/Easy.pdf',
-'sheets/ed-sheeran-blow.pdf',
-'sheets/ed-sheeran-i-dont-care.pdf',
-'sheets/Elton John - Bennie And The Jets.pdf',
-'sheets/Elton John George Michael.pdf',
-'sheets/elton-john-rocket-man.pdf',
-'sheets/Endless Love.pdf',
-'sheets/Energy.pdf',
-'sheets/Enjoy Yourself.pdf',
-'sheets/Entract DRUMS.pdf',
-'sheets/Esperanza Spalding - I Know You Know.pdf',
-'sheets/Eternal To.pdf',
-'sheets/Ever Fallen In Love.pdf',
-'sheets/Everglow.pdf',
-'sheets/Evergreen.pdf',
-'sheets/Everlasting Love REPEAT X.pdf',
-'sheets/Everlasting Love.pdf',
-'sheets/Everlong.pdf',
-'sheets/Every Teardrop Is A.pdf',
-'sheets/Everybody Needs Somebody To Love.pdf',
-'sheets/Everything Changes X.pdf',
-'sheets/Everywhere To.pdf',
-'sheets/Eye Has Not Seen.pdf',
-'sheets/Fa Sad Song HORNS.pdf',
-'sheets/Fairytale Of New York.pdf',
-'sheets/Faith To.pdf',
-'sheets/Fallen Angel.pdf',
-'sheets/Fat Bottomed Girls.pdf',
-'sheets/Feel PIANO.pdf',
-'sheets/Feeling Fine.pdf',
-'sheets/Feeling Good To.pdf',
-'sheets/Fernando ACCEL loco.pdf',
-'sheets/Fernando loco.pdf',
-'sheets/Final Song.pdf',
-'sheets/Finally Remix ON.pdf',
-'sheets/Finally REPEAT MANY TIMES.pdf',
-'sheets/Five Colours In.pdf',
-'sheets/Fix You To.pdf',
-'sheets/Flight Facilities - Foreign Language.pdf',
-'sheets/flowers-miley-cyrus.pdf',
-'sheets/Fly Me To The.pdf',
-'sheets/Foot Tapper MAIN.pdf',
-'sheets/Footloose IN.pdf',
-'sheets/Footsteps In The Dark.pdf',
-'sheets/Forever And Ever OPT.pdf',
-'sheets/Forever Autumn.pdf',
-'sheets/Forget You.pdf',
-'sheets/Fort Rock.pdf',
-'sheets/Foundations.pdf',
-'sheets/Frankie Johnny.pdf',
-'sheets/Free Fallin.pdf',
-'sheets/Free X.pdf',
-'sheets/free-all-right-now.pdf',
-'sheets/Freed From Desire.pdf',
-'sheets/Fresh Prince of Bel.pdf',
-'sheets/Fretless Hey You.pdf',
-'sheets/Friday Im In Love.pdf',
-'sheets/From Me To You.pdf',
-'sheets/Frosty The Snowman REPEAT.pdf',
-'sheets/Frosty The Snowman.pdf',
-'sheets/Funkytown.pdf',
-'sheets/Galway Girl.pdf',
-'sheets/Game of Love To.pdf',
-'sheets/Garden Of Love.pdf',
-'sheets/Gary Gould Buttercat Walk.pdf',
-'sheets/Gary Gould rd Stonerd Stone.pdf',
-'sheets/Gay Bar.pdf',
-'sheets/genesis-no-reply-at-all.pdf',
-'sheets/Georgy Porgy.pdf',
-'sheets/Gerontology.pdf',
-'sheets/Get Down Tonight.pdf',
-'sheets/Get Lucky.pdf',
-'sheets/Get On The Floor.pdf',
-'sheets/Get Ready To.pdf',
-'sheets/Ghost.pdf',
-'sheets/Gimme Shelter.pdf',
-'sheets/Gimme Some LovinGimme.pdf',
-'sheets/Gimme.pdf',
-'sheets/Girl From Ipanema.pdf',
-'sheets/Girls And Boys.pdf',
-'sheets/Girls Boys.pdf',
-'sheets/Give It To Me Baby.pdf',
-'sheets/Give It Up To.pdf',
-'sheets/Give Me The Reason.pdf',
-'sheets/gladys-knight-midnight-train-to-georgia.pdf',
-'sheets/Gloria.pdf',
-'sheets/Go Make A Difference.pdf',
-'sheets/Go Your Own Way.pdf',
-'sheets/God Bless The Child.pdf',
-'sheets/God Put A Smile Upon.pdf',
-'sheets/God Save The King.pdf',
-'sheets/Goin Down The Road.pdf',
-'sheets/Gold To.pdf',
-'sheets/Good Times.pdf',
-'sheets/Goodbye Mr A.pdf',
-'sheets/Goodbye Supernova STRINGS.pdf',
-'sheets/Goodnight Saigon.pdf',
-'sheets/Got To Be Real.pdf',
-'sheets/Got To Get You Into.pdf',
-'sheets/grace-potter-paris.pdf',
-'sheets/Gracious God GRACIOUS GOD.pdf',
-'sheets/grateful-dead-touch-of-grey.pdf',
-'sheets/Grease.pdf',
-'sheets/Great Mu Ga Ru.pdf',
-'sheets/Grinnin In Your Face.pdf',
-'sheets/Grits Aint Groceries To.pdf',
-'sheets/Groovy Kind of Love(1).pdf',
-'sheets/Groovy Kind Of Love.pdf',
-'sheets/Guilty.pdf',
-'sheets/Guns Of Navarone.pdf',
-'sheets/Gypsy Queen To.pdf',
-'sheets/hall-and-oates-baby-come-back.pdf',
-'sheets/hall-and-oates-sarah-smile.pdf',
-'sheets/Ham Hocks Cabbage.pdf',
-'sheets/Hammer To Fall.pdf',
-'sheets/Handbags and Gladrags RPT.pdf',
-'sheets/Hang In Long Enough.pdf',
-'sheets/Hanging On The Telephone.pdf',
-'sheets/Happy Birthday.pdf',
-'sheets/Happy BREAKDOWN.pdf',
-'sheets/Happy Days Are Here Again.pdf',
-'sheets/Happy Together X.pdf',
-'sheets/Hard To Handle.pdf',
-'sheets/Havana.pdf',
-'sheets/Have You Ever Seen The.pdf',
-'sheets/He Aint Heavy Hes.pdf',
-'sheets/Head Full Of Dreams.pdf',
-'sheets/Headrush To.pdf',
-'sheets/Heart - Barracuda.pdf',
-'sheets/Heart - Straight On.pdf',
-'sheets/Heart of Glass.pdf',
-'sheets/Heart of Gold.pdf',
-'sheets/Heartache Tonight To.pdf',
-'sheets/Heatwave.pdf',
-'sheets/Heaven Must Be Missing.pdf',
-'sheets/Heaven Must Have Sent.pdf',
-'sheets/Heaven.pdf',
-'sheets/Help  To.pdf',
-'sheets/Help Me Make It.pdf',
-'sheets/Help Me Rhonda.pdf',
-'sheets/Here Comes Santa Claus.pdf',
-'sheets/Here Comes The Hotstepper.pdf',
-'sheets/Here I Go Again.pdf',
-'sheets/Hey Baby.pdf',
-'sheets/Hey Brother.pdf',
-'sheets/Hey Joe.pdf',
-'sheets/Hey Jude.pdf',
-'sheets/Hey Mickey VOCALS DRUMS.pdf',
-'sheets/Hey Ya.pdf',
-'sheets/Hi Ho Silver Lining.pdf',
-'sheets/Hideaway.pdf',
-'sheets/High Hopes PIANO BELLS.pdf',
-'sheets/Higher And.pdf',
-'sheets/Higher Power To.pdf',
-'sheets/Highway To Hell.pdf',
-'sheets/Hit The Road Jack.pdf',
-'sheets/Ho Hey.pdf',
-'sheets/Hold Back The Night.pdf',
-'sheets/Hold Back The River.pdf',
-'sheets/Hold My Girl.pdf',
-'sheets/Hold On Im Coming.pdf',
-'sheets/Hold The Line To.pdf',
-'sheets/Hole Hearted To.pdf',
-'sheets/Hollaback Girl.pdf',
-'sheets/Home.pdf',
-'sheets/Honesty  PIANO.pdf',
-'sheets/Honky Tonk Woman.pdf',
-'sheets/Hooked On Rock N.pdf',
-'sheets/Hookey Street.pdf',
-'sheets/Hot Fudge.pdf',
-'sheets/Hot In Here.pdf',
-'sheets/Hotel California.pdf',
-'sheets/Hound Dog.pdf',
-'sheets/How Do You Keep The.pdf',
-'sheets/How Do You Stop.pdf',
-'sheets/How It Feels To.pdf',
-'sheets/How Long.pdf',
-'sheets/How Will I Know.pdf',
-'sheets/Human To.pdf',
-'sheets/Human.pdf',
-'sheets/Hurt.pdf',
-'sheets/Hymn The Weekend.pdf',
-'sheets/I Believe Im Gonna Love.pdf',
-'sheets/I Believe In A.pdf',
-'sheets/I Believe In Father.pdf',
-'sheets/I Bet You Look Good.pdf',
-'sheets/I Can See Clearly.pdf',
-'sheets/I Cant Dance.pdf',
-'sheets/I Cant Feel My.pdf',
-'sheets/I Cant Get Bouncing Babies.pdf',
-'sheets/I Cant Go That.pdf',
-'sheets/I Cant Help Myself.pdf',
-'sheets/I Cant Turn You.pdf',
-'sheets/I Dont Need No Doctor.pdf',
-'sheets/I Dont Want To Miss.pdf',
-'sheets/I Drove All Night.pdf',
-'sheets/I Feel Fine.pdf',
-'sheets/I Got A Woman.pdf',
-'sheets/I Got Sun In.pdf',
-'sheets/I Got You Babe.pdf',
-'sheets/I Got You.pdf',
-'sheets/I Gotta Feeling wwwtomreadbasscoukwwwtomreadbasscouk.pdf',
-'sheets/I Guess Thats Why.pdf',
-'sheets/I Have A Dream.pdf',
-'sheets/I Heard It Through The.pdf',
-'sheets/I Just Wanna Make.pdf',
-'sheets/I Just Wanna Stop.pdf',
-'sheets/I Know You.pdf',
-'sheets/I Left My Heart In.pdf',
-'sheets/I Loved Her First.pdf',
-'sheets/I Made It Through The.pdf',
-'sheets/I Onl y Wanna Be.pdf',
-'sheets/I Predict A Riot.pdf',
-'sheets/I Really Didnt Mean It.pdf',
-'sheets/I Saw Her Standing.pdf',
     ];
 
+    // --- DOM Elements ---
     const openPdfButton = document.getElementById('open-pdf-button');
     const osmdContainer = document.getElementById('osmd-container');
     const pdfViewerContainer = document.getElementById('pdf-viewer-container');
-    const pdfZoomSlider = document.getElementById('pdf-zoom-slider');
-    const pdfZoomValue = document.getElementById('pdf-zoom-value');
+    const pdfCanvasContainer = document.getElementById('pdf-canvas-container');
+    pdfCanvasContainer.style.display = 'flex';
+    pdfCanvasContainer.style.flexDirection = 'column';
+    pdfCanvasContainer.style.alignItems = 'center';
+    const zoomSlider = document.getElementById('pdf-zoom-slider');
+    const zoomValueSpan = document.getElementById('pdf-zoom-value');
+    const notification = document.getElementById('in-page-notification');
+    const notificationMessage = document.getElementById('notification-message');
 
-    let pdfDoc = null,
-        pageNum = 1,
-        pageRendering = false,
-        pageNumPending = null,
-        scale = 2, // Initial scale set to 200%
-        canvas = document.getElementById('pdf-canvas'),
-        ctx = canvas.getContext('2d');
+    // --- State Variables ---
+    let pdfDoc = null;
+    let currentZoom = 1.5; // Default zoom
+    let currentPdfUrl = null;
 
-    function renderPage(num, newScale) {
-        scale = newScale || scale;
-        pageRendering = true;
-        pdfDoc.getPage(num).then(function(page) {
-            const viewport = page.getViewport({scale: scale});
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            const renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
-            const renderTask = page.render(renderContext);
-            renderTask.promise.then(function() {
-                pageRendering = false;
-                if (pageNumPending !== null) {
-                    renderPage(pageNumPending);
-                    pageNumPending = null;
-                }
-            });
-        });
-        document.getElementById('page-num').textContent = num;
-    }
-
-    function queueRenderPage(num) {
-        if (pageRendering) {
-            pageNumPending = num;
-        } else {
-            renderPage(num);
+    // --- Helper Functions ---
+    function showNotification(message, isError = false) {
+        if (!notification || !notificationMessage) return;
+        notificationMessage.textContent = message;
+        notification.className = 'in-page-notification'; // Reset classes
+        if (isError) {
+            notification.classList.add('error');
         }
+        notification.classList.add('visible');
+        setTimeout(() => {
+            notification.classList.remove('visible');
+        }, 3000);
     }
 
-    function onPrevPage() {
-        if (pageNum <= 1) return;
-        pageNum--;
-        queueRenderPage(pageNum);
-    }
+    // --- Core PDF Rendering Logic ---
+    function renderPDF(url) {
+        if (!url) return;
+        currentPdfUrl = url; // Store the URL for re-renders (like zoom)
 
-    function onNextPage() {
-        if (pageNum >= pdfDoc.numPages) return;
-        pageNum++;
-        queueRenderPage(pageNum);
-    }
+        // Stop music playback and switch views
+        if (window.stopPlayback) {
+            window.stopPlayback();
+        }
+        osmdContainer.style.display = 'none';
+        pdfViewerContainer.style.display = 'block';
 
-    function loadPdf(url) {
         pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
-            document.getElementById('page-count').textContent = pdfDoc.numPages;
-            pageNum = 1;
-            renderPage(pageNum);
+            pdfCanvasContainer.innerHTML = ''; // Clear any previous canvases
+
+            // Loop through all pages and render each one
+            for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                pdfDoc.getPage(pageNum).then(function(page) {
+                    const viewport = page.getViewport({ scale: currentZoom });
+                    
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    // Add some spacing between pages
+                    canvas.style.marginBottom = '10px'; 
+                    
+                    pdfCanvasContainer.appendChild(canvas);
+
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }
         }).catch(function(error) {
             console.error('Error loading PDF:', error);
-            alert('Error al cargar el PDF. Verifique la ruta del archivo.');
+            showNotification('Error al cargar el PDF. Verifique el nombre y la ruta.', true);
         });
     }
 
+    // --- Event Listeners ---
+
+    // Listener for the main "Open PDF" button
     if (openPdfButton) {
         openPdfButton.addEventListener('click', () => {
             if (pdfFiles && pdfFiles.length > 0) {
+                // Original behavior: pick and render a random PDF
                 const randomIndex = Math.floor(Math.random() * pdfFiles.length);
                 const randomPdfUrl = pdfFiles[randomIndex];
-                loadPdf(randomPdfUrl);
-                if (osmdContainer) osmdContainer.style.display = 'none';
-                if (pdfViewerContainer) pdfViewerContainer.style.display = 'block';
+                renderPDF(randomPdfUrl);
             } else {
-                alert("No se encontró la lista de PDFs.");
+                showNotification("No se encontró la lista de PDFs.", true);
             }
         });
     }
 
-    if (pdfZoomSlider) {
-        pdfZoomSlider.addEventListener('input', (e) => {
-            if (pdfZoomValue) {
-                pdfZoomValue.textContent = `${Math.round(parseFloat(e.target.value) * 100)}%`;
-            }
-        });
-        pdfZoomSlider.addEventListener('change', (e) => {
-            const newScale = parseFloat(e.target.value);
-            if (pdfDoc) {
-                renderPage(pageNum, newScale);
-            }
-        });
-    }
+    // Listener for the zoom slider
+    if (zoomSlider) {
+        // Set initial value
+        zoomSlider.value = currentZoom;
+        if (zoomValueSpan) {
+            zoomValueSpan.textContent = `${Math.round(currentZoom * 100)}%`;
+        }
 
-    const prevPageButton = document.getElementById('prev-page');
-    const nextPageButton = document.getElementById('next-page');
-    if (prevPageButton) {
-        prevPageButton.addEventListener('click', onPrevPage);
+        zoomSlider.addEventListener('input', function() {
+            if (zoomValueSpan) {
+                const newZoom = parseFloat(this.value);
+                zoomValueSpan.textContent = `${Math.round(newZoom * 100)}%`;
+            }
+        });
+        
+        zoomSlider.addEventListener('change', function() {
+            currentZoom = parseFloat(this.value);
+            // Re-render the currently loaded PDF with the new zoom level
+            if (pdfDoc && currentPdfUrl) {
+                renderPDF(currentPdfUrl);
+            }
+        });
     }
-    if (nextPageButton) {
-        nextPageButton.addEventListener('click', onNextPage);
+    
+    // Close notification button
+    const closeBtn = document.querySelector('.in-page-notification .close-btn');
+    if(closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            if (notification) {
+                notification.classList.remove('visible');
+            }
+        });
     }
 });

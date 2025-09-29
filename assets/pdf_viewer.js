@@ -1436,6 +1436,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const zoomValueSpan = document.getElementById('pdf-zoom-value');
     const notification = document.getElementById('in-page-notification');
     const notificationMessage = document.getElementById('notification-message');
+    const youtubeBtn = document.getElementById('youtube-search-btn');
 
     // --- State Variables ---
     let pdfDoc = null;
@@ -1460,6 +1461,18 @@ document.addEventListener("DOMContentLoaded", function() {
     function renderPDF(url) {
         if (!url) return;
         currentPdfUrl = url; // Store the URL for re-renders (like zoom)
+
+        if (youtubeBtn) {
+            const filename = url.split('/').pop();
+            if (filename.toLowerCase().includes('realbook')) {
+                youtubeBtn.style.display = 'none'; // Hide for realbook files
+            } else {
+                const songTitle = filename.replace('.pdf', '').replace(/-/g, ' ').replace(/_/g, ' ');
+                const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(songTitle)}`;
+                youtubeBtn.href = youtubeUrl;
+                youtubeBtn.style.display = 'inline-block'; // Show for other files
+            }
+        }
 
         // Stop music playback and switch views
         if (window.stopPlayback) {

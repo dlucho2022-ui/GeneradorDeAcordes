@@ -10,6 +10,19 @@
     <link rel="stylesheet" href="assets/cards.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        .selector-container input[type="number"] {
+            width: 60px;
+            font-size: 0.9em;
+            background-color: #2c2c2c;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 4px 2px;
+        }
+        .selector-container input[type="range"] {
+            width: 80px;
+            vertical-align: middle; /* Align slider better with label */
+        }
         body {
             touch-action: manipulation;
         }
@@ -271,6 +284,14 @@
                         <option value="1800">30m</option>
                     </select>
                 </div>
+                <div class="selector-container">
+                    <label for="bpm-input">BPM:</label>
+                    <input type="number" id="bpm-input" value="120" min="40" max="240">
+                </div>
+                <div class="selector-container">
+                    <label for="metronome-volume">Volumen:</label>
+                    <input type="range" id="metronome-volume" min="0" max="1" step="0.01" value="0.5">
+                </div>
             </div>
             <div class="circle-area">
                 <div class="circle-container" id="tonality-circle">
@@ -332,6 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalTimeDisplay = document.getElementById('total-time-display');
     const modeSelector = document.getElementById('mode-selector');
     const modeRootSelector = document.getElementById('mode-root-selector');
+    const bpmInput = document.getElementById('bpm-input');
+    const metronomeVolumeSlider = document.getElementById('metronome-volume');
+    const metronomeClick = new Audio('assets/audios/metronome_click.wav');
+    let metronomeInterval = null;
     let rotationDirection = 'clockwise'; // 'clockwise' or 'counter-clockwise'
 
     // State for new "Circle of Modes"
@@ -854,6 +879,18 @@ document.addEventListener('DOMContentLoaded', () => {
             await initAudio();
         }
 
+        // Metronome Start
+        const bpm = parseInt(bpmInput.value, 10);
+        if (bpm > 0) {
+            const interval = 60000 / bpm;
+            if (metronomeInterval) clearInterval(metronomeInterval);
+            metronomeClick.volume = metronomeVolumeSlider.value;
+            metronomeInterval = setInterval(() => {
+                metronomeClick.currentTime = 0;
+                metronomeClick.play().catch(e => console.error("Error playing metronome click:", e));
+            }, interval);
+        }
+
         isTimerRunning = true;
         startStopButton.textContent = 'Detener';
         startStopButton.style.backgroundColor = '#dc3545';
@@ -890,13 +927,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function stopTimer() {
         if (!isTimerRunning) return;
+
+        // Metronome Stop
+        if (metronomeInterval) {
+            clearInterval(metronomeInterval);
+            metronomeInterval = null;
+        }
+
         isTimerRunning = false;
         clearInterval(mainTimerId);
         stopAllSounds();
         startStopButton.textContent = 'Iniciar';
         startStopButton.style.backgroundColor = '#198754';
         updateTotalTimeDisplay(duration * 12);
-        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);    }
+        timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
+    }
 
     timePerKeySelector.addEventListener('change', e => {
         if (isTimerRunning) {
@@ -1017,12 +1062,30 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimers(parseInt(timePerKeySelector.value, 10) || 60);
     });
 
+    bpmInput.addEventListener('input', () => {
+        if (isTimerRunning) {
+            const bpm = parseInt(bpmInput.value, 10);
+            if (bpm > 0) {
+                const interval = 60000 / bpm;
+                clearInterval(metronomeInterval);
+                metronomeInterval = setInterval(() => {
+                    metronomeClick.currentTime = 0;
+                    metronomeClick.play().catch(e => console.error("Error playing metronome click:", e));
+                }, interval);
+            }
+        }
+    });
+
+    metronomeVolumeSlider.addEventListener('input', () => {
+        metronomeClick.volume = metronomeVolumeSlider.value;
+    });
+
     // Inicialización
     renderOuterCircle();
     renderModeCircle();
     updateDisplay();
     updateTimers(duration, duration * 12);
-    });
+});
 </script>
 </body>
 </html>

@@ -206,11 +206,31 @@
                     <button id="leftArrow" class="arrow-button"><</button>
                     <button id="rightArrow" class="arrow-button active-direction">></button>
                 </div>
+
+                <div class="selector-container">
+                    <label for="mode-root-selector">Tónica Modos:</label>
+                    <select id="mode-root-selector">
+                        <option value="-" selected>-</option>
+                        <option value="C">C</option>
+                        <option value="Db">Db</option>
+                        <option value="D">D</option>
+                        <option value="Eb">Eb</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="F#">F#</option>
+                        <option value="G">G</option>
+                        <option value="Ab">Ab</option>
+                        <option value="A">A</option>
+                        <option value="Bb">Bb</option>
+                        <option value="B">B</option>
+                    </select>
+                </div>
                 
                 <div class="selector-container">
                     <label for="mode-selector">Modo:</label>
                     <select id="mode-selector">
-                        <option value="Mayor">Mayor</option>
+                        <option value="-" disabled>-</option>
+                        <option value="Mayor" selected>Mayor</option>
                         <option value="Menor">Menor</option>
                         <option value="Maj7">Maj7</option>
                         <option value="m7">m7</option>
@@ -250,6 +270,9 @@
             <div class="circle-area">
                 <div class="circle-container" id="tonality-circle">
                     <!-- Las tonalidades se renderizan aquí con JS -->
+                </div>
+                <div class="circle-container" id="mode-circle" style="display: none;">
+                    <!-- Los modos se renderizan aquí con JS -->
                 </div>
                 <div class="center-display">
                     <div id="scale-display-container">
@@ -294,6 +317,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const circle = document.getElementById('tonality-circle');
+    const modeCircle = document.getElementById('mode-circle');
     const scaleDisplayContainer = document.getElementById('scale-display-container');
     const timerDisplay = document.getElementById('timer-display');
     const startStopButton = document.getElementById('startStopButton');
@@ -302,7 +326,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalTimeSelector = document.getElementById('total-time-selector');
     const totalTimeDisplay = document.getElementById('total-time-display');
     const modeSelector = document.getElementById('mode-selector');
+    const modeRootSelector = document.getElementById('mode-root-selector');
     let rotationDirection = 'clockwise'; // 'clockwise' or 'counter-clockwise'
+
+    // State for new "Circle of Modes"
+    let trainerMode = 'fifths'; // 'fifths' or 'modes'
+    let fixedRootNote = 'C';
+    let currentModeIndex = 0;
+    const modeCircleQualities = ['Mayor', 'Menor', 'Maj7', 'm7', '7', 'dim7', 'm7b5', 'Aug', 'Sus4', 'Sus2'];
+    let modeRotationAngle = 0;
+
     let masterGainNode;
     let currentRotationAngle = 0; // New variable
 
@@ -380,25 +413,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const noteName = note.replace(/[0-9]/g, '');
         const octaveStr = note.match(/[0-9]/g).join('');
         let octave = parseInt(octaveStr, 10);
-        let canonicalName = noteName;
 
-        if (noteName === 'B#') {
-            canonicalName = 'C';
-            octave++;
-        } else if (noteName === 'E#') {
-            canonicalName = 'F';
-        } else if (noteName === 'Cb') {
-            canonicalName = 'B';
-            octave--;
-        } else if (noteName === 'Fb') {
-            canonicalName = 'E';
-        } else {
-            const flatToSharp = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
-            if (flatToSharp[noteName]) {
-                canonicalName = flatToSharp[noteName];
-            }
+        const enharmonicEquivalents = {
+            // Single accidentals with octave change
+            'B#': { name: 'C', octaveOffset: 1 },
+            'Cb': { name: 'B', octaveOffset: -1 },
+            // Other single accidentals
+            'E#': { name: 'F', octaveOffset: 0 },
+            'Fb': { name: 'E', octaveOffset: 0 },
+            'Db': { name: 'C#', octaveOffset: 0 },
+            'Eb': { name: 'D#', octaveOffset: 0 },
+            'Gb': { name: 'F#', octaveOffset: 0 },
+            'Ab': { name: 'G#', octaveOffset: 0 },
+            'Bb': { name: 'A#', octaveOffset: 0 },
+            // Double sharps
+            'Cx': { name: 'D', octaveOffset: 0 }, 'C##': { name: 'D', octaveOffset: 0 },
+            'Dx': { name: 'E', octaveOffset: 0 }, 'D##': { name: 'E', octaveOffset: 0 },
+            'Ex': { name: 'F#', octaveOffset: 0 }, 'E##': { name: 'F#', octaveOffset: 0 },
+            'Fx': { name: 'G', octaveOffset: 0 }, 'F##': { name: 'G', octaveOffset: 0 },
+            'Gx': { name: 'A', octaveOffset: 0 }, 'G##': { name: 'A', octaveOffset: 0 },
+            'Ax': { name: 'B', octaveOffset: 0 }, 'A##': { name: 'B', octaveOffset: 0 },
+            'Bx': { name: 'C#', octaveOffset: 1 }, 'B##': { name: 'C#', octaveOffset: 1 },
+            // Double flats
+            'Cbb':{ name: 'Bb', octaveOffset: -1 },
+            'Dbb':{ name: 'C', octaveOffset: 0 },
+            'Ebb':{ name: 'D', octaveOffset: 0 },
+            'Fbb':{ name: 'Eb', octaveOffset: 0 },
+            'Gbb':{ name: 'F', octaveOffset: 0 },
+            'Abb':{ name: 'G', octaveOffset: 0 },
+            'Bbb':{ name: 'A', octaveOffset: 0 }
+        };
+
+        if (enharmonicEquivalents[noteName]) {
+            const mapping = enharmonicEquivalents[noteName];
+            return mapping.name + (octave + mapping.octaveOffset);
         }
-        return canonicalName + octave;
+
+        return note; // Return original if no mapping (e.g., C4, G5)
     }
 
 
@@ -615,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const textSpan = document.createElement('span');
             textSpan.className = 'tonality-text';
-            textSpan.textContent = tonality.replace('b', '♭').replace('#', '♯');
+            textSpan.textContent = tonality.replace(/x/g, '♯♯').replace(/bb/g, '♭♭').replace(/b/g, '♭').replace(/#/g, '♯');
             el.appendChild(textSpan);
 
             // Add click event listener
@@ -646,7 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (signature) {
                 const signatureEl = document.createElement('div');
                 signatureEl.className = 'key-signature-display'; // New class for styling
-                signatureEl.textContent = signature.replace('#', '♯').replace('b', '♭');
+                signatureEl.textContent = signature.replace(/x/g, '♯♯').replace(/bb/g, '♭♭').replace(/b/g, '♭').replace(/#/g, '♯');
                 scaleDisplayContainer.appendChild(signatureEl);
             }
 
@@ -664,51 +715,71 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = radius * Math.sin(angle);
             const el = document.createElement('div');
             el.className = 'scale-note';
-            el.textContent = note.replace('b', '♭').replace('#', '♯');
+            el.textContent = note.replace(/x/g, '♯♯').replace(/bb/g, '♭♭').replace(/b/g, '♭').replace(/#/g, '♯');
             el.style.transform = `translate(${x}px, ${y}px)`;
             scaleDisplayContainer.appendChild(el);
         });
     }
 
     function updateDisplay() {
-        // Calculate the target angle for the current tonality
-        const targetAngle = -currentTonalityIndex * 30;
+        if (trainerMode === 'fifths') {
+            const targetAngle = -currentTonalityIndex * 30;
+            let angleDifference = targetAngle - currentRotationAngle;
+            if (angleDifference > 180) angleDifference -= 360;
+            if (angleDifference < -180) angleDifference += 360;
+            currentRotationAngle += angleDifference;
+            circle.style.transform = `rotate(${currentRotationAngle}deg)`;
 
-        // Calculate the shortest path to the target angle
-        let angleDifference = targetAngle - currentRotationAngle;
+            document.querySelectorAll('#tonality-circle .tonality-text').forEach(span => {
+                span.style.transform = `rotate(${-currentRotationAngle}deg)`;
+            });
 
-        // Normalize angleDifference to be between -180 and 180
-        if (angleDifference > 180) angleDifference -= 360;
-        if (angleDifference < -180) angleDifference += 360;
+            document.querySelectorAll('#tonality-circle .tonality').forEach((el, index) => {
+                el.classList.toggle('active', index === currentTonalityIndex);
+            });
 
-        currentRotationAngle += angleDifference; // Accumulate the rotation
+            const currentTonality = tonalities[currentTonalityIndex];
+            renderCenterDisplay(currentTonality, currentMode);
+        } else { // trainerMode === 'modes'
+            const numModes = modeCircleQualities.length;
+            const targetAngle = -currentModeIndex * (360 / numModes);
+            let angleDifference = targetAngle - modeRotationAngle;
+            if (angleDifference > 180) angleDifference -= 360;
+            if (angleDifference < -180) angleDifference += 360;
+            modeRotationAngle += angleDifference;
+            modeCircle.style.transform = `rotate(${modeRotationAngle}deg)`;
 
-        circle.style.transform = `rotate(${currentRotationAngle}deg)`;
+            document.querySelectorAll('#mode-circle .tonality-text').forEach(span => {
+                span.style.transform = `rotate(${-modeRotationAngle}deg)`;
+            });
 
-        document.querySelectorAll('.tonality-text').forEach(span => {
-            span.style.transform = `rotate(${-currentRotationAngle}deg)`;
-        });
+            document.querySelectorAll('#mode-circle .tonality').forEach((el, index) => {
+                el.classList.toggle('active', index === currentModeIndex);
+            });
 
-        document.querySelectorAll('.tonality').forEach((el, index) => {
-            if (index === currentTonalityIndex) {
-                el.classList.add('active');
-            } else {
-                el.classList.remove('active');
-            }
-        });
-
-        const currentTonality = tonalities[currentTonalityIndex];
-        renderCenterDisplay(currentTonality, currentMode);
+            const currentQuality = modeCircleQualities[currentModeIndex];
+            renderCenterDisplay(fixedRootNote, currentQuality);
+        }
     }
 
-    function switchToNextTonality() {
-        if (rotationDirection === 'clockwise') {
-            currentTonalityIndex = (currentTonalityIndex + 1) % tonalities.length;
-        } else { // counter-clockwise
-            currentTonalityIndex = (currentTonalityIndex - 1 + tonalities.length) % tonalities.length;
+    function switchToNextItem() {
+        if (trainerMode === 'fifths') {
+            if (rotationDirection === 'clockwise') {
+                currentTonalityIndex = (currentTonalityIndex + 1) % tonalities.length;
+            } else { // counter-clockwise
+                currentTonalityIndex = (currentTonalityIndex - 1 + tonalities.length) % tonalities.length;
+            }
+            updateDisplay();
+            playChord(tonalities[currentTonalityIndex], currentMode);
+        } else { // trainerMode === 'modes'
+            if (rotationDirection === 'clockwise') {
+                currentModeIndex = (currentModeIndex + 1) % modeCircleQualities.length;
+            } else { // counter-clockwise
+                currentModeIndex = (currentModeIndex - 1 + modeCircleQualities.length) % modeCircleQualities.length;
+            }
+            updateDisplay();
+            playChord(fixedRootNote, modeCircleQualities[currentModeIndex]);
         }
-        updateDisplay();
-        playChord(tonalities[currentTonalityIndex], currentMode);
     }
 
     function formatTime(seconds) {
@@ -724,7 +795,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTimers(newDuration, newTotal) {
         duration = newDuration;
-        totalCountdown = newTotal;
+        const itemsCount = trainerMode === 'fifths' ? tonalities.length : modeCircleQualities.length;
+        totalCountdown = newTotal || (duration * itemsCount);
+
         timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);
         updateTotalTimeDisplay(totalCountdown);
 
@@ -741,7 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     stopTimer();
                     alert("¡Vuelta completa!");
                 } else if (countdown <= 0) {
-                    switchToNextTonality();
+                    switchToNextItem();
                     countdown = duration;
                 }
             }, 1000);
@@ -758,11 +831,17 @@ document.addEventListener('DOMContentLoaded', () => {
         startStopButton.textContent = 'Detener';
         startStopButton.style.backgroundColor = '#dc3545';
 
-        playChord(tonalities[currentTonalityIndex], currentMode);
+        const itemsCount = trainerMode === 'fifths' ? tonalities.length : modeCircleQualities.length;
+        
+        if (trainerMode === 'fifths') {
+            playChord(tonalities[currentTonalityIndex], currentMode);
+        } else {
+            playChord(fixedRootNote, modeCircleQualities[currentModeIndex]);
+        }
 
         clearInterval(mainTimerId);
         countdown = duration;
-        totalCountdown = duration * 12;
+        totalCountdown = duration * itemsCount;
         timerDisplay.textContent = 'Tonalidad: ' + formatTime(countdown);
         updateTotalTimeDisplay(totalCountdown);
 
@@ -776,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopTimer();
                 alert("¡Vuelta completa!");
             } else if (countdown <= 0) {
-                switchToNextTonality();
+                switchToNextItem();
                 countdown = duration;
             }
         }, 1000);
@@ -805,10 +884,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     modeSelector.addEventListener('change', e => {
-        currentMode = e.target.value;
-        updateDisplay(); // Actualizar el display central para mostrar las nuevas notas
-        if (isTimerRunning) {
-            stopTimer(); // Detener el temporizador y el audio
+        // Changing this selector implies we are in 'fifths' mode.
+        if (e.target.value !== '-') {
+            trainerMode = 'fifths';
+            circle.style.display = '';
+            modeCircle.style.display = 'none';
+            if (modeRootSelector.value !== '-') {
+                modeRootSelector.value = '-';
+            }
+            modeSelector.disabled = false;
+
+            currentMode = e.target.value;
+            updateDisplay(); 
+            if (isTimerRunning) {
+                stopTimer();
+            }
         }
     });
 
@@ -832,8 +922,68 @@ document.addEventListener('DOMContentLoaded', () => {
         leftArrow.classList.remove('active-direction');
     });
 
+    function renderModeCircle() {
+        modeCircle.innerHTML = ''; // Clear previous content
+        const radius = 240;
+        const numModes = modeCircleQualities.length;
+
+        modeCircleQualities.forEach((quality, i) => {
+            const angle = (i / numModes) * 2 * Math.PI - (Math.PI / 2);
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const el = document.createElement('div');
+            el.className = 'tonality'; // Reuse class for styling
+            el.style.setProperty('--x', `${x}px`);
+            el.style.setProperty('--y', `${y}px`);
+            el.style.transform = `translate(var(--x), var(--y))`;
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'tonality-text';
+            textSpan.textContent = quality;
+            el.appendChild(textSpan);
+
+            el.addEventListener('click', () => {
+                if (isTimerRunning) {
+                    stopTimer();
+                } else {
+                    playChord(fixedRootNote, modeCircleQualities[i]);
+                }
+                currentModeIndex = i;
+                updateDisplay();
+            });
+            
+            modeCircle.appendChild(el);
+        });
+    }
+
+    modeRootSelector.addEventListener('change', e => {
+        const selectedValue = e.target.value;
+        if (isTimerRunning) {
+            stopTimer();
+        }
+
+        if (selectedValue === '-') {
+            trainerMode = 'fifths';
+            circle.style.display = '';
+            modeCircle.style.display = 'none';
+        } else {
+            trainerMode = 'modes';
+            fixedRootNote = selectedValue;
+            circle.style.display = 'none';
+            modeCircle.style.display = '';
+            if (modeSelector.value !== '-') {
+                modeSelector.selectedIndex = 0; // Set to '-'
+            }
+            currentModeIndex = 0;
+            modeRotationAngle = 0;
+        }
+        updateDisplay();
+        updateTimers(parseInt(timePerKeySelector.value, 10) || 60);
+    });
+
     // Inicialización
     renderOuterCircle();
+    renderModeCircle();
     updateDisplay();
     updateTimers(duration, duration * 12);
     });

@@ -121,6 +121,11 @@
             font-size: 1.8em;
             border: 2px solid #555;
         }
+        .scale-note.root-note {
+            background-color: #bb86fc;
+            color: #fff;
+            border-color: #fff;
+        }
         .key-signature-display {
             position: absolute;
             top: 50%;
@@ -208,7 +213,7 @@
                 </div>
 
                 <div class="selector-container">
-                    <label for="mode-root-selector">Tónica Modos:</label>
+                    <label for="mode-root-selector">Tónica:</label>
                     <select id="mode-root-selector">
                         <option value="-" selected>-</option>
                         <option value="C">C</option>
@@ -731,6 +736,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = radius * Math.sin(angle);
             const el = document.createElement('div');
             el.className = 'scale-note';
+
+            // Highlight the root note only when in 'modes' trainer mode
+            if (trainerMode === 'modes' && note === tonality) {
+                 el.classList.add('root-note');
+            }
+
             el.textContent = note.replace(/x/g, '♯♯').replace(/bb/g, '♭♭').replace(/b/g, '♭').replace(/#/g, '♯');
             el.style.transform = `translate(${x}px, ${y}px)`;
             scaleDisplayContainer.appendChild(el);
@@ -888,15 +899,26 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.textContent = 'Tonalidad: ' + formatTime(duration);    }
 
     timePerKeySelector.addEventListener('change', e => {
-        totalTimeSelector.value = '-';
-        const newDuration = parseInt(e.target.value, 10);
-        updateTimers(newDuration, newDuration * 12);
+        if (isTimerRunning) {
+            stopTimer();
+        }
+        if (e.target.value !== '-') {
+            totalTimeSelector.value = '-';
+            const newDuration = parseInt(e.target.value, 10);
+            updateTimers(newDuration);
+        }
     });
 
     totalTimeSelector.addEventListener('change', e => {
-        timePerKeySelector.value = '-';
-        const totalDuration = parseInt(e.target.value, 10);
-        updateTimers(totalDuration / 12, totalDuration);
+        if (isTimerRunning) {
+            stopTimer();
+        }
+        if (e.target.value !== '-') {
+            timePerKeySelector.value = '-';
+            const totalDuration = parseInt(e.target.value, 10);
+            const itemsCount = trainerMode === 'fifths' ? tonalities.length : modeCircleQualities.length;
+            updateTimers(totalDuration / itemsCount, totalDuration);
+        }
     });
 
     modeSelector.addEventListener('change', e => {

@@ -393,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioContext;
     const audioBuffers = {};
     let currentlyPlayingNodes = [];
+    let fadingOutNodes = [];
     const AUDIO_DURATION = 8.0;
     const QUICK_FADE_OUT = 1.0;
     const loopFadeOutTime = 4.0;
@@ -597,7 +598,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const isTonalityChange = (previousTonality !== tonality && previousTonality !== null);
         const fadeOut = isTonalityChange ? QUICK_FADE_OUT : loopFadeOutTime;
 
-        currentlyPlayingNodes.forEach(node => {
+        // Clear any previously scheduled fades that haven't completed, just in case
+        fadingOutNodes.forEach(node => {
+            try { node.source.stop(now); } catch (e) {}
+        });
+
+        fadingOutNodes = currentlyPlayingNodes;
+        fadingOutNodes.forEach(node => {
+            node.gainNode.gain.cancelAndHoldAtTime(now);
             node.gainNode.gain.linearRampToValueAtTime(0, now + fadeOut);
             node.source.stop(now + fadeOut);
         });
@@ -643,12 +651,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!audioContext) return;
         clearTimeout(loopTimeoutId);
         const now = audioContext.currentTime;
-        currentlyPlayingNodes.forEach(node => {
+        const allNodes = [...currentlyPlayingNodes, ...fadingOutNodes];
+        allNodes.forEach(node => {
             node.gainNode.gain.cancelAndHoldAtTime(now); // Cancelar automatizaciones pendientes
             node.gainNode.gain.linearRampToValueAtTime(0, now + QUICK_FADE_OUT);
-            node.source.stop(now + QUICK_FADE_OUT);
+            try { node.source.stop(now + QUICK_FADE_OUT); } catch(e) {}
         });
         currentlyPlayingNodes = [];
+        fadingOutNodes = [];
         previousTonality = null;
     }
 

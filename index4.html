@@ -216,6 +216,8 @@
                         <option value="m7">m7</option>
                         <option value="7">7</option>
                         <option value="Dim">Dim</option>
+                        <option value="m7b5">m7b5</option>
+                        <option value="dim7">dim7</option>
                         <option value="Aug">Aug</option>
                         <option value="7#11">7#11</option>
                         <option value="Sus4">Sus4</option>
@@ -340,6 +342,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'm7': { steps: [1, 3, 5, 7], intervals: [0, 3, 7, 10] },
         '7': { steps: [1, 3, 5, 7], intervals: [0, 4, 7, 10] },
         'Dim': { steps: [1, 3, 5], intervals: [0, 3, 6] },
+        'm7b5': { steps: [1, 3, 5, 7], intervals: [0, 3, 6, 10] },
+        'dim7': { steps: [1, 3, 5, 7], intervals: [0, 3, 6, 9] },
         'Aug': { steps: [1, 3, 5], intervals: [0, 4, 8] },
         '7#11': { steps: [1, 3, 5, 7, 11], intervals: [0, 4, 7, 10, 18] },
         'Sus4': { steps: [1, 4, 5], intervals: [0, 5, 7] },
@@ -373,12 +377,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let isAudioReady = false;
 
     function getCanonicalNoteName(note) {
-        const octave = note.slice(-1);
-        const pitch = note.slice(0, -1);
-        if (flatToSharpMap[pitch]) {
-            return flatToSharpMap[pitch] + octave;
+        const noteName = note.replace(/[0-9]/g, '');
+        const octaveStr = note.match(/[0-9]/g).join('');
+        let octave = parseInt(octaveStr, 10);
+        let canonicalName = noteName;
+
+        if (noteName === 'B#') {
+            canonicalName = 'C';
+            octave++;
+        } else if (noteName === 'E#') {
+            canonicalName = 'F';
+        } else if (noteName === 'Cb') {
+            canonicalName = 'B';
+            octave--;
+        } else if (noteName === 'Fb') {
+            canonicalName = 'E';
+        } else {
+            const flatToSharp = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+            if (flatToSharp[noteName]) {
+                canonicalName = flatToSharp[noteName];
+            }
         }
-        return note;
+        return canonicalName + octave;
     }
 
 
@@ -434,14 +454,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function formatNoteForFile(note) {
         const noteName = note.replace(/[0-9]/g, '');
-        const octave = note.match(/[0-9]/g).join('');
+        const octaveStr = note.match(/[0-9]/g).join('');
+        
+        if (noteName === 'B#') {
+            return 'c' + (parseInt(octaveStr, 10) + 1);
+        }
+        if (noteName === 'Cb') {
+            return 'b' + (parseInt(octaveStr, 10) - 1);
+        }
+
         const fileNoteMap = {
             'C#': 'cs', 'Db': 'cs', 'D#': 'ds', 'Eb': 'ds', 'F#': 'fs', 'Gb': 'fs',
-            'G#': 'gs', 'Ab': 'gs', 'A#': 'as', 'Bb': 'as', 'B#':'c', 'E#':'f',
-            'Cb': 'b', 'Fb': 'e'
+            'G#': 'gs', 'Ab': 'gs', 'A#': 'as', 'Bb': 'as', 
+            'E#': 'f', 
+            'Fb': 'e'
         };
-        if (fileNoteMap[noteName]) return fileNoteMap[noteName] + octave;
-        return noteName.toLowerCase().replace('#', 's') + octave;
+
+        if (fileNoteMap[noteName]) {
+            return fileNoteMap[noteName] + octaveStr;
+        }
+        
+        return noteName.toLowerCase().replace('#', 's') + octaveStr;
     }
 
     async function initAudio() {
@@ -455,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingOverlay.style.display = 'flex';
         const notesToLoad = [];
 
-        for (let midi = 48; midi <= 84; midi++) { // C3 a C6
+        for (let midi = 48; midi <= 96; midi++) { // C3 a C7
             const noteName = midiToNoteName[midi % 12];
             const octave = Math.floor(midi / 12) - 1;
             const fullNote = `${noteName}${octave}`;
@@ -527,9 +560,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const audioFileName = `${formatNoteForFile(note)}.wav`;
                 console.log(`Buscando: ${audioFileName} (original: ${note})`);
 
-                const buffer = audioBuffers[note];
+                const canonicalNote = getCanonicalNoteName(note);
+                const buffer = audioBuffers[canonicalNote];
                 if (!buffer) {
-                    console.warn(`Audio para la nota ${note} (${audioFileName}) no encontrado.`);
+                    console.warn(`Audio para la nota ${note} (canónica: ${canonicalNote}, archivo: ${audioFileName}) no encontrado.`);
                     return;
                 }
 

@@ -600,7 +600,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clear any previously scheduled fades that haven't completed, just in case
         fadingOutNodes.forEach(node => {
-            try { node.source.stop(now); } catch (e) {}
+            // Use a very fast fade-out to prevent clicks instead of an abrupt stop
+            node.gainNode.gain.cancelAndHoldAtTime(now);
+            node.gainNode.gain.linearRampToValueAtTime(0, now + 0.01);
+            try { node.source.stop(now + 0.01); } catch (e) {}
         });
 
         fadingOutNodes = currentlyPlayingNodes;
@@ -641,9 +644,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentlyPlayingNodes = newNodes;
         previousTonality = tonality;
 
-        const nextLoopTime = (AUDIO_DURATION - loopFadeOutTime) * 1000;
-        if (nextLoopTime > 0) {
-             loopTimeoutId = setTimeout(() => playChord(tonality, quality), nextLoopTime);
+        // Only schedule the next loop if the main timer is running
+        if (isTimerRunning) {
+            const nextLoopTime = (AUDIO_DURATION - loopFadeOutTime) * 1000;
+            if (nextLoopTime > 0) {
+                 loopTimeoutId = setTimeout(() => playChord(tonality, quality), nextLoopTime);
+            }
         }
     }
 
@@ -955,8 +961,6 @@ document.addEventListener('DOMContentLoaded', () => {
             el.addEventListener('click', () => {
                 if (isTimerRunning) {
                     stopTimer();
-                } else {
-                    playChord(fixedRootNote, modeCircleQualities[i]);
                 }
                 currentModeIndex = i;
                 updateDisplay();

@@ -617,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } else {
-            notesToDisplay = getChordNotes(tonality, mode).map(note => note.replace(/[0-9]/g, ''));
+            notesToDisplay = getChordNotes(tonality, mode).slice(1).map(note => note.replace(/[0-9]/g, ''));
         }
 
         if (!notesToDisplay) return;

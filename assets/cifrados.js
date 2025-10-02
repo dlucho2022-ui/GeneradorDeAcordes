@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (qualityLower === 'm9b5') quality = 'm9b5';
         else if (quality === '') quality = 'maj';
         else if (quality === 'm') quality = 'm';
-        else if (quality === '°' || qualityLower === 'dim') quality = 'dim';
+        else if (quality === '°' || qualityLower === 'dim' || qualityLower === 'mb5') quality = 'dim';
         else if (quality === 'ø' || qualityLower === 'm7b5') quality = 'm7b5';
         else if (quality === '°7' || qualityLower === 'dim7') quality = 'dim7';
         else if (quality === 'M7' || qualityLower === 'maj7' || quality === '△7' || quality === '△') quality = 'maj7';
@@ -543,6 +543,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('reset-chart-btn').addEventListener('click', resetChart);
+
+    // --- LÓGICA DE TRANSPOSICIÓN ---
+    const notesSharp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const notesFlat = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+
+    const noteValues = {
+        "C": 0, "B#": 0,
+        "C#": 1, "Db": 1,
+        "D": 2,
+        "D#": 3, "Eb": 3,
+        "E": 4, "Fb": 4,
+        "F": 5, "E#": 5,
+        "F#": 6, "Gb": 6,
+        "G": 7,
+        "G#": 8, "Ab": 8,
+        "A": 9,
+        "A#": 10, "Bb": 10,
+        "B": 11, "Cb": 11
+    };
+
+    function transposeNote(note, semitones) {
+        const value = noteValues[note];
+        if (value === undefined) return note; // Devuelve la nota original si no se encuentra
+
+        const transposedValue = (value + semitones + 12) % 12;
+        
+        // Preferir bemoles para ciertas tonalidades podría ser una mejora futura
+        return notesSharp[transposedValue];
+    }
+
+    function transposeChord(chordName, semitones) {
+        if (!chordName || chordName.trim() === '') return chordName;
+
+        let root, quality, bass;
+        const parts = chordName.split('/');
+        const mainChord = parts[0];
+        bass = parts.length > 1 ? parts[1] : null;
+
+        const match = mainChord.match(/^([A-G](?:#|b)?)/);
+        if (match) {
+            root = match[1];
+            quality = mainChord.substring(root.length);
+        } else {
+            return chordName; // No se pudo interpretar, devolver original
+        }
+
+        const newRoot = transposeNote(root, semitones);
+        let newChord = newRoot + quality;
+
+        if (bass) {
+            const newBass = transposeNote(bass, semitones);
+            newChord += '/' + newBass;
+        }
+
+        return newChord;
+    }
+
+    function transposeAllChords(semitones) {
+        console.log(`Iniciando transposición con ${semitones} semitonos.`);
+        const measures = document.querySelectorAll('.measure');
+        console.log(`Se encontraron ${measures.length} compases.`);
+
+        measures.forEach((measure, index) => {
+            const originalContent = measure.textContent.trim();
+            if (!originalContent) {
+                console.log(`Compás #${index + 1} está vacío, omitiendo.`);
+                return;
+            }
+
+            console.log(`Procesando compás #${index + 1}: "${originalContent}"`);
+            const chords = originalContent.split(/\s+/).filter(Boolean);
+            const transposedChords = chords.map(chord => transposeChord(chord, semitones));
+            measure.textContent = transposedChords.join(' ');
+            console.log(` -> Compás #${index + 1} transpuesto a: "${measure.textContent}"`);
+        });
+
+        console.log("Transposición completa. Guardando partitura...");
+        saveSheetMusic();
+        console.log("Partitura guardada.");
+    }
+
+    document.getElementById('transpose-up-btn').addEventListener('click', () => {
+        console.log("Botón de subir semitono presionado.");
+        transposeAllChords(1);
+    });
+    document.getElementById('transpose-down-btn').addEventListener('click', () => {
+        console.log("Botón de bajar semitono presionado.");
+        transposeAllChords(-1);
+    });
 
     // --- EVENT LISTENERS PARA AUDIO Y METRÓNOMO ---
     Tone.loaded().then(() => {

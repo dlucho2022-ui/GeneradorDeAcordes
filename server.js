@@ -117,6 +117,114 @@ app.delete('/api/profiles/:name', (req, res) => {
 //     });
 // });
 
+// --- API para Partituras (con carpetas) ---
+const partiturasDir = path.join(__dirname, 'partituras_guardadas');
+
+if (!fs.existsSync(partiturasDir)) {
+    fs.mkdirSync(partiturasDir);
+}
+
+// GET all sheets, grouped by folder
+app.get('/api/partituras', (req, res) => {
+    fs.readdir(partiturasDir, { withFileTypes: true }, (err, files) => {
+        if (err) {
+            return res.status(500).json({ message: 'No se pudo leer la carpeta de partituras.' });
+        }
+
+        const folderPromises = files
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => {
+                const folderPath = path.join(partiturasDir, dirent.name);
+                return new Promise((resolve, reject) => {
+                    fs.readdir(folderPath, (err, songFiles) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        const sheetNames = songFiles
+                            .filter(file => path.extname(file) === '.json')
+                            .map(file => path.basename(file, '.json'));
+                        resolve({ folder: dirent.name, sheets: sheetNames });
+                    });
+                });
+            });
+
+        Promise.all(folderPromises)
+            .then(results => {
+                const groupedSheets = results.reduce((acc, { folder, sheets }) => {
+                    if (sheets.length > 0) {
+                        acc[folder] = sheets;
+                    }
+                    return acc;
+                }, {});
+                res.json(groupedSheets);
+            })
+            .catch(error => {
+                res.status(500).json({ message: 'Error al leer las subcarpetas de partituras.' });
+            });
+    });
+});
+
+// GET a specific sheet by folder and name
+app.get('/api/partituras/:folder/:name', (req, res) => {
+    const folderName = path.basename(req.params.folder);
+    const sheetName = path.basename(req.params.name);
+    const filePath = path.join(partiturasDir, folderName, `${sheetName}.json`);
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                return res.status(404).json({ message: 'La partitura no existe.' });
+            }
+            return res.status(500).json({ message: 'Error al leer la partitura.' });
+        }
+        res.json(JSON.parse(data));
+    });
+});
+
+// POST (save) a sheet
+app.post('/api/partituras/:folder/:name', (req, res) => {
+    const folderName = path.basename(req.params.folder);
+    const sheetName = path.basename(req.params.name);
+
+    if (!folderName || !sheetName) {
+        return res.status(400).json({ message: 'El nombre de la carpeta y de la partitura no pueden estar vacíos.' });
+    }
+
+    const folderPath = path.join(partiturasDir, folderName);
+    const filePath = path.join(folderPath, `${sheetName}.json`);
+    const sheetData = JSON.stringify(req.body, null, 2);
+
+    // Create folder if it doesn't exist
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    fs.writeFile(filePath, sheetData, 'utf8', (err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error al guardar la partitura.' });
+        }
+        res.status(201).json({ message: `Partitura '${sheetName}' guardada en '${folderName}' con éxito.` });
+    });
+});
+
+// DELETE a sheet
+app.delete('/api/partituras/:folder/:name', (req, res) => {
+    const folderName = path.basename(req.params.folder);
+    const sheetName = path.basename(req.params.name);
+    const filePath = path.join(partiturasDir, folderName, `${sheetName}.json`);
+
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                return res.status(404).json({ message: 'La partitura no existe.' });
+            }
+            return res.status(500).json({ message: 'Error al eliminar la partitura.' });
+        }
+        res.json({ message: `Partitura '${sheetName}' eliminada con éxito.` });
+    });
+});
+
+
 app.listen(port, () => {
     console.log(`Servidor de perfiles escuchando en http://localhost:${port}`);
 });

@@ -1,0 +1,32 @@
+{
+  "songTitle": "Loca",
+  "sections": [
+    {
+      "title": "An espil",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "Dm7   Cm7",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Bbmaj7   Cm7",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comments": [],
+  "settings": {
+    "zoom": "100%",
+    "measureFontSize": "1.9",
+    "measureHeight": "80"
+  }
+}

@@ -281,47 +281,53 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dragHandle) { dragHandle.onmousedown = dragMouseDown; } else { element.onmousedown = dragMouseDown; }
         function dragMouseDown(e) { e = e || window.event; e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
         function elementDrag(e) { e = e || window.event; e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY; element.style.top = (element.offsetTop - pos2) + "px"; element.style.left = (element.offsetLeft - pos1) + "px"; }
-        function closeDragElement() { document.onmouseup = null; document.onmousemove = null; saveSheetMusic(); }
+        function closeDragElement() { document.onmouseup = null; document.onmousemove = null; saveSheetMusicToLocalStorage(); }
     }
 
-    function saveSheetMusic() {
-        const data = { songTitle: document.getElementById('song-title').textContent, sections: [], comments: [] };
+    // Lógica de guardado/cargado refactorizada
+    function serializeChart() {
+        const data = {
+            songTitle: document.getElementById('song-title').textContent,
+            sections: [],
+            comments: [],
+            settings: {
+                zoom: document.getElementById('font-size-selector').value,
+                measureFontSize: document.getElementById('measure-font-size-slider').value,
+                measureHeight: document.getElementById('measure-height-slider').value,
+                bpm: document.getElementById('metronome-bpm-input').value
+            }
+        };
         document.querySelectorAll('.song-section').forEach(sectionDiv => {
             const section = { title: sectionDiv.querySelector('h2').textContent, rows: [] };
             sectionDiv.querySelectorAll('.measure-row').forEach(rowDiv => {
                 const row = { measures: [] };
-                rowDiv.querySelectorAll('.measure').forEach(measureDiv => { row.measures.push({ content: measureDiv.textContent, isPlaceholder: measureDiv.classList.contains('measure-placeholder') }); });
+                rowDiv.querySelectorAll('.measure').forEach(measureDiv => { 
+                    row.measures.push({ 
+                        content: measureDiv.textContent, 
+                        isPlaceholder: measureDiv.classList.contains('measure-placeholder'),
+                        isRepeatStart: measureDiv.classList.contains('repeat-start'),
+                        isRepeatEnd: measureDiv.classList.contains('repeat-end')
+                    }); 
+                });
                 section.rows.push(row);
             });
             data.sections.push(section);
         });
         document.querySelectorAll('.comment-box').forEach(commentBox => { data.comments.push({ content: commentBox.querySelector('.comment-content').textContent, top: commentBox.style.top, left: commentBox.style.left }); });
-        localStorage.setItem('sheetMusicData', JSON.stringify(data));
+        return data;
     }
 
-    function loadSheetMusic() {
-        const savedData = localStorage.getItem('sheetMusicData');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            if (data.sections.length > 0 && data.sections[0].measures) {
-                data.sections.forEach(section => {
-                    section.rows = [];
-                    let currentRow = { measures: [] };
-                    section.measures.forEach((measure, index) => {
-                        if (index > 0 && index % 4 === 0) { section.rows.push(currentRow); currentRow = { measures: [] }; }
-                        currentRow.measures.push(measure);
-                    });
-                    section.rows.push(currentRow);
-                    delete section.measures;
-                });
-            }
-            chartContainer.innerHTML = '';
-            document.querySelectorAll('.comment-box').forEach(comment => comment.remove());
-            const songTitleElement = document.createElement('h1');
-            songTitleElement.id = 'song-title';
-            songTitleElement.contentEditable = 'true';
-            songTitleElement.textContent = data.songTitle;
-            chartContainer.appendChild(songTitleElement);
+    function renderChart(data) {
+        chartContainer.innerHTML = '';
+        document.querySelectorAll('.comment-box').forEach(comment => comment.remove());
+
+        const songTitleElement = document.createElement('h1');
+        songTitleElement.id = 'song-title';
+        songTitleElement.contentEditable = 'true';
+        songTitleElement.textContent = data.songTitle || 'Nombre de la Canción';
+        chartContainer.appendChild(songTitleElement);
+
+        if (data.sections) {
             data.sections.forEach(sectionData => {
                 const newSection = document.createElement('div');
                 newSection.className = 'song-section';
@@ -337,7 +343,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         newRow.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`;
                         rowData.measures.forEach(measureData => {
                             const measureDiv = document.createElement('div');
-                            measureDiv.className = measureData.isPlaceholder ? 'measure measure-placeholder' : 'measure';
+                            measureDiv.className = 'measure';
+                            if (measureData.isPlaceholder) measureDiv.classList.add('measure-placeholder');
+                            if (measureData.isRepeatStart) measureDiv.classList.add('repeat-start');
+                            if (measureData.isRepeatEnd) measureDiv.classList.add('repeat-end');
                             measureDiv.contentEditable = 'true';
                             measureDiv.textContent = measureData.content;
                             newRow.appendChild(measureDiv);
@@ -347,25 +356,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 chartContainer.appendChild(newSection);
             });
-            if (data.comments) {
-                data.comments.forEach(commentData => {
-                    const commentBox = document.createElement('div');
-                    commentBox.className = 'comment-box';
-                    const dragHandle = document.createElement('div');
-                    dragHandle.className = 'comment-drag-handle';
-                    const contentArea = document.createElement('div');
-                    contentArea.className = 'comment-content';
-                    contentArea.contentEditable = 'true';
-                    contentArea.textContent = commentData.content;
-                    commentBox.appendChild(dragHandle);
-                    commentBox.appendChild(contentArea);
-                    commentBox.style.top = commentData.top;
-                    commentBox.style.left = commentData.left;
-                    chartContainer.appendChild(commentBox);
-                    makeDraggable(commentBox);
-                    contentArea.addEventListener('blur', saveSheetMusic);
-                });
+        }
+
+        if (data.comments) {
+            data.comments.forEach(commentData => {
+                const commentBox = document.createElement('div');
+                commentBox.className = 'comment-box';
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'comment-drag-handle';
+                const contentArea = document.createElement('div');
+                contentArea.className = 'comment-content';
+                contentArea.contentEditable = 'true';
+                contentArea.textContent = commentData.content;
+                commentBox.appendChild(dragHandle);
+                commentBox.appendChild(contentArea);
+                commentBox.style.top = commentData.top;
+                commentBox.style.left = commentData.left;
+                chartContainer.appendChild(commentBox);
+                makeDraggable(commentBox);
+                contentArea.addEventListener('blur', saveSheetMusicToLocalStorage);
+            });
+        }
+
+        // Aplicar los ajustes de visualización guardados
+        if (data.settings) {
+            const { zoom, measureFontSize, measureHeight, bpm } = data.settings;
+            const fontSizeSelector = document.getElementById('font-size-selector');
+            const measureFontSizeSlider = document.getElementById('measure-font-size-slider');
+            const measureHeightSlider = document.getElementById('measure-height-slider');
+            const bpmInput = document.getElementById('metronome-bpm-input');
+            const bpmSlider = document.getElementById('metronome-bpm-slider');
+
+            if (zoom) {
+                fontSizeSelector.value = zoom;
+                chartContainer.style.fontSize = zoom;
             }
+            if (measureFontSize) {
+                measureFontSizeSlider.value = measureFontSize;
+            }
+            if (measureHeight) {
+                measureHeightSlider.value = measureHeight;
+            }
+            if (bpm) {
+                bpmInput.value = bpm;
+                bpmSlider.value = bpm;
+                Tone.Transport.bpm.value = bpm;
+            }
+            applyMeasureStyles(measureFontSizeSlider.value, measureHeightSlider.value);
+        }
+    }
+
+    function saveSheetMusicToLocalStorage() {
+        const data = serializeChart();
+        localStorage.setItem('sheetMusicData', JSON.stringify(data));
+    }
+
+    function loadSheetMusicFromLocalStorage() {
+        const savedData = localStorage.getItem('sheetMusicData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            renderChart(data);
         } else {
              chartContainer.innerHTML = `
                 <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
@@ -390,11 +440,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chartContainer.addEventListener('input', (event) => {
         if (event.target.classList.contains('measure') || event.target.id === 'song-title' || (event.target.tagName === 'H2' && event.target.closest('.song-section'))) {
-            saveSheetMusic();
+            saveSheetMusicToLocalStorage();
         }
     });
 
-    fontSizeSelector.addEventListener('change', (e) => { chartContainer.style.fontSize = e.target.value; saveSheetMusic(); });
+    fontSizeSelector.addEventListener('change', (e) => { chartContainer.style.fontSize = e.target.value; saveSheetMusicToLocalStorage(); });
 
     const measureFontSizeSlider = document.getElementById('measure-font-size-slider');
     const measureHeightSlider = document.getElementById('measure-height-slider');
@@ -428,30 +478,30 @@ document.addEventListener('DOMContentLoaded', () => {
         row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`;
     }
 
-    document.getElementById('add-start-repeat-btn').addEventListener('click', () => { if (focusedMeasure) focusedMeasure.classList.toggle('repeat-start'); else alert('Hacé clic en un compás primero.'); saveSheetMusic(); });
-    document.getElementById('add-end-repeat-btn').addEventListener('click', () => { if (focusedMeasure) focusedMeasure.classList.toggle('repeat-end'); else alert('Hacé clic en un compás primero.'); saveSheetMusic(); });
+    document.getElementById('add-start-repeat-btn').addEventListener('click', () => { if (focusedMeasure) focusedMeasure.classList.toggle('repeat-start'); saveSheetMusicToLocalStorage(); });
+    document.getElementById('add-end-repeat-btn').addEventListener('click', () => { if (focusedMeasure) focusedMeasure.classList.toggle('repeat-end'); saveSheetMusicToLocalStorage(); });
     document.getElementById('delete-measure-btn').addEventListener('click', () => {
         if (!focusedMeasure) { alert('Hacé clic en el compás que querés eliminar.'); return; }
         const row = focusedMeasure.closest('.measure-row');
-        if (row && row.children.length > 1) { focusedMeasure.remove(); const numMeasures = row.children.length; row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`; saveSheetMusic(); } else { alert('No se puede eliminar el último compás de una fila.'); }
+        if (row && row.children.length > 1) { focusedMeasure.remove(); const numMeasures = row.children.length; row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`; saveSheetMusicToLocalStorage(); } else { alert('No se puede eliminar el último compás de una fila.'); }
     });
     document.getElementById('clear-measure-btn').addEventListener('click', () => { if (focusedMeasure) { focusedMeasure.textContent = ''; focusedMeasure.classList.remove('repeat-start', 'repeat-end', 'double-bar'); } });
     document.getElementById('add-measure-btn').addEventListener('click', () => {
         if (!focusedMeasure) { alert('Hacé clic en un compás para agregar otro a su lado.'); return; }
         const row = focusedMeasure.closest('.measure-row');
-        if (row) { const newMeasure = document.createElement('div'); newMeasure.className = 'measure'; newMeasure.contentEditable = 'true'; row.insertBefore(newMeasure, focusedMeasure.nextSibling); const numMeasures = row.children.length; row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`; saveSheetMusic(); }
+        if (row) { const newMeasure = document.createElement('div'); newMeasure.className = 'measure'; newMeasure.contentEditable = 'true'; row.insertBefore(newMeasure, focusedMeasure.nextSibling); const numMeasures = row.children.length; row.style.gridTemplateColumns = `repeat(${numMeasures}, 1fr)`; saveSheetMusicToLocalStorage(); }
     });
 
     document.getElementById('add-row-btn').addEventListener('click', () => {
         let currentSection;
         if (focusedMeasure) { currentSection = focusedMeasure.closest('.song-section'); } else if (focusedSectionTitle) { currentSection = focusedSectionTitle.closest('.song-section'); } else { const sections = chartContainer.querySelectorAll('.song-section'); if (sections.length > 0) { currentSection = sections[sections.length - 1]; } }
-        if (currentSection) { const newRow = document.createElement('div'); newRow.className = 'measure-row'; insertMeasures(newRow, 4); currentSection.appendChild(newRow); saveSheetMusic(); } else { alert('No se encontró una sección para agregar la fila.'); }
+        if (currentSection) { const newRow = document.createElement('div'); newRow.className = 'measure-row'; insertMeasures(newRow, 4); currentSection.appendChild(newRow); saveSheetMusicToLocalStorage(); } else { alert('No se encontró una sección para agregar la fila.'); }
     });
 
     document.getElementById('delete-row-btn').addEventListener('click', () => {
         if (!focusedMeasure) { alert('Hacé clic en un compás de la fila que querés eliminar.'); return; }
         const row = focusedMeasure.closest('.measure-row');
-        if (row) { if (confirm('¿Estás seguro de que querés eliminar esta fila completa?')) { row.remove(); saveSheetMusic(); } }
+        if (row) { if (confirm('¿Estás seguro de que querés eliminar esta fila completa?')) { row.remove(); saveSheetMusicToLocalStorage(); } }
     });
 
     document.getElementById('add-section-btn').addEventListener('click', () => {
@@ -460,14 +510,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTitle = document.createElement('h2'); newTitle.contentEditable = 'true'; newTitle.textContent = `Sección ${sectionCount}`;
         newSection.appendChild(newTitle);
         const newRow = document.createElement('div'); newRow.className = 'measure-row'; insertMeasures(newRow, 4); newSection.appendChild(newRow);
-        chartContainer.appendChild(newSection); saveSheetMusic();
+        chartContainer.appendChild(newSection); saveSheetMusicToLocalStorage();
     });
 
     document.getElementById('delete-section-btn').addEventListener('click', () => {
         if (!focusedMeasure && !focusedSectionTitle) { alert('Hacé clic en un compás o título de la sección que querés eliminar.'); return; }
         let section;
         if(focusedMeasure) { section = focusedMeasure.closest('.song-section'); } else { section = focusedSectionTitle.closest('.song-section'); }
-        if (section) { if (chartContainer.getElementsByClassName('song-section').length > 1) { if (confirm('¿Estás seguro de que querés eliminar esta sección completa?')) { section.remove(); focusedMeasure = null; focusedSectionTitle = null; saveSheetMusic(); } } else { alert('No se puede eliminar la única sección.'); } }
+        if (section) { if (chartContainer.getElementsByClassName('song-section').length > 1) { if (confirm('¿Estás seguro de que querés eliminar esta sección completa?')) { section.remove(); focusedMeasure = null; focusedSectionTitle = null; saveSheetMusicToLocalStorage(); } } else { alert('No se puede eliminar la única sección.'); } }
     });
 
     document.getElementById('add-comment-btn').addEventListener('click', () => {
@@ -476,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const contentArea = document.createElement('div'); contentArea.className = 'comment-content'; contentArea.contentEditable = 'true'; contentArea.textContent = 'Escribí acá...';
         commentBox.appendChild(dragHandle); commentBox.appendChild(contentArea);
         commentBox.style.top = `${window.innerHeight / 2 - 50}px`; commentBox.style.left = `${window.innerWidth / 2 - 75}px`;
-        chartContainer.appendChild(commentBox); makeDraggable(commentBox); saveSheetMusic(); contentArea.addEventListener('blur', saveSheetMusic);
+        chartContainer.appendChild(commentBox); makeDraggable(commentBox); saveSheetMusicToLocalStorage(); contentArea.addEventListener('blur', saveSheetMusicToLocalStorage);
     });
 
     document.getElementById('export-pdf-btn').addEventListener('click', async () => {
@@ -521,24 +571,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    loadSheetMusic();
+    loadSheetMusicFromLocalStorage();
+
+    function clearChart() {
+        localStorage.removeItem('sheetMusicData');
+        loadSheetMusicFromLocalStorage(); // Esta función ya gestiona la creación de una partitura en blanco
+    }
 
     function resetChart() {
         if (confirm('¿Estás seguro de que quieres reiniciar la partitura? Se borrará todo el contenido.')) {
-            localStorage.removeItem('sheetMusicData');
-            chartContainer.innerHTML = `
-                <h1 id="song-title" contenteditable="true">Nombre de la Canción</h1>
-                <div class="song-section">
-                    <h2 contenteditable="true">Intro</h2>
-                    <div class="measure-row" style="grid-template-columns: repeat(4, 1fr);">
-                        <div class="measure" contenteditable="true"></div>
-                        <div class="measure" contenteditable="true"></div>
-                        <div class="measure" contenteditable="true"></div>
-                        <div class="measure" contenteditable="true"></div>
-                    </div>
-                </div>
-            `;
-            document.querySelectorAll('.comment-box').forEach(comment => comment.remove());
+            clearChart();
         }
     }
 
@@ -601,37 +643,235 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function transposeAllChords(semitones) {
-        console.log(`Iniciando transposición con ${semitones} semitonos.`);
         const measures = document.querySelectorAll('.measure');
-        console.log(`Se encontraron ${measures.length} compases.`);
+        measures.forEach(measure => {
+            const chords = measure.textContent.trim().split(/\s+/).filter(Boolean);
+            const transposedChords = chords.map(chord => transposeChord(chord, semitones));
+            measure.textContent = transposedChords.join(' ');
+        });
+        saveSheetMusicToLocalStorage(); // Guardar los cambios
+    }
 
-        measures.forEach((measure, index) => {
-            const originalContent = measure.textContent.trim();
-            if (!originalContent) {
-                console.log(`Compás #${index + 1} está vacío, omitiendo.`);
+    document.getElementById('transpose-up-btn').addEventListener('click', () => transposeAllChords(1));
+    document.getElementById('transpose-down-btn').addEventListener('click', () => transposeAllChords(-1));
+
+    // --- LÓGICA DE GUARDADO/CARGA EN SERVIDOR ---
+    const saveChartBtn = document.getElementById('save-chart-btn');
+    
+    // Load Modal Elements
+    const openLoadChartModalBtn = document.getElementById('open-load-chart-modal-btn');
+    const loadChartModal = document.getElementById('load-chart-modal');
+    const loadChartModalCloseBtn = document.getElementById('load-chart-modal-close-btn');
+    const chartListContainer = document.getElementById('chart-list-container');
+    const chartSearchInput = document.getElementById('chart-search-input');
+
+    // Save Modal Elements
+    const saveChartModal = document.getElementById('save-chart-modal');
+    const saveChartModalCloseBtn = document.getElementById('save-chart-modal-close-btn');
+    const existingFolderSelect = document.getElementById('existing-folder-select');
+    const newFolderInput = document.getElementById('new-folder-input');
+    const confirmSaveBtn = document.getElementById('confirm-save-btn');
+
+    const API_BASE_URL = 'http://localhost:3000/api';
+    let allSheets = {}; // Cache for all loaded sheets
+
+    // --- Load Modal Logic ---
+    openLoadChartModalBtn.addEventListener('click', () => {
+        loadChartModal.style.display = 'block';
+        populateLoadModal();
+    });
+    loadChartModalCloseBtn.addEventListener('click', () => {
+        loadChartModal.style.display = 'none';
+    });
+    chartSearchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const items = chartListContainer.querySelectorAll('.chart-list-item, h3');
+        items.forEach(item => {
+            const isFolder = item.tagName === 'H3';
+            if (isFolder) {
+                item.style.display = 'none';
+            } else {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                    let prev = item.previousElementSibling;
+                    while(prev) {
+                        if (prev.tagName === 'H3') {
+                            prev.style.display = 'block';
+                            break;
+                        }
+                        prev = prev.previousElementSibling;
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    async function populateLoadModal(showAlertOnError = true) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/partituras`);
+            if (!response.ok) throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+            allSheets = await response.json();
+            
+            chartListContainer.innerHTML = '';
+            
+            if (Object.keys(allSheets).length === 0) {
+                chartListContainer.innerHTML = '<p>No hay partituras guardadas.</p>';
                 return;
             }
 
-            console.log(`Procesando compás #${index + 1}: "${originalContent}"`);
-            const chords = originalContent.split(/\s+/).filter(Boolean);
-            const transposedChords = chords.map(chord => transposeChord(chord, semitones));
-            measure.textContent = transposedChords.join(' ');
-            console.log(` -> Compás #${index + 1} transpuesto a: "${measure.textContent}"`);
-        });
+            for (const folder in allSheets) {
+                const groupTitle = document.createElement('h3');
+                groupTitle.textContent = folder;
+                chartListContainer.appendChild(groupTitle);
 
-        console.log("Transposición completa. Guardando partitura...");
-        saveSheetMusic();
-        console.log("Partitura guardada.");
+                allSheets[folder].forEach(sheetName => {
+                    const item = document.createElement('div');
+                    item.className = 'chart-list-item';
+                    item.title = `Cargar: ${sheetName}`;
+                    item.addEventListener('click', () => loadChartFromServer(folder, sheetName));
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = sheetName;
+                    
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'actions';
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Eliminar';
+                    deleteBtn.className = 'btn-danger';
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteChartFromServer(folder, sheetName);
+                    });
+
+                    actionsDiv.appendChild(deleteBtn);
+                    item.appendChild(nameSpan);
+                    item.appendChild(actionsDiv);
+                    chartListContainer.appendChild(item);
+                });
+            }
+        } catch (error) {
+            console.error('Error al cargar partituras:', error);
+            if (showAlertOnError) {
+                alert('No se pudo conectar con el servidor para cargar la lista de partituras.');
+            }
+        }
     }
 
-    document.getElementById('transpose-up-btn').addEventListener('click', () => {
-        console.log("Botón de subir semitono presionado.");
-        transposeAllChords(1);
+    async function loadChartFromServer(folder, name) {
+        if (!folder || !name) {
+            alert("La selección de la partitura no es válida.");
+            return;
+        }
+        try {
+            const response = await fetch(`${API_BASE_URL}/partituras/${folder}/${name}`);
+            if (!response.ok) throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+            const chartData = await response.json();
+            renderChart(chartData);
+            saveSheetMusicToLocalStorage();
+            loadChartModal.style.display = 'none';
+        } catch (error) {
+            console.error('Error al cargar la partitura:', error);
+            alert(`No se pudo cargar la partitura: ${error.message}`);
+        }
+    }
+
+    async function deleteChartFromServer(folder, name) {
+        if (!folder || !name) {
+            alert('La selección de la partitura no es válida.');
+            return;
+        }
+        if (!confirm(`¿Estás seguro de que quieres eliminar la partitura "${name}" de la carpeta "${folder}"? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+        try {
+            const response = await fetch(`${API_BASE_URL}/partituras/${folder}/${name}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+            const result = await response.json();
+            alert(result.message);
+            await populateLoadModal();
+        } catch (error) {
+            console.error('Error al eliminar la partitura:', error);
+            alert(`No se pudo eliminar la partitura: ${error.message}`);
+        }
+    }
+
+    // --- Save Modal Logic ---
+    saveChartBtn.addEventListener('click', () => {
+        const title = document.getElementById('song-title').textContent.trim();
+        if (!title || title === 'Nombre de la Canción') {
+            alert('Por favor, ponle un nombre a la canción antes de guardarla.');
+            return;
+        }
+        
+        // Populate existing folders
+        existingFolderSelect.innerHTML = '<option value="">Seleccionar carpeta...</option>';
+        const folders = Object.keys(allSheets);
+        folders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder;
+            option.textContent = folder;
+            existingFolderSelect.appendChild(option);
+        });
+        newFolderInput.value = '';
+        saveChartModal.style.display = 'block';
     });
-    document.getElementById('transpose-down-btn').addEventListener('click', () => {
-        console.log("Botón de bajar semitono presionado.");
-        transposeAllChords(-1);
+
+    saveChartModalCloseBtn.addEventListener('click', () => {
+        saveChartModal.style.display = 'none';
     });
+
+    confirmSaveBtn.addEventListener('click', async () => {
+        const chartData = serializeChart();
+        const title = chartData.songTitle.trim();
+        
+        let folder = newFolderInput.value.trim();
+        if (!folder) {
+            folder = existingFolderSelect.value;
+        }
+
+        if (!folder) {
+            alert('Por favor, selecciona una carpeta existente o crea una nueva.');
+            return;
+        }
+
+        const fileName = title.replace(/[^a-z0-9\s_.-]/gi, '_');
+        const folderName = folder.replace(/[^a-z0-9\s_.-]/gi, '_');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/partituras/${folderName}/${fileName}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(chartData)
+            });
+
+            if (!response.ok) throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+
+            const result = await response.json();
+            alert(result.message);
+            saveChartModal.style.display = 'none';
+            await populateLoadModal(false); // Update cache and list silently
+        } catch (error) {
+            console.error('Error al guardar la partitura:', error);
+            alert(`No se pudo guardar la partitura: ${error.message}`);
+        }
+    });
+
+    // --- General Modal Logic ---
+    window.addEventListener('click', (event) => {
+        if (event.target === loadChartModal) {
+            loadChartModal.style.display = 'none';
+        }
+        if (event.target === saveChartModal) {
+            saveChartModal.style.display = 'none';
+        }
+    });
+
+    // Initial load
+    populateLoadModal(false);
 
     // --- EVENT LISTENERS PARA AUDIO Y METRÓNOMO ---
     Tone.loaded().then(() => {
@@ -772,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (progressionSequence) { progressionSequence.dispose(); }
 
                 progressionSequence = new Tone.Part((time, value) => {
-                    playChord(value.chord); // Usa la nueva función playChord
+                    playChord(value.chord);
                 }, playbackEvents);
 
                 const lastEvent = playbackEvents[playbackEvents.length - 1];

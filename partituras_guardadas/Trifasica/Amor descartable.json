@@ -1,0 +1,120 @@
+{
+  "songTitle": "Amor descartable",
+  "sections": [
+    {
+      "title": "Intro - Estrofa",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "Dm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C   Am",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Puente",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "Gm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Bb",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Am",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        },
+        {
+          "measures": [
+            {
+              "content": "Gm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Bb",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Am Dm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Estribillo",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "Bb",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "F   G",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "content": "",
+      "top": "485px",
+      "left": "559px"
+    }
+  ],
+  "settings": {
+    "zoom": "100%",
+    "measureFontSize": "2.2",
+    "measureHeight": "85"
+  }
+}

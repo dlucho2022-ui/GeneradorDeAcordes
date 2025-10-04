@@ -1998,40 +1998,69 @@ body:not(.body-sheet-music) .button.playing svg {
     background-color: #bb86fc;
     color: #121212;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 18px; /* Increased font size */
-    z-index: 2;
-    border: 1px solid #121212;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-.note-marker.root-note {
-    background-color: #ffc107;
-    transform: scale(1.1);
+/* Panel de Controles a la Derecha para Guardado */
+.right-controls-container {
+    position: fixed;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    background-color: #2c2c2c;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #444;
 }
 
-/* Estilo para resaltar trastes en instrumentos sin trastes */
-.fret.fret-highlight {
-    background-color: rgba(255, 255, 255, 0.1); /* Un sutil resaltado de fondo */
-    border-right-color: #fff; /* Línea del traste más brillante */
+.right-controls-container .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* Estilos para ocultar trastes en Cello y Violin */
-.fretboard.cello .fret,
-.fretboard.violin .fret {
-    border-right-color: transparent; /* Oculta las líneas de los trastes */
+.right-controls-container button,
+.right-controls-container select {
+    background-color: #383838;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Pero mantenemos la cejuela visible */
-.fretboard.cello .fret:first-child,
-.fretboard.violin .fret:first-child {
-    border-right-color: #f0f0f0;
+.right-controls-container button:hover,
+.right-controls-container select:hover {
+    background-color: #6a0dad;
 }
 
-/* Y hacemos que el resaltado de posición también muestre una línea */
-.fretboard.cello .fret.fret-highlight,
-.fretboard.violin .fret.fret-highlight {
-    /* border-right: 1px solid #fff; */ /* Desactivado por pedido del usuario */
+.right-controls-container .btn-danger {
+    background-color: #dc3545;
+}
+
+.right-controls-container .btn-danger:hover {
+    background-color: #a72836;
+}
+
+.right-controls-container .btn-action {
+    background-color: #198754; /* Verde */
+}
+
+.right-controls-container .btn-action:hover {
+    background-color: #146c43;
+}
+
+.right-controls-container label {
+    color: #f0f0f0;
+    font-size: 0.9em;
+    text-align: center;
+    margin-bottom: -5px;
 }

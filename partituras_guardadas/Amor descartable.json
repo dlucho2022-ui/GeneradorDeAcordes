@@ -1,0 +1,115 @@
+{
+  "songTitle": "Amor descartable",
+  "sections": [
+    {
+      "title": "Intro - Estrofa",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "D#m",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C# A#m",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Puente",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "G#m",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "B",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C#",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "A#m",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        },
+        {
+          "measures": [
+            {
+              "content": "G#m",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "B",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C#",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "A#m D#m",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Estribillo",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "B",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "F# G#",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "content": "asdacá...",
+      "top": "396px",
+      "left": "520px"
+    }
+  ]
+}

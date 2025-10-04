@@ -1,0 +1,105 @@
+{
+  "songTitle": "Toxi Taxi",
+  "sections": [
+    {
+      "title": "Intro - Estrofa",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "Dm ",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Gm A7",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Puente - Estribillo",
+      "rows": [
+        {
+          "measures": [
+            {
+              "content": "C",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Gm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "C",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Bb",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        },
+        {
+          "measures": [
+            {
+              "content": "Dm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Dm",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Am",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            },
+            {
+              "content": "Bb C",
+              "isPlaceholder": false,
+              "isRepeatStart": false,
+              "isRepeatEnd": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "content": "C# - D (riff)",
+      "top": "388px",
+      "left": "86px"
+    },
+    {
+      "content": "C# - D (riff)",
+      "top": "387px",
+      "left": "302px"
+    }
+  ],
+  "settings": {
+    "zoom": "100%",
+    "measureFontSize": "1.9",
+    "measureHeight": "80",
+    "bpm": "105"
+  }
+}

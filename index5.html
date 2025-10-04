@@ -11,6 +11,53 @@
             background-color: #d1e7ff !important;
             box-shadow: inset 0 0 0 2px #007bff;
         }
+        .chart-list {
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .chart-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .chart-list-item:hover {
+            background-color: #bb86fc;
+            color: #121212;
+        }
+        .chart-list-item:hover span {
+            color: #121212;
+        }
+        .chart-list-item span {
+            /* cursor: pointer; no longer needed here */
+        }
+        .chart-list-item .actions button {
+            margin-left: 5px;
+        }
+        #load-chart-modal .modal-content {
+            width: 600px;
+        }
+        #save-chart-modal .modal-content {
+            width: 600px;
+            height: auto;
+        }
+
+        /* Aumentar altura de elementos en modales */
+        .modal-content select,
+        .modal-content input[type="text"],
+        .modal-content .btn-action {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        #load-chart-modal .modal-content,
+        #save-chart-modal .modal-content {
+            gap: 15px;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +148,45 @@
         <button id="add-comment-btn" class="btn-comment">Insertar Comentario</button>
         <button id="export-pdf-btn" class="btn-export">Exportar como PDF</button>
         <button id="reset-chart-btn" class="btn-danger">Reiniciar Partitura</button>
+    </div>
+</div>
+
+<!-- Controles de Guardado a la Derecha -->
+<div class="right-controls-container">
+    <div class="control-group">
+        <button id="save-chart-btn" class="btn-action">Guardar</button>
+        <button id="open-load-chart-modal-btn" class="btn-structure-edit">Cargar</button>
+    </div>
+</div>
+
+<!-- Modal para Cargar Partituras -->
+<div id="load-chart-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-button" id="load-chart-modal-close-btn">&times;</span>
+        <h2>Cargar Partitura</h2>
+        <input type="text" id="chart-search-input" placeholder="Buscar por nombre o banda..." style="width: 100%; padding: 8px; margin-bottom: 10px;">
+        <div id="chart-list-container" class="chart-list">
+            <!-- La lista de partituras se generará aquí -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Guardar Partituras -->
+<div id="save-chart-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-button" id="save-chart-modal-close-btn">&times;</span>
+        <h2>Guardar Partitura</h2>
+        <div class="control-group">
+            <label for="existing-folder-select">Guardar en carpeta existente:</label>
+            <select id="existing-folder-select">
+                <option value="">Seleccionar carpeta...</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="new-folder-input">O crear una nueva carpeta:</label>
+            <input type="text" id="new-folder-input" placeholder="Nombre de la nueva carpeta...">
+        </div>
+        <button id="confirm-save-btn" class="btn-action" style="margin-top: 15px;">Confirmar Guardado</button>
     </div>
 </div>
 

@@ -151,6 +151,10 @@
             <label for="include-ties">Ligaduras</label>
             <input type="checkbox" id="include-ties">
         </div>
+        <div class="selector-container">
+            <label for="include-groove">Groove</label>
+            <input type="checkbox" id="include-groove">
+        </div>
     </div>
 
     <div id="notes-modal" class="control-section">
@@ -358,6 +362,7 @@
                     maxNote: document.getElementById('max-note-slider').value,
                     accidentals: document.getElementById('accidentals-slider').value,
                     ties: document.getElementById('include-ties').checked,
+                    groove: document.getElementById('include-groove').checked,
                     timeSigSimple: document.getElementById('time-signature-selector-simple').value,
                     simpleQuarters: document.getElementById('include-quarters').checked,
                     simpleEighths: document.getElementById('include-eighths').checked,
@@ -411,6 +416,7 @@
                     setSliderValue('interval-slider', settings.interval);
                     setSliderValue('accidentals-slider', settings.accidentals);
                     setCheckbox('include-ties', settings.ties);
+                    setCheckbox('include-groove', settings.groove);
 
                     if (settings.activeTab) {
                         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -646,11 +652,27 @@
                     allowedBlocks = blocks;
                 } 
                 if (allowedBlocks.length === 0) { allowedBlocks.push(activeTab === 'simple' ? 'quarters' : 'three-eighths'); }
-                                let currentGeneratedNotes = [];
+                                const includeGroove = document.getElementById('include-groove')?.checked;
+                let currentGeneratedNotes = [];
                 let lastNoteName = null;
+                let measureCache = [];
+
                 for (let i = 0; i < numMeasures; i++) {
+                    if (includeGroove && i % 4 !== 0) {
+                        const notesToCopy = JSON.parse(JSON.stringify(measureCache));
+                        // Update lastNoteName from the copied measure to ensure continuity for the *next* generated measure
+                        const lastNoteOfCopiedMeasure = notesToCopy.slice().reverse().find(n => n.name);
+                        if(lastNoteOfCopiedMeasure) {
+                            lastNoteName = lastNoteOfCopiedMeasure.name;
+                        }
+                        currentGeneratedNotes.push(...notesToCopy);
+                        continue;
+                    }
+
                     let beatsInCurrentMeasure = 0;
                     const totalBeatsInMeasure = activeTab === 'simple' ? beatsPerMeasure : beatsPerMeasure * 1.5;
+                    const singleMeasureNotes = [];
+
                     while (beatsInCurrentMeasure < totalBeatsInMeasure) {
                         const remainingBeats = totalBeatsInMeasure - beatsInCurrentMeasure;
                         let possibleBlocks = allowedBlocks.filter(key => rhythmicBlocks[key] && rhythmicBlocks[key].beats <= remainingBeats);
@@ -666,7 +688,7 @@
                             const isLastInBlock = (index === blockInfo.notes.length - 1);
 
                             if (noteInfo.isRest) {
-                                currentNoteName = null; // No cambiamos lastNoteName
+                                currentNoteName = null;
                             } else {
                                 if (lastNoteName === null) {
                                     currentNoteName = diatonicNotePool[Math.floor(Math.random() * diatonicNotePool.length)];
@@ -686,28 +708,34 @@
                                     const newPitch = currentPitch + direction;
                                     let allPossibleNames = Object.keys(pitchMap).filter(name => pitchMap[name] === newPitch);
                                     
-                                                    const forbiddenNotes = ['E#', 'B#', 'Fb', 'Cb', 'Mi#', 'Si#', 'Fab', 'Dob'];
-                                                    let preferredNames = allPossibleNames.filter(name => !forbiddenNotes.some(forbidden => name.includes(forbidden)));
+                                    const forbiddenNotes = ['E#', 'B#', 'Fb', 'Cb', 'Mi#', 'Si#', 'Fab', 'Dob'];
+                                    let preferredNames = allPossibleNames.filter(name => !forbiddenNotes.some(forbidden => name.includes(forbidden)));
                                     
-                                                    if (preferredNames.length > 0) {
-                                                        const alteredNoteName = preferredNames[Math.floor(Math.random() * preferredNames.length)];
-                                                        const alteredNotePitch = pitchMap[alteredNoteName]; // Get pitch of altered note
-                                                        if (alteredNotePitch >= minNotePitch && alteredNotePitch <= maxNotePitch) { // Check if within range
-                                                            if (!diatonicNotePool.includes(alteredNoteName)) {
-                                                                currentNoteName = alteredNoteName;
-                                                                isChromatic = true;
-                                                            }
-                                                        }
-                                                    }
+                                    if (preferredNames.length > 0) {
+                                        const alteredNoteName = preferredNames[Math.floor(Math.random() * preferredNames.length)];
+                                        const alteredNotePitch = pitchMap[alteredNoteName];
+                                        if (alteredNotePitch >= minNotePitch && alteredNotePitch <= maxNotePitch) {
+                                            if (!diatonicNotePool.includes(alteredNoteName)) {
+                                                currentNoteName = alteredNoteName;
+                                                isChromatic = true;
+                                            }
+                                        }
+                                    }
                                 }
-                                lastNoteName = currentNoteName; // Actualizamos solo si no es silencio
+                                lastNoteName = currentNoteName;
                             }
                             blockNotes.push({ ...noteInfo, name: currentNoteName, isChromatic: isChromatic, isLastInBlock: isLastInBlock });
                         });
                         addBeaming(blockNotes);
                         addTupletNotations(blockNotes);
-                        currentGeneratedNotes.push(...blockNotes);
+                        singleMeasureNotes.push(...blockNotes);
                         beatsInCurrentMeasure += blockInfo.beats;
+                    }
+                    
+                    currentGeneratedNotes.push(...singleMeasureNotes);
+
+                    if (includeGroove) {
+                        measureCache = singleMeasureNotes;
                     }
                 }
                 allGeneratedNotes = currentGeneratedNotes;

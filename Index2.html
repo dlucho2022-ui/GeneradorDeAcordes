@@ -356,7 +356,7 @@
                     interval: document.getElementById('interval-slider').value,
                     minNote: document.getElementById('min-note-slider').value,
                     maxNote: document.getElementById('max-note-slider').value,
-                    accidentals: document.getElementById('include-accidentals').checked,
+                    accidentals: document.getElementById('accidentals-slider').value,
                     ties: document.getElementById('include-ties').checked,
                     timeSigSimple: document.getElementById('time-signature-selector-simple').value,
                     simpleQuarters: document.getElementById('include-quarters').checked,
@@ -409,7 +409,7 @@
                     setSelect('clef-selector', settings.clef);
                     document.getElementById('measure-selector').value = settings.measures;
                     setSliderValue('interval-slider', settings.interval);
-                    setCheckbox('include-accidentals', settings.accidentals);
+                    setSliderValue('accidentals-slider', settings.accidentals);
                     setCheckbox('include-ties', settings.ties);
 
                     if (settings.activeTab) {
@@ -1159,6 +1159,14 @@
                     alert('Por favor, ingresá un nombre para el perfil.');
                     return;
                 }
+
+                const existingProfiles = Array.from(document.querySelectorAll('#profile-selector option')).map(opt => opt.value);
+                if (existingProfiles.includes(name)) {
+                    if (!confirm(`El perfil '${name}' ya existe. ¿Querés sobrescribirlo?`)) {
+                        return;
+                    }
+                }
+                
                 const settings = getCurrentSettings();
                 try {
                     const response = await fetch(`${API_URL}/${name}`, {

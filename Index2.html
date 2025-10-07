@@ -409,7 +409,8 @@
                     accompVol: document.getElementById('accompaniment-volume-slider').value,
                     visualGuide: document.getElementById('visual-guide-checkbox').checked,
                     autoscroll: document.getElementById('autoscroll-checkbox').checked,
-                    loop: document.getElementById('loop-playback-checkbox').checked
+                    loop: document.getElementById('loop-playback-checkbox').checked,
+                    countIn: document.getElementById('count-in-checkbox').checked
                 };
             }
 
@@ -478,6 +479,7 @@
                     setCheckbox('visual-guide-checkbox', settings.visualGuide);
                     setCheckbox('autoscroll-checkbox', settings.autoscroll);
                     setCheckbox('loop-playback-checkbox', settings.loop);
+                    setCheckbox('count-in-checkbox', settings.countIn);
 
                     document.getElementById('bpm-slider').dispatchEvent(new Event('input'));
                     document.getElementById('zoom-slider').dispatchEvent(new Event('input'));
@@ -1023,11 +1025,38 @@
 
                                 if (noteStartTime >= measureStartTime && !processedMeasures.has(measureIndex)) {
                                     if (!note.isRest) {
-                                        const noteName = note.name.replace(/[0-9]/g, '');
-                                        const chordToPlay = chordData[noteName];
-                                        if (chordToPlay) {
-                                            console.log(`Acompañamiento Inteligente - Compás ${measureIndex + 1}: Nota ${noteName} -> Acorde [${chordToPlay.join(', ')}]`);
-                                            accompanimentEvents.push({ time: `${measureIndex}m`, chord: chordToPlay });
+                                        let noteForChord = note;
+                                        if (note.isChromatic) {
+                                            const diatonicNotesInMeasure = [];
+                                            let searchTime = currentTime;
+                                            let noteSearchIndex = allGeneratedNotes.findIndex(n => n === note);
+
+                                            for (let i = noteSearchIndex; i < allGeneratedNotes.length; i++) {
+                                                const futureNote = allGeneratedNotes[i];
+                                                if (searchTime >= (measureIndex + 1) * measureDuration - 0.001) {
+                                                    break; 
+                                                }
+                                                if (!futureNote.isChromatic && !futureNote.isRest) {
+                                                    diatonicNotesInMeasure.push(futureNote);
+                                                }
+                                                searchTime += Tone.Time(futureNote.duration).toSeconds();
+                                            }
+
+                                            if (diatonicNotesInMeasure.length > 0) {
+                                                noteForChord = diatonicNotesInMeasure[Math.floor(Math.random() * diatonicNotesInMeasure.length)];
+                                                console.log(`Alteración en compás ${measureIndex + 1}. Usando nota diatónica al azar: ${noteForChord.name}`);
+                                            } else {
+                                                noteForChord = null; 
+                                            }
+                                        }
+
+                                        if (noteForChord) {
+                                            const noteName = noteForChord.name.replace(/[0-9]/g, '');
+                                            const chordToPlay = chordData[noteName];
+                                            if (chordToPlay) {
+                                                console.log(`Acompañamiento Inteligente - Compás ${measureIndex + 1}: Nota ${noteName} -> Acorde [${chordToPlay.join(', ')}]`);
+                                                accompanimentEvents.push({ time: `${measureIndex}m`, chord: chordToPlay });
+                                            }
                                         }
                                         processedMeasures.add(measureIndex);
                                     }

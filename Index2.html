@@ -87,6 +87,14 @@
             <input type="range" id="accompaniment-volume-slider" min="-70" max="0" value="-70" step="1">
         </div>
         <div class="selector-container">
+            <label for="accompaniment-octave-selector">Octava Acompañ.:</label>
+            <select id="accompaniment-octave-selector">
+                <option value="-1">Octava -1</option>
+                <option value="0" selected>Original</option>
+                <option value="1">Octava +1</option>
+            </select>
+        </div>
+        <div class="selector-container">
             <label for="fullscreen-button">Pantalla Completa</label>
             <button id="fullscreen-button" class="button" style="flex-grow: 0; padding: 5px 15px; background-color: #333">Activar</button>
         </div>
@@ -410,7 +418,8 @@
                     visualGuide: document.getElementById('visual-guide-checkbox').checked,
                     autoscroll: document.getElementById('autoscroll-checkbox').checked,
                     loop: document.getElementById('loop-playback-checkbox').checked,
-                    countIn: document.getElementById('count-in-checkbox').checked
+                    countIn: document.getElementById('count-in-checkbox').checked,
+                    accompOctave: document.getElementById('accompaniment-octave-selector').value
                 };
             }
 
@@ -480,6 +489,9 @@
                     setCheckbox('autoscroll-checkbox', settings.autoscroll);
                     setCheckbox('loop-playback-checkbox', settings.loop);
                     setCheckbox('count-in-checkbox', settings.countIn);
+                    if (settings.accompOctave) {
+                        setSelect('accompaniment-octave-selector', settings.accompOctave);
+                    }
 
                     document.getElementById('bpm-slider').dispatchEvent(new Event('input'));
                     document.getElementById('zoom-slider').dispatchEvent(new Event('input'));
@@ -568,6 +580,17 @@
                     }
                 }
                 return preferredName || 'N/A';
+            }
+
+            function shiftNoteOctave(noteName, shift = 0) {
+                if (shift === 0) return noteName;
+                const match = noteName.match(/([a-zA-Z#b]+)([0-9]+)/);
+                if (match) {
+                    const note = match[1];
+                    const octave = parseInt(match[2], 10);
+                    return `${note}${octave + shift}`;
+                }
+                return noteName; // Si no coincide el formato, devuelve la nota original
             }
 
             function updateNoteRangeSliders(clef) {
@@ -1071,7 +1094,9 @@
 
                         const accompanimentPart = new Tone.Part((time, value) => {
                             if (accompanimentSampler.loaded) {
-                                accompanimentSampler.triggerAttackRelease(value.chord, '1m', time);
+                                const octaveShift = parseInt(document.getElementById('accompaniment-octave-selector').value, 10) || 0;
+                                const shiftedChord = value.chord.map(note => shiftNoteOctave(note, octaveShift));
+                                accompanimentSampler.triggerAttackRelease(shiftedChord, '1m', time);
                             }
                         }, accompanimentEvents);
                         const numMeasures = parseInt(document.getElementById('measure-selector').value, 10);
@@ -1084,7 +1109,9 @@
                         const accompanimentSequence = new Tone.Sequence((time, chordIndex) => {
                             const notesToPlay = chordIndex === 0 ? currentAccompaniment.chord1 : currentAccompaniment.chord2;
                             if (accompanimentSampler.loaded && notesToPlay) {
-                                accompanimentSampler.triggerAttackRelease(notesToPlay, '1n', time);
+                                const octaveShift = parseInt(document.getElementById('accompaniment-octave-selector').value, 10) || 0;
+                                const shiftedNotes = notesToPlay.map(note => shiftNoteOctave(note, octaveShift));
+                                accompanimentSampler.triggerAttackRelease(shiftedNotes, '1n', time);
                             }
                         }, [0, 1], '1m');
                         accompanimentSequence.loop = true;

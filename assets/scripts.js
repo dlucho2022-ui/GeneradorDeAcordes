@@ -229,6 +229,7 @@ function renderFretboard() {
 
     const numFrets = 12;
     const tuningMidi = instrumentTunings[selectedInstrument];
+    const isFretless = (selectedInstrument === 'cello' || selectedInstrument === 'violin');
 
     [...tuningMidi].forEach((openNoteMidi, stringIndex) => {
         const stringDiv = document.createElement('div');
@@ -242,29 +243,39 @@ function renderFretboard() {
             fretDiv.dataset.note = noteName;
             fretDiv.dataset.midi = currentNoteMidi % 12;
 
-            // Add inlays/markers based on instrument type
-            if (selectedInstrument === 'bajo' || selectedInstrument === 'guitarra') {
-                // Standard dot inlays for fretted instruments
-                const inlayStringIndex = (tuningMidi.length === 6) ? 2 : 2; 
-                if (stringIndex === inlayStringIndex) { 
-                     if (fret === 3 || fret === 5 || fret === 7 || fret === 9) {
-                        fretDiv.classList.add('single-inlay');
-                    }
-                    if (fret === 12) {
-                        fretDiv.classList.add('double-inlay');
-                    }
-                }
-            } else if (selectedInstrument === 'cello' || selectedInstrument === 'violin') {
-                // Highlight the entire fret column for fretless-style position markers
-                if (fret === 2 || fret === 5 || fret === 7 || fret === 12) {
-                    fretDiv.classList.add('fret-highlight');
-                }
+            // Add highlight class for fretless instruments
+            if (isFretless && [2, 5, 7, 10, 12].includes(fret)) {
+                fretDiv.classList.add('fret-highlight');
             }
 
             stringDiv.appendChild(fretDiv);
         }
         fretboard.appendChild(stringDiv);
     });
+
+    // --- Inlay Layer (Conditional) ---
+    if (!isFretless) {
+        const inlayLayer = document.createElement('div');
+        inlayLayer.className = 'inlay-layer';
+
+        for (let fret = 0; fret <= numFrets; fret++) {
+            const inlayFretColumn = document.createElement('div');
+            inlayFretColumn.className = 'inlay-fret-column';
+            
+            if (fret === 0) {
+                inlayFretColumn.style.flexGrow = '0.5'; // Match the nut width
+            }
+
+            if ([3, 5, 7, 9].includes(fret)) {
+                inlayFretColumn.classList.add('single-inlay');
+            }
+            if (fret === 12) {
+                inlayFretColumn.classList.add('double-inlay');
+            }
+            inlayLayer.appendChild(inlayFretColumn);
+        }
+        fretboard.appendChild(inlayLayer);
+    }
 
     fretboardContainer.appendChild(fretboard);
 }

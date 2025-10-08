@@ -2029,6 +2029,10 @@ body:not(.body-sheet-music) .button.playing svg {
         z-index: 2;
     }
 
+    .note-marker.root-note {
+        background-color: #ffd700; /* Gold color for the root note */
+    }
+
     /* Styles for Fretless Instruments */
     .fretboard.cello .fret:not(:first-child),
     .fretboard.violin .fret:not(:first-child) {
